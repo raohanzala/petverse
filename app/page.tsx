@@ -399,12 +399,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          <div className="lg:col-span-2 flex justify-center gap-2 pt-2">
-            <span className="w-2 h-2 rounded-full bg-gold" />
-            <span className="w-2 h-2 rounded-full bg-white/30" />
-            <span className="w-2 h-2 rounded-full bg-white/30" />
-          </div>
         </div>
       </section>
 

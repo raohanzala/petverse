@@ -11,8 +11,6 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-console.log(plusJakartaSans.variable)
-
 export const metadata: Metadata = {
   title: "PetCare | Better Care for Your Best Friend",
   description:
@@ -23,6 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
