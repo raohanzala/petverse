@@ -88,6 +88,12 @@ petverse/
 │   │   ├── page-header.tsx
 │   │   └── confirm-dialog.tsx
 │   │
+│   ├── form/                     # React Hook Form wrappers (use for all app forms)
+│   │   ├── form.tsx              # FormProvider + fieldset
+│   │   ├── form-row-vertical.tsx # label + error + helper
+│   │   ├── form-input.tsx        # RHF register + password toggle
+│   │   └── index.ts
+│   │
 │   ├── booking/                  # Feature: public booking wizard
 │   │   ├── booking-wizard.tsx
 │   │   ├── service-picker.tsx
@@ -181,6 +187,7 @@ Each group gets its own `layout.tsx` when the chrome differs (public header vs a
 | If the component is… | Put it in… |
 |----------------------|------------|
 | A shadcn primitive (Button, Input, Dialog) | `components/ui/` |
+| React Hook Form field wrapper | `components/form/` |
 | Used on 2+ unrelated features | `components/shared/` |
 | Specific to one product module | `components/<feature>/` |
 | A page shell (sidebar, header) | `components/layout/` |
@@ -408,6 +415,24 @@ export type CreateBookingInput = z.infer<typeof createBookingSchema>
 Use the **same schema** in:
 - Client forms (`react-hook-form` + `zodResolver`)
 - Server Actions (parse before DB write)
+
+### Form UI pattern
+
+Use `components/form/*` for every React Hook Form screen:
+
+```tsx
+const methods = useForm<MyValues>({ resolver: zodResolver(schema), defaultValues })
+
+<Form methods={methods} onSubmit={handleSubmit} disabled={isSubmitting}>
+  <FormRowVertical label="Email" name="email" required>
+    <FormInput name="email" type="email" placeholder="you@clinic.com" />
+  </FormRowVertical>
+  <Button type="submit">Save</Button>
+</Form>
+```
+
+- `components/ui/input.tsx` stays a dumb primitive — use `FormInput` inside forms.
+- Add `FormSelectField` in `components/form/` when you need selects (wraps `ui/select` + `Controller`).
 
 ---
 
