@@ -14,6 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import { updatePassword } from "@/lib/supabase/mutations/auth"
@@ -108,43 +109,45 @@ export function ResetPasswordForm() {
       title="Set new password"
       description="Choose a strong password for your staff account."
     >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <FieldGroup>
-          <Field data-invalid={!!form.formState.errors.password}>
-            <FieldLabel htmlFor="password">New password</FieldLabel>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              placeholder="At least 8 characters"
-              aria-invalid={!!form.formState.errors.password}
-              {...form.register("password")}
-            />
-            {form.formState.errors.password ? (
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          className="space-y-5"
+        >
+          <FieldGroup>
+            <Field data-invalid={!!form.formState.errors.password}>
+              <FieldLabel htmlFor="password">New password</FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                aria-invalid={!!form.formState.errors.password}
+                {...form.register("password")}
+              />
               <FieldError errors={[form.formState.errors.password]} />
-            ) : null}
-          </Field>
+            </Field>
 
-          <Field data-invalid={!!form.formState.errors.confirmPassword}>
-            <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="Repeat password"
-              aria-invalid={!!form.formState.errors.confirmPassword}
-              {...form.register("confirmPassword")}
-            />
-            {form.formState.errors.confirmPassword ? (
+            <Field data-invalid={!!form.formState.errors.confirmPassword}>
+              <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                placeholder="Repeat password"
+                aria-invalid={!!form.formState.errors.confirmPassword}
+                {...form.register("confirmPassword")}
+              />
               <FieldError errors={[form.formState.errors.confirmPassword]} />
-            ) : null}
-          </Field>
-        </FieldGroup>
+            </Field>
+          </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Updating password…" : "Update password"}
-        </Button>
-      </form>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Updating password…" : "Update password"}
+          </Button>
+        </form>
+      </Form>
     </AuthCard>
   )
 }

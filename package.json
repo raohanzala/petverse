@@ -14,6 +14,7 @@
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.109.0",
     "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-table": "^9.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",

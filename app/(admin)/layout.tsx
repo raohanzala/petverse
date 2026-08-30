@@ -1,17 +1,29 @@
+import type { User } from "@supabase/supabase-js"
+
+import { AdminShell } from "@/components/admin/admin-shell"
+import type { AdminUserInfo } from "@/components/admin/nav-user"
 import { requireStaff } from "@/lib/auth/session"
+
+function toAdminUserInfo(user: User): AdminUserInfo {
+  const metadata = user.user_metadata as {
+    full_name?: string
+    avatar_url?: string
+  }
+
+  return {
+    email: user.email,
+    fullName: metadata.full_name ?? null,
+    avatarUrl: metadata.avatar_url ?? null,
+    role: "Administrator",
+  }
+}
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  await requireStaff()
+  const user = await requireStaff()
 
-  return (
-    <div className="min-h-full bg-background">
-      <div className="mx-auto flex min-h-full max-w-6xl flex-col px-6 py-10">
-        {children}
-      </div>
-    </div>
-  )
+  return <AdminShell user={toAdminUserInfo(user)}>{children}</AdminShell>
 }

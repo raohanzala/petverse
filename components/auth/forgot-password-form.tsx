@@ -14,6 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { sendPasswordResetEmail } from "@/lib/supabase/mutations/auth"
 import {
@@ -74,28 +75,32 @@ export function ForgotPasswordForm() {
         </p>
       ) : null}
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <FieldGroup>
-          <Field data-invalid={!!form.formState.errors.email}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@clinic.com"
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-            />
-            {form.formState.errors.email ? (
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          className="space-y-5"
+        >
+          <FieldGroup>
+            <Field data-invalid={!!form.formState.errors.email}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@clinic.com"
+                aria-invalid={!!form.formState.errors.email}
+                {...form.register("email")}
+              />
               <FieldError errors={[form.formState.errors.email]} />
-            ) : null}
-          </Field>
-        </FieldGroup>
+            </Field>
+          </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Sending link…" : "Send reset link"}
-        </Button>
-      </form>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Sending link…" : "Send reset link"}
+          </Button>
+        </form>
+      </Form>
     </AuthCard>
   )
 }

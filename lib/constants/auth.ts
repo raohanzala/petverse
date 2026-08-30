@@ -6,6 +6,6 @@ export const AUTH_ROUTES = {
   confirm: "/confirm",
 } as const
 
-export const DEFAULT_LOGIN_REDIRECT = "/admin/home"
+export const DEFAULT_LOGIN_REDIRECT = "/admin"
 
 export const PROTECTED_ROUTE_PREFIX = "/admin"

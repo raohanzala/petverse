@@ -15,6 +15,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { DEFAULT_LOGIN_REDIRECT } from "@/lib/constants/auth"
 import { signInWithPassword } from "@/lib/supabase/mutations/auth"
@@ -80,51 +81,53 @@ export function LoginForm({ redirectTo, initialMessage }: LoginFormProps) {
         </p>
       ) : null}
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <FieldGroup>
-          <Field data-invalid={!!form.formState.errors.email}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@clinic.com"
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-            />
-            {form.formState.errors.email ? (
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          className="space-y-5"
+        >
+          <FieldGroup>
+            <Field data-invalid={!!form.formState.errors.email}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@clinic.com"
+                aria-invalid={!!form.formState.errors.email}
+                {...form.register("email")}
+              />
               <FieldError errors={[form.formState.errors.email]} />
-            ) : null}
-          </Field>
+            </Field>
 
-          <Field data-invalid={!!form.formState.errors.password}>
-            <div className="flex items-center justify-between gap-2">
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Link
-                href="/forgot-password"
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              aria-invalid={!!form.formState.errors.password}
-              {...form.register("password")}
-            />
-            {form.formState.errors.password ? (
+            <Field data-invalid={!!form.formState.errors.password}>
+              <div className="flex items-center justify-between gap-2">
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                aria-invalid={!!form.formState.errors.password}
+                {...form.register("password")}
+              />
               <FieldError errors={[form.formState.errors.password]} />
-            ) : null}
-          </Field>
-        </FieldGroup>
+            </Field>
+          </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+      </Form>
     </AuthCard>
   )
 }

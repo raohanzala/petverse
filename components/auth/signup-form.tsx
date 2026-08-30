@@ -14,6 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Form } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { signUpWithPassword } from "@/lib/supabase/mutations/auth"
 import { signupSchema, type SignupInput } from "@/lib/validations/auth"
@@ -77,72 +78,70 @@ export function SignupForm() {
         </p>
       ) : null}
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <FieldGroup>
-          <Field data-invalid={!!form.formState.errors.fullName}>
-            <FieldLabel htmlFor="fullName">Full name</FieldLabel>
-            <Input
-              id="fullName"
-              autoComplete="name"
-              placeholder="Dr. Sarah Connor"
-              aria-invalid={!!form.formState.errors.fullName}
-              {...form.register("fullName")}
-            />
-            {form.formState.errors.fullName ? (
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          noValidate
+          className="space-y-5"
+        >
+          <FieldGroup>
+            <Field data-invalid={!!form.formState.errors.fullName}>
+              <FieldLabel htmlFor="fullName">Full name</FieldLabel>
+              <Input
+                id="fullName"
+                autoComplete="name"
+                placeholder="Dr. Sarah Connor"
+                aria-invalid={!!form.formState.errors.fullName}
+                {...form.register("fullName")}
+              />
               <FieldError errors={[form.formState.errors.fullName]} />
-            ) : null}
-          </Field>
+            </Field>
 
-          <Field data-invalid={!!form.formState.errors.email}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@clinic.com"
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-            />
-            {form.formState.errors.email ? (
+            <Field data-invalid={!!form.formState.errors.email}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@clinic.com"
+                aria-invalid={!!form.formState.errors.email}
+                {...form.register("email")}
+              />
               <FieldError errors={[form.formState.errors.email]} />
-            ) : null}
-          </Field>
+            </Field>
 
-          <Field data-invalid={!!form.formState.errors.password}>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              placeholder="At least 8 characters"
-              aria-invalid={!!form.formState.errors.password}
-              {...form.register("password")}
-            />
-            {form.formState.errors.password ? (
+            <Field data-invalid={!!form.formState.errors.password}>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                aria-invalid={!!form.formState.errors.password}
+                {...form.register("password")}
+              />
               <FieldError errors={[form.formState.errors.password]} />
-            ) : null}
-          </Field>
+            </Field>
 
-          <Field data-invalid={!!form.formState.errors.confirmPassword}>
-            <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="Repeat password"
-              aria-invalid={!!form.formState.errors.confirmPassword}
-              {...form.register("confirmPassword")}
-            />
-            {form.formState.errors.confirmPassword ? (
+            <Field data-invalid={!!form.formState.errors.confirmPassword}>
+              <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+              <Input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                placeholder="Repeat password"
+                aria-invalid={!!form.formState.errors.confirmPassword}
+                {...form.register("confirmPassword")}
+              />
               <FieldError errors={[form.formState.errors.confirmPassword]} />
-            ) : null}
-          </Field>
-        </FieldGroup>
+            </Field>
+          </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account…" : "Create account"}
-        </Button>
-      </form>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account…" : "Create account"}
+          </Button>
+        </form>
+      </Form>
     </AuthCard>
   )
 }
