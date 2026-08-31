@@ -24,15 +24,8 @@ import {
   Quote,
   PawPrint,
 } from "lucide-react";
-import Link from "next/link";
-
-const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "About Us", href: "#about" },
-  { label: "Why Us", href: "#why-us" },
-  { label: "Contact", href: "#contact" },
-];
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 
 const heroFeatures = [
   {
@@ -52,7 +45,7 @@ const heroFeatures = [
   },
 ];
 
-const services = [
+export const services = [
   {
     icon: Stethoscope,
     title: "Health Check-ups",
@@ -129,7 +122,7 @@ const testimonials = [
   },
 ];
 
-function ToothIcon(props: React.SVGProps<SVGSVGElement>) {
+export function ToothIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -149,30 +142,8 @@ export default function Home() {
   return (
     <main className="bg-white">
       {/* ---------- Header ---------- */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
-        <div className="container-px mx-auto flex items-center justify-between py-4 max-w-7xl">
-          <a href="#home" className="flex items-center gap-2 text-navy font-bold text-xl">
-            <PawPrint className="w-6 h-6 text-navy" />
-            PetCare
-          </a>
-
-          <nav className="hidden lg:flex items-center gap-9 text-sm font-medium text-navy/80">
-            {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className="hover:text-gold transition-colors">
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          <Link
-            href="/login"
-            className="hidden sm:inline-flex items-center gap-2 bg-white border border-navy text-navy text-sm font-medium px-5 py-3 rounded-md hover:bg-navy-800 transition-colors"
-          >
-            <Calendar className="w-4 h-4" />
-            Login
-          </Link>
-        </div>
-      </header>
+     
+     <Header/>
 
       <section id="home" className="relative min-h-[680px] overflow-hidden bg-cream">
   {/* Hero Background Image */}
@@ -271,7 +242,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-5 sm:gap-5 gap-1">
             {services.map((s) => (
               <div
                 key={s.title}
@@ -431,78 +402,7 @@ export default function Home() {
       </section>
 
       {/* ---------- Footer ---------- */}
-      <footer id="contact" className="bg-navy pt-16 pb-6">
-        <div className="container-px mx-auto max-w-7xl grid sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10">
-          <div>
-            <a href="#home" className="flex items-center gap-2 text-white font-bold text-xl mb-4">
-              <PawPrint className="w-6 h-6" />
-              PetCare
-            </a>
-            <p className="text-white/50 text-sm mb-5">Caring for pets, enriching lives.</p>
-            <div className="flex gap-3">
-              {/* {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-navy text-white transition-colors"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))} */}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2.5 text-sm text-white/50">
-              {navLinks.map((l) => (
-                <li key={l.label}>
-                  <a href={l.href} className="hover:text-gold transition-colors">
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-semibold mb-4">Services</h4>
-            <ul className="space-y-2.5 text-sm text-white/50">
-              {services.map((s) => (
-                <li key={s.title}>
-                  <a href="#services" className="hover:text-gold transition-colors">
-                    {s.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-semibold mb-4">Contact Us</h4>
-            <ul className="space-y-3 text-sm text-white/50">
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-gold shrink-0" />
-                +92 300 1234567
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-gold shrink-0" />
-                info@petcare.com
-              </li>
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                123 PetCare Lane, Loving City, PK 12345
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 pt-6">
-          <p className="text-center text-white/40 text-xs">
-            © 2024 PetCare. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer/>
     </main>
   );
 }
