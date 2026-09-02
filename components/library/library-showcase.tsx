@@ -16,12 +16,13 @@ import { toast } from "sonner"
 import { LibrarySection } from "@/components/library/library-section"
 import {
   DataTable,
+  DataTableColumnHeader,
   EmptyState,
   PageHeader,
   StatCard,
   StatusBadge,
   Stepper,
-  type ColumnDef,
+  type AdminColumnDef,
 } from "@/components/shared"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
@@ -171,17 +172,39 @@ export function LibraryShowcase() {
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [step, setStep] = useState(2)
 
-  const columns = useMemo<ColumnDef<AppointmentRow>[]>(
+  const columns = useMemo<AdminColumnDef<AppointmentRow>[]>(
     () => [
-      { accessorKey: "pet", header: "Pet" },
-      { accessorKey: "owner", header: "Owner" },
-      { accessorKey: "service", header: "Service" },
+      {
+        accessorKey: "pet",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Pet" />
+        ),
+      },
+      {
+        accessorKey: "owner",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Owner" />
+        ),
+      },
+      {
+        accessorKey: "service",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Service" />
+        ),
+      },
       {
         accessorKey: "status",
-        header: "Status",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Status" />
+        ),
         cell: ({ row }) => <StatusBadge status={row.original.status} />,
       },
-      { accessorKey: "date", header: "Date" },
+      {
+        accessorKey: "date",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Date" />
+        ),
+      },
     ],
     []
   )
@@ -377,10 +400,16 @@ export function LibraryShowcase() {
           <LibrarySection
             id="data-table"
             title="DataTable"
-            description="TanStack Table wrapper: pass columns + data, get pagination and empty state for free."
-            importFrom="@/components/shared"
-            usage={`const columns: ColumnDef<Appointment>[] = [
-  { accessorKey: "pet", header: "Pet" },
+            description="TanStack Table v9 admin kit: sorting, search, pagination, column visibility, and optional row selection. Define columns per feature; pass data from a server query."
+            importFrom="@/components/shared/data-table"
+            usage={`// columns.tsx — use DataTableColumnHeader for sortable headers
+const columns: AdminColumnDef<Appointment>[] = [
+  {
+    accessorKey: "pet",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Pet" />
+    ),
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -388,12 +417,25 @@ export function LibraryShowcase() {
   },
 ]
 
-<DataTable columns={columns} data={appointments} pageSize={5} />`}
+<DataTable
+  columns={columns}
+  data={appointments}
+  searchKey="pet"
+  searchPlaceholder="Search pets…"
+  enableColumnVisibility
+  enableRowSelection
+  pageSize={5}
+/>`}
           >
             <DataTable
               columns={columns}
               data={DEMO_APPOINTMENTS}
               pageSize={3}
+              searchKey="pet"
+              searchPlaceholder="Search appointments…"
+              enableColumnVisibility
+              enableRowSelection
+              showSelectionCount
             />
           </LibrarySection>
 

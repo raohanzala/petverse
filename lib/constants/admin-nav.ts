@@ -3,6 +3,7 @@ import {
   Calendar,
   CalendarCheck,
   ClipboardList,
+  FolderTree,
   LayoutDashboard,
   Package,
   PawPrint,
@@ -46,10 +47,15 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     ],
   },
   {
-    label: "Services",
+    label: "Catalog",
     items: [
-      { title: "Services", href: "/admin/services", icon: Wrench },
-      { title: "Packages", href: "/admin/packages", icon: Package },
+      {
+        title: "Categories",
+        href: "/admin/catalog/categories",
+        icon: FolderTree,
+      },
+      { title: "Services", href: "/admin/catalog/services", icon: Wrench },
+      { title: "Packages", href: "/admin/catalog/packages", icon: Package },
     ],
   },
   {
