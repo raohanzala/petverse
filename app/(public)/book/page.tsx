@@ -1,10 +1,17 @@
-import { AdminPlaceholderPage } from "@/components/admin/placeholder-page"
+import { BookManager } from "@/components/booking/book-manager"
+import { listServiceCategories } from "@/lib/supabase/queries/service-categories"
+import { listActiveServices } from "@/lib/supabase/queries/services"
 
-export default function SettingsPage() {
+export default async function BookPage() {
+  const [services, categories] = await Promise.all([
+    listActiveServices(),
+    listServiceCategories(),
+  ])
+
   return (
-    <AdminPlaceholderPage
-      title="Settings"
-      description="Configure clinic details, notifications, and account preferences."
+    <BookManager
+      services={services}
+      categories={categories}
     />
   )
 }

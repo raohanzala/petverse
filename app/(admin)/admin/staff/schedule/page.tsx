@@ -1,10 +1,26 @@
-import { AdminPlaceholderPage } from "@/components/admin/placeholder-page"
+import { Suspense } from "react"
 
-export default function SettingsPage() {
+import { EmployeeSchedulesManager } from "@/components/staff/employee-schedules-manager"
+import { PageLoader } from "@/components/shared/page-loader"
+import {
+  listEmployeeSchedules,
+} from "@/lib/supabase/queries/employee-schedules"
+import {
+  listActiveEmployees,
+} from "@/lib/supabase/queries/employees"
+
+export default async function EmployeeSchedulesPage() {
+  const [schedules, employees] = await Promise.all([
+    listEmployeeSchedules(),
+    listActiveEmployees(),
+  ])
+
   return (
-    <AdminPlaceholderPage
-      title="Settings"
-      description="Configure clinic details, notifications, and account preferences."
-    />
+    <Suspense fallback={<PageLoader label="Loading schedules…" />}>
+      <EmployeeSchedulesManager
+        schedules={schedules}
+        employees={employees}
+      />
+    </Suspense>
   )
 }

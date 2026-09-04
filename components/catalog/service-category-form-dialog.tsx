@@ -128,7 +128,7 @@ export function ServiceCategoryFormDialog({
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             noValidate
-            className="space-y-5"
+            className="space-y-5 h-100 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <FieldGroup>
               <Field data-invalid={!!form.formState.errors.name}>

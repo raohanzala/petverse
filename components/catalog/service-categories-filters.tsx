@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { STATUS_LABELS } from "@/lib/supabase/types"
 
 type ServiceCategoriesFiltersProps = {
   initialSearch?: string
@@ -85,7 +86,7 @@ export function ServiceCategoriesFilters({
           placeholder="Search categories…"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="h-9 bg-muted/40 pl-9 shadow-none"
+          className="h-9 bg-white pl-9 shadow-none"
           aria-label="Search categories"
         />
       </div>
@@ -98,12 +99,16 @@ export function ServiceCategoriesFilters({
         }}
       >
         <SelectTrigger className="h-9 w-[160px]">
-          <SelectValue placeholder="Status" />
+          <SelectValue>
+            {initialStatus === "all"
+              ? STATUS_LABELS.all
+              : `Status: ${STATUS_LABELS[initialStatus]}`}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All statuses</SelectItem>
-          <SelectItem value="active">Active only</SelectItem>
-          <SelectItem value="inactive">Inactive only</SelectItem>
+          <SelectItem value="all">{STATUS_LABELS.all}</SelectItem>
+          <SelectItem value="active">{STATUS_LABELS.active}</SelectItem>
+          <SelectItem value="inactive">{STATUS_LABELS.inactive}</SelectItem>
         </SelectContent>
       </Select>
     </div>

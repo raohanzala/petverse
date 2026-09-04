@@ -42,8 +42,8 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     label: "Pets & Clients",
     items: [
-      { title: "Pets", href: "/admin/pets", icon: PawPrint },
-      { title: "Customers", href: "/admin/customers", icon: Users },
+      { title: "Pets", href: "/admin/clients/pets", icon: PawPrint },
+      { title: "Owners", href: "/admin/clients/owners", icon: Users },
     ],
   },
   {
@@ -56,13 +56,14 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       },
       { title: "Services", href: "/admin/catalog/services", icon: Wrench },
       { title: "Packages", href: "/admin/catalog/packages", icon: Package },
+      { title: "Packages Steps", href: "/admin/catalog/package-steps", icon: Package },
     ],
   },
   {
     label: "Staff",
     items: [
-      { title: "Professionals", href: "/admin/professionals", icon: Stethoscope },
-      { title: "Schedules", href: "/admin/schedules", icon: ClipboardList },
+      { title: "Employees", href: "/admin/staff/employees", icon: Stethoscope },
+      { title: "Schedules", href: "/admin/staff/schedule", icon: ClipboardList },
     ],
   },
   {
