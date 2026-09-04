@@ -1,4 +1,5 @@
-import { Calendar, Link, PawPrint } from "lucide-react";
+import { Calendar, PawPrint } from "lucide-react";
+import Link from "next/link";
 
 export  const navLinks = [
     { label: "Home", href: "#home" },
@@ -35,7 +36,7 @@ export default function Header() {
 
         <Link
           href="/login"
-          className="hidden sm:inline-flex items-center gap-2 bg-white border border-navy text-navy text-sm font-medium px-5 py-3 rounded-md hover:bg-navy-800 transition-colors"
+          className="hidden sm:inline-flex items-center gap-2 bg-white border border-navy text-navy text-sm font-medium px-5 py-3 rounded-md hover:bg-navy-800 hover:text-white transition-colors"
         >
           <Calendar className="w-4 h-4" />
           Login

@@ -16,6 +16,7 @@ import { ConfirmationStep } from "./confirmation-step"
 import { SelectedDetails } from "./selected-details"
 import { toast } from "sonner"
 import { createPublicAppointment } from '@/lib/supabase/mutations/public-appointment'
+import { useRouter } from "next/navigation"
 
 type BookingStep = 1 | 2 | 3 | 4
 
@@ -40,6 +41,7 @@ type BookingState = {
 type BookManagerProps = {
     services: ServiceRow[]
     categories: ServiceCategoryRow[]
+    onConfirm?: () => void
 }
 
 const INITIAL_BOOKING: BookingState = {
@@ -83,6 +85,7 @@ export function BookManager({
     services,
     categories,
 }: BookManagerProps) {
+    const router = useRouter()
     const [currentStep, setCurrentStep] =
         useState<BookingStep>(1)
 
@@ -116,6 +119,14 @@ export function BookManager({
             uncategorizedServices,
         }
     }, [services, categories])
+
+    const isComplete = Boolean(
+        booking.serviceId &&
+        booking.date &&
+        booking.time &&
+        booking.customer &&
+        booking.pet
+    )
 
     const selectedService = useMemo(
         () =>
@@ -284,7 +295,7 @@ export function BookManager({
                     <Button
                         variant="ghost"
                         size="sm"
-                        type="button"
+                        onClick={() => router.push('/')}
                     >
                         <ArrowLeft />
                         Back to Home
@@ -394,9 +405,12 @@ export function BookManager({
                     ) : (
                         <Button
                             type="button"
-                            disabled={!canContinue}
+                            onClick={handleConfirmBooking}
+                            disabled={!isComplete || isSubmitting}
                         >
-                            Confirm Appointment
+                            {isSubmitting
+                                ? "Confirming..."
+                                : "Confirm Appointment"}
                         </Button>
                     )}
                 </div>

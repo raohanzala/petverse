@@ -23,6 +23,7 @@ import {
   createBusinessSettingsSchema,
   type CreateBusinessSettingsInput,
 } from "@/lib/validations/business-settings"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 
 type BusinessSettingsFormProps = {
   settings: BusinessSettingsRow
@@ -87,180 +88,204 @@ export function BusinessSettingsForm({
         noValidate
         className="space-y-5"
       >
-        <FieldGroup>
-          <Field data-invalid={!!form.formState.errors.business_name}>
-            <FieldLabel htmlFor="business-name">
-              Business name
-            </FieldLabel>
-            <Input
-              id="business-name"
-              placeholder="Pet Company 1"
-              aria-invalid={!!form.formState.errors.business_name}
-              {...form.register("business_name")}
-            />
-            <FieldDescription>
-              The name of your business shown throughout the system.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.business_name]}
-            />
-          </Field>
+        {/* Business Information */}
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle>Business information</CardTitle>
+            <CardDescription>
+              Manage your business details used throughout the system.
+            </CardDescription>
+          </CardHeader>
 
-          <Field data-invalid={!!form.formState.errors.logo_url}>
-            <FieldLabel htmlFor="business-logo-url">
-              Logo URL
-            </FieldLabel>
-            <Input
-              id="business-logo-url"
-              placeholder="https://example.com/logo.png"
-              aria-invalid={!!form.formState.errors.logo_url}
-              {...form.register("logo_url")}
-            />
-            <FieldDescription>
-              Optional URL for your business logo.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.logo_url]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.timezone}>
-            <FieldLabel htmlFor="business-timezone">
-              Timezone
-            </FieldLabel>
-            <Input
-              id="business-timezone"
-              placeholder="Asia/Karachi"
-              aria-invalid={!!form.formState.errors.timezone}
-              {...form.register("timezone")}
-            />
-            <FieldDescription>
-              Timezone used for appointments and business operations.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.timezone]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.currency}>
-            <FieldLabel htmlFor="business-currency">
-              Currency
-            </FieldLabel>
-            <Input
-              id="business-currency"
-              placeholder="PKR"
-              aria-invalid={!!form.formState.errors.currency}
-              {...form.register("currency")}
-            />
-            <FieldDescription>
-              Currency used for service and package prices.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.currency]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.phone}>
-            <FieldLabel htmlFor="business-phone">
-              Phone
-            </FieldLabel>
-            <Input
-              id="business-phone"
-              placeholder="+92 300 1234567"
-              aria-invalid={!!form.formState.errors.phone}
-              {...form.register("phone")}
-            />
-            <FieldError
-              errors={[form.formState.errors.phone]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.email}>
-            <FieldLabel htmlFor="business-email">
-              Email
-            </FieldLabel>
-            <Input
-              id="business-email"
-              type="email"
-              placeholder="hello@example.com"
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-            />
-            <FieldError
-              errors={[form.formState.errors.email]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.address}>
-            <FieldLabel htmlFor="business-address">
-              Address
-            </FieldLabel>
-            <Textarea
-              id="business-address"
-              placeholder="123 Main Street, Karachi"
-              rows={3}
-              aria-invalid={!!form.formState.errors.address}
-              {...form.register("address")}
-            />
-            <FieldError
-              errors={[form.formState.errors.address]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.hero_title}>
-            <FieldLabel htmlFor="business-hero-title">
-              Hero title
-            </FieldLabel>
-            <Input
-              id="business-hero-title"
-              placeholder="Better care for your best friend"
-              aria-invalid={!!form.formState.errors.hero_title}
-              {...form.register("hero_title")}
-            />
-            <FieldDescription>
-              Main heading displayed on the public booking page.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.hero_title]}
-            />
-          </Field>
-
-          <Field data-invalid={!!form.formState.errors.hero_subtitle}>
-            <FieldLabel htmlFor="business-hero-subtitle">
-              Hero subtitle
-            </FieldLabel>
-            <Textarea
-              id="business-hero-subtitle"
-              placeholder="Book trusted pet care services with ease."
-              rows={3}
-              aria-invalid={!!form.formState.errors.hero_subtitle}
-              {...form.register("hero_subtitle")}
-            />
-            <FieldDescription>
-              Supporting text displayed below the hero title.
-            </FieldDescription>
-            <FieldError
-              errors={[form.formState.errors.hero_subtitle]}
-            />
-          </Field>
-        </FieldGroup>
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Spinner
-                  size="sm"
-                  className="text-primary-foreground"
+          <CardContent className="pt-5">
+            <FieldGroup>
+              <Field data-invalid={!!form.formState.errors.business_name}>
+                <FieldLabel htmlFor="business-name">
+                  Business name
+                </FieldLabel>
+                <Input
+                  id="business-name"
+                  placeholder="Pet Company 1"
+                  aria-invalid={!!form.formState.errors.business_name}
+                  {...form.register("business_name")}
                 />
-                Saving…
-              </>
-            ) : (
-              "Save changes"
-            )}
-          </Button>
-        </div>
+                <FieldError
+                  errors={[form.formState.errors.business_name]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.logo_url}>
+                <FieldLabel htmlFor="business-logo-url">
+                  Logo URL
+                </FieldLabel>
+                <Input
+                  id="business-logo-url"
+                  placeholder="https://example.com/logo.png"
+                  aria-invalid={!!form.formState.errors.logo_url}
+                  {...form.register("logo_url")}
+                />
+                <FieldDescription>
+                  Optional URL for your business logo.
+                </FieldDescription>
+                <FieldError
+                  errors={[form.formState.errors.logo_url]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.timezone}>
+                <FieldLabel htmlFor="business-timezone">
+                  Timezone
+                </FieldLabel>
+                <Input
+                  id="business-timezone"
+                  placeholder="Asia/Karachi"
+                  aria-invalid={!!form.formState.errors.timezone}
+                  {...form.register("timezone")}
+                />
+                <FieldDescription>
+                  Timezone used for appointments and business operations.
+                </FieldDescription>
+                <FieldError
+                  errors={[form.formState.errors.timezone]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.currency}>
+                <FieldLabel htmlFor="business-currency">
+                  Currency
+                </FieldLabel>
+                <Input
+                  id="business-currency"
+                  placeholder="PKR"
+                  aria-invalid={!!form.formState.errors.currency}
+                  {...form.register("currency")}
+                />
+                <FieldDescription>
+                  Currency used for service and package prices.
+                </FieldDescription>
+                <FieldError
+                  errors={[form.formState.errors.currency]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.phone}>
+                <FieldLabel htmlFor="business-phone">
+                  Phone
+                </FieldLabel>
+                <Input
+                  id="business-phone"
+                  placeholder="+92 300 1234567"
+                  aria-invalid={!!form.formState.errors.phone}
+                  {...form.register("phone")}
+                />
+                <FieldError
+                  errors={[form.formState.errors.phone]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.email}>
+                <FieldLabel htmlFor="business-email">
+                  Email
+                </FieldLabel>
+                <Input
+                  id="business-email"
+                  type="email"
+                  placeholder="hello@example.com"
+                  aria-invalid={!!form.formState.errors.email}
+                  {...form.register("email")}
+                />
+                <FieldError
+                  errors={[form.formState.errors.email]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.address}>
+                <FieldLabel htmlFor="business-address">
+                  Address
+                </FieldLabel>
+                <Textarea
+                  id="business-address"
+                  placeholder="123 Main Street, Karachi"
+                  rows={3}
+                  aria-invalid={!!form.formState.errors.address}
+                  {...form.register("address")}
+                />
+                <FieldError
+                  errors={[form.formState.errors.address]}
+                />
+              </Field>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+
+        {/* Public Booking Page */}
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle>Public booking page</CardTitle>
+            <CardDescription>
+              Customize the content visitors see on your public booking page.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="pt-5">
+            <FieldGroup>
+              <Field data-invalid={!!form.formState.errors.hero_title}>
+                <FieldLabel htmlFor="business-hero-title">
+                  Hero title
+                </FieldLabel>
+                <Input
+                  id="business-hero-title"
+                  placeholder="Better care for your best friend"
+                  aria-invalid={!!form.formState.errors.hero_title}
+                  {...form.register("hero_title")}
+                />
+                <FieldDescription>
+                  Main heading displayed on the public booking page.
+                </FieldDescription>
+                <FieldError
+                  errors={[form.formState.errors.hero_title]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.hero_subtitle}>
+                <FieldLabel htmlFor="business-hero-subtitle">
+                  Hero subtitle
+                </FieldLabel>
+                <Textarea
+                  id="business-hero-subtitle"
+                  placeholder="Book trusted pet care services with ease."
+                  rows={3}
+                  aria-invalid={!!form.formState.errors.hero_subtitle}
+                  {...form.register("hero_subtitle")}
+                />
+                <FieldDescription>
+                  Supporting text displayed below the hero title.
+                </FieldDescription>
+                <FieldError
+                  errors={[form.formState.errors.hero_subtitle]}
+                />
+              </Field>
+            </FieldGroup>
+          </CardContent>
+
+          <CardFooter className="justify-end">
+            <Button type="submit" disabled={isSubmitting || !form.formState.isDirty}>
+              {isSubmitting ? (
+                <>
+                  <Spinner
+                    size="sm"
+                    className="text-primary-foreground"
+                  />
+                  Saving…
+                </>
+              ) : (
+                "Save changes"
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
       </form>
     </Form>
+
   )
 }

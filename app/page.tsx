@@ -191,7 +191,7 @@ export default function Home() {
 
       {/* CTA */}
       <a
-        href="#contact"
+        href="/book"
         className="mt-8 inline-flex items-center gap-3 bg-navy text-white font-semibold px-7 py-4 rounded-md hover:bg-navy-800 transition-all duration-200 shadow-sm"
       >
         <Calendar className="w-4 h-4" />
@@ -391,7 +391,7 @@ export default function Home() {
             </div>
           </div>
           <a
-            href="#contact"
+            href="/book"
             className="inline-flex items-center gap-2 bg-navy text-white font-medium px-6 py-4 rounded-md hover:bg-navy-800 transition-colors whitespace-nowrap"
           >
             <Calendar className="w-4 h-4" />

@@ -114,14 +114,6 @@ export function ConfirmationStep({
   onConfirm,
   isSubmitting = false,
 }: ConfirmationStepProps) {
-  //   const selectedService = services.find(
-  //     (service) => service.id === booking.serviceId
-  //   )
-
-  //   const selectedCategory = categories.find(
-  //     (category) =>
-  //       category.id === selectedService?.category_id
-  //   )
 
   const isComplete = Boolean(
     booking.serviceId &&
@@ -325,24 +317,6 @@ export function ConfirmationStep({
           </div>
         </div>
       </section>
-
-      {/* Confirmation */}
-      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
-          By confirming, you&apos;ll submit this
-          appointment request.
-        </p>
-
-        <Button
-          type="button"
-          onClick={onConfirm}
-          disabled={!isComplete || isSubmitting}
-        >
-          {isSubmitting
-            ? "Confirming..."
-            : "Confirm Appointment"}
-        </Button>
-      </div>
     </div>
   )
 }
