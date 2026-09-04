@@ -64,8 +64,8 @@ export function getEmployeeScheduleColumns({
             cell: ({ row }) => (
                 <div className="flex items-center gap-3">
                     <div className="flex size-9 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                        {row.original.employee.initials ||
-                            row.original.employee.display_name
+                        {row.original.employee[0]?.initials ||
+                            row.original.employee[0]?.display_name
                                 .split(" ")
                                 .map((name) => name[0])
                                 .join("")
@@ -74,7 +74,7 @@ export function getEmployeeScheduleColumns({
                     </div>
 
                     <span className="font-medium text-foreground">
-                        {row.original.employee.display_name}
+                        {row.original.employee[0]?.display_name}
                     </span>
                 </div>
             ),

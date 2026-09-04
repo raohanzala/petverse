@@ -134,7 +134,7 @@ export function EmployeeSchedulesManager({
             <AlertDialogDescription>
               This will permanently delete the schedule for{" "}
               <strong>
-                {deletingSchedule?.employee.display_name}
+                {deletingSchedule?.employee[0]?.display_name}
               </strong>
               .
             </AlertDialogDescription>
