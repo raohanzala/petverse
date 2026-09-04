@@ -166,6 +166,8 @@ export function EmployeeScheduleFormDialog({
                 <Select
                   value={form.watch("employee_id")}
                   onValueChange={(value) => {
+                    if (!value) return
+
                     form.setValue(
                       "employee_id",
                       value,

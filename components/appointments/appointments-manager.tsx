@@ -164,11 +164,11 @@ export function AppointmentsManager({
             <AlertDialogDescription>
               This will permanently delete the appointment for{" "}
               <strong>
-                {deletingAppointment?.pet.name}
+                {deletingAppointment?.pet[0]?.name}
               </strong>{" "}
               owned by{" "}
               <strong>
-                {deletingAppointment?.owner.name}
+                {deletingAppointment?.owner[0]?.name}
               </strong>
               .
             </AlertDialogDescription>

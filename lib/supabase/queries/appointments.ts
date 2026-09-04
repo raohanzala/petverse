@@ -180,5 +180,5 @@ export async function getAppointmentById(
         )
     }
 
-    return data ?? []
+    return data 
 }

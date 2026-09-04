@@ -94,10 +94,10 @@ export function getAppointmentColumns({
       cell: ({ row }) => (
         <div>
           <p className="font-medium text-foreground">
-            {row.original.owner.name}
+            {row.original.owner[0]?.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {row.original.owner.phone}
+            {row.original.owner[0]?.phone}
           </p>
         </div>
       ),
@@ -113,10 +113,10 @@ export function getAppointmentColumns({
       cell: ({ row }) => (
         <div>
           <p className="font-medium text-foreground">
-            {row.original.pet.name}
+            {row.original.pet[0]?.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {row.original.pet.species}
+            {row.original.pet[0]?.species}
           </p>
         </div>
       ),
@@ -131,8 +131,8 @@ export function getAppointmentColumns({
       ),
       cell: ({ row }) => (
         <span>
-          {row.original.service?.name ??
-            row.original.package?.name ??
+          {row.original.service[0]?.name ??
+            row.original.package[0]?.name ??
             "—"}
         </span>
       ),
@@ -147,7 +147,7 @@ export function getAppointmentColumns({
       ),
       cell: ({ row }) => (
         <span>
-          {row.original.employee?.display_name ?? "Unassigned"}
+          {row.original.employee[0]?.display_name ?? "Unassigned"}
         </span>
       ),
     },
@@ -194,7 +194,7 @@ export function getAppointmentColumns({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                aria-label={`Actions for ${row.original.pet.name} appointment`}
+                aria-label={`Actions for ${row.original.pet[0]?.name} appointment`}
               />
             }
           >
