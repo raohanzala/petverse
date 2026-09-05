@@ -145,125 +145,135 @@ export default function Home() {
      
      <Header/>
 
-      <section id="home" className="relative min-h-[680px] overflow-hidden bg-cream">
-  {/* Hero Background Image */}
-  <div className="absolute inset-0">
-    <Image
-      src="/hero.png"
-      alt="Golden retriever and grey tabby cat"
-      fill
-      priority
-      className="object-cover object-center"
-      sizes="100vw"
-    />
-
-    {/* Very subtle overlay to keep text readable */}
-    {/* <div className="absolute inset-0 bg-gradient-to-r from-cream/95 via-cream/45 to-transparent" /> */}
-  </div>
-
-  {/* Hero Content */}
-  <div className="relative z-10 container-px mx-auto max-w-7xl min-h-[680px] flex items-center">
-    <div className="w-full lg:w-[52%] py-20 lg:py-24">
-
-      {/* Eyebrow */}
-      <p className="text-gold font-semibold tracking-wide text-sm mb-5">
-        Trusted Care. Happy Pets.
-      </p>
-
-      {/* Heading */}
-      <h1 className="text-5xl md:text-6xl lg:text-[64px] font-extrabold leading-[1.05] text-navy">
-        Better Care
-        <br />
-        for Your Best
-        <br />
-        <span className="text-gold">Friend </span>
-        <Heart
-          className="inline-block w-9 h-9 lg:w-10 lg:h-10 text-gold align-middle"
-          strokeWidth={2}
-        />
-      </h1>
-
-      {/* Description */}
-      <p className="mt-6 text-navy/60 text-lg leading-relaxed max-w-md">
-        Book an appointment for your pet&apos;s grooming, health
-        check-up, or any of our expert services.
-      </p>
-
-      {/* CTA */}
-      <a
-        href="/book"
-        className="mt-8 inline-flex items-center gap-3 bg-navy text-white font-semibold px-7 py-4 rounded-md hover:bg-navy-800 transition-all duration-200 shadow-sm"
+      <section
+        id="home"
+        className="relative min-h-[min(100svh,640px)] sm:min-h-[620px] lg:min-h-[680px] overflow-hidden bg-cream"
       >
-        <Calendar className="w-4 h-4" />
-        Book Appointment
-        <ArrowRight className="w-4 h-4" />
-      </a>
+        {/* Hero Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/hero.png"
+            alt="Golden retriever and grey tabby cat"
+            fill
+            priority
+            className="object-cover object-[70%_center] sm:object-center"
+            sizes="100vw"
+          />
 
-      {/* Features */}
-      <div className="mt-14 grid grid-cols-3 gap-5 max-w-xl">
-        {heroFeatures.map((f) => (
-          <div key={f.title} className="flex items-start gap-2.5">
-            <f.icon
-              className="w-6 h-6 text-navy shrink-0 mt-0.5"
-              strokeWidth={1.75}
-            />
+          {/* Readable overlay on small screens; lighter on desktop */}
+          <div className="absolute inset-0 bg-gradient-to-b from-cream/90 via-cream/75 to-cream/55 sm:bg-gradient-to-r sm:from-cream/90 sm:via-cream/50 sm:to-transparent lg:from-cream/70 lg:via-cream/25" />
+        </div>
 
-            <div>
-              <p className="text-navy font-semibold text-sm leading-tight">
-                {f.title}
-              </p>
+        {/* Hero Content */}
+        <div className="relative z-10 container-px mx-auto max-w-7xl min-h-[min(100svh,640px)] sm:min-h-[620px] lg:min-h-[680px] flex items-center">
+          <div className="w-full lg:w-[52%] py-14 sm:py-20 lg:py-24">
+            <p className="text-gold font-semibold tracking-wide text-xs sm:text-sm mb-3 sm:mb-5">
+              Trusted Care. Happy Pets.
+            </p>
 
-              <p className="text-navy/50 text-xs leading-snug mt-1">
-                {f.desc}
-              </p>
+            <h1 className="text-[2.35rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[64px] lg:leading-[1.05] font-extrabold text-navy">
+              Better Care
+              <br />
+              for Your Best
+              <br />
+              <span className="text-gold">Friend </span>
+              <Heart
+                className="inline-block w-7 h-7 sm:w-9 sm:h-9 lg:w-10 lg:h-10 text-gold align-middle"
+                strokeWidth={2}
+              />
+            </h1>
+
+            <p className="mt-4 sm:mt-6 text-navy/65 text-base sm:text-lg leading-relaxed max-w-md">
+              Book an appointment for your pet&apos;s grooming, health
+              check-up, or any of our expert services.
+            </p>
+
+            <a
+              href="/book"
+              className="mt-6 sm:mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 bg-navy text-white font-semibold px-6 sm:px-7 py-3.5 sm:py-4 rounded-md hover:bg-navy-800 transition-all duration-200 shadow-sm"
+            >
+              <Calendar className="w-4 h-4" />
+              Book Appointment
+              <ArrowRight className="w-4 h-4" />
+            </a>
+
+            <div className="mt-10 sm:mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 max-w-xl">
+              {heroFeatures.map((f) => (
+                <div
+                  key={f.title}
+                  className="flex items-start gap-3 sm:gap-2.5 rounded-lg bg-white/40 sm:bg-transparent p-3 sm:p-0 backdrop-blur-[2px] sm:backdrop-blur-none"
+                >
+                  <f.icon
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-navy shrink-0 mt-0.5"
+                    strokeWidth={1.75}
+                  />
+                  <div>
+                    <p className="text-navy font-semibold text-sm leading-tight">
+                      {f.title}
+                    </p>
+                    <p className="text-navy/50 text-xs leading-snug mt-1">
+                      {f.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
+        </div>
+      </section>
 
       {/* ---------- Services ---------- */}
-      <section id="services" className="py-24">
+      <section id="services" className="py-14 sm:py-20 lg:py-24">
         <div className="container-px mx-auto max-w-7xl">
-          <div className="text-center max-w-xl mx-auto mb-14">
-            <p className="text-gold font-semibold tracking-wide text-sm mb-3 flex items-center justify-center gap-2">
+          <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12 lg:mb-14">
+            <p className="text-gold font-semibold tracking-wide text-xs sm:text-sm mb-2 sm:mb-3 flex items-center justify-center gap-2">
               <PawPrint className="w-4 h-4" /> OUR SERVICES
             </p>
-            <h2 className="text-4xl font-extrabold text-navy leading-tight">
-              Comprehensive Care
-              <br />
-              for Your Pets
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-navy leading-tight">
+              Comprehensive Care for Your Pets
             </h2>
-            <p className="mt-4 text-navy/50">
-              From routine check-ups to specialized treatments, we provide everything
-              your pet needs.
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-navy/50 px-1">
+              From routine check-ups to specialized treatments, we provide
+              everything your pet needs.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-5 sm:gap-5 gap-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-5">
             {services.map((s) => (
               <div
                 key={s.title}
-                className="border border-gray-100 rounded-xl p-7 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                className="border border-gray-100 rounded-xl p-5 sm:p-6 lg:p-7 text-left sm:text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex sm:flex-col items-start sm:items-center gap-4 sm:gap-0"
               >
-                <div className="w-14 h-14 rounded-xl bg-cream flex items-center justify-center mx-auto mb-5">
-                  <s.icon className="w-7 h-7 text-navy" strokeWidth={1.6} />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-cream flex items-center justify-center shrink-0 sm:mx-auto sm:mb-5">
+                  <s.icon
+                    className="w-6 h-6 sm:w-7 sm:h-7 text-navy"
+                    strokeWidth={1.6}
+                  />
                 </div>
-                <h3 className="font-semibold text-navy mb-2">{s.title}</h3>
-                <p className="text-sm text-navy/50 leading-relaxed">{s.desc}</p>
+                <div>
+                  <h3 className="font-semibold text-navy mb-1 sm:mb-2 text-[0.95rem] sm:text-base">
+                    {s.title}
+                  </h3>
+                  <p className="text-sm text-navy/50 leading-relaxed">
+                    {s.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Stats bar */}
-          <div className="mt-16 py-4 bg-navy rounded-lg grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/15 overflow-hidden">
+          <div className="mt-10 sm:mt-14 lg:mt-16 py-2 sm:py-4 bg-navy rounded-lg grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/15 overflow-hidden">
             {stats.map((s) => (
-              <div key={s.label} className="flex items-center flex-col justify-center gap-2 py-9 px-6">
-                <s.icon className="w-8 h-8 text-white" strokeWidth={1.5} />
+              <div
+                key={s.label}
+                className="flex items-center flex-col justify-center gap-2 py-7 sm:py-9 px-6"
+              >
+                <s.icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" strokeWidth={1.5} />
                 <div className="text-center">
-                  <p className="text-white text-4xl font-semibold mb-2 leading-none">{s.value}</p>
+                  <p className="text-white text-3xl sm:text-4xl font-semibold mb-1 sm:mb-2 leading-none">
+                    {s.value}
+                  </p>
                   <p className="text-white/60 text-xs mt-1.5">{s.label}</p>
                 </div>
               </div>

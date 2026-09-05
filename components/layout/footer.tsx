@@ -1,7 +1,7 @@
 import { services } from '@/app/page'
 import { MapPin, Mail, PawPrint, Phone } from 'lucide-react'
 import React from 'react'
-import { navLinks } from './header'
+import { navLinks } from '@/components/layout/nav-links'
 
 export default function Footer() {
 

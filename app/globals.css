@@ -171,7 +171,11 @@
 }
 
 @utility container-px {
-  padding-inline: 1.5rem;
+  padding-inline: 1rem;
+
+  @media (min-width: 640px) {
+    padding-inline: 1.5rem;
+  }
 }
 
 html {

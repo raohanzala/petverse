@@ -36,7 +36,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     label: "Appointments",
     items: [
       { title: "Appointments", href: "/admin/appointments", icon: CalendarCheck },
-      { title: "Calendar", href: "/admin/calendar", icon: Calendar },
+      // { title: "Calendar", href: "/admin/calendar", icon: Calendar },
     ],
   },
   {
@@ -66,13 +66,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { title: "Schedules", href: "/admin/staff/schedule", icon: ClipboardList },
     ],
   },
-  {
-    label: "Management",
-    items: [
-      { title: "Reports", href: "/admin/reports", icon: BarChart3 },
-      { title: "Reviews", href: "/admin/reviews", icon: Star },
-    ],
-  },
+  // {
+  //   label: "Management",
+  //   items: [
+  //     { title: "Reports", href: "/admin/reports", icon: BarChart3 },
+  //     { title: "Reviews", href: "/admin/reviews", icon: Star },
+  //   ],
+  // },
   {
     label: "Settings",
     items: [{ title: "Settings", href: "/admin/settings", icon: Settings }],

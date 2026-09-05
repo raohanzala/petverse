@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 
 import { BusinessSettingsForm } from "@/components/settings/business-settings-form"
+import { PageHeader } from "@/components/shared/page-header"
 import { PageLoader } from "@/components/shared/page-loader"
 import { getBusinessSettings } from "@/lib/supabase/queries/business-settings"
 
@@ -10,7 +11,7 @@ export default async function BusinessSettingsPage() {
   if (!settings) {
     return (
       <Suspense fallback={<PageLoader label="Loading business settings…" />}>
-        <div className="rounded-lg border p-6">
+        <div className="mx-auto w-full max-w-4xl rounded-lg border p-6">
           <h2 className="text-lg font-semibold">
             Business settings not found
           </h2>
@@ -25,13 +26,11 @@ export default async function BusinessSettingsPage() {
   return (
     <Suspense fallback={<PageLoader label="Loading business settings…" />}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Business settings
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your business information and public booking page content.
-          </p>
+        <div className="mx-auto w-full max-w-4xl">
+          <PageHeader
+            title="Business settings"
+            description="Manage your business information and public booking page content."
+          />
         </div>
 
         <BusinessSettingsForm settings={settings} />
