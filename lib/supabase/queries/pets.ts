@@ -26,6 +26,13 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
+function normalizePet(row: any): PetRow {
+  return {
+    ...row,
+    owner: Array.isArray(row.owner) ? row.owner[0] : row.owner,
+  }
+}
+
 /** Admin list — supports server-side search and status filter */
 export async function listPets(
   filters: PetListFilters = {}
@@ -63,7 +70,7 @@ export async function listPets(
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizePet)
 }
 
 /** Booking / appointment — active pets only */
@@ -85,7 +92,7 @@ export async function listActivePets(): Promise<PetRow[]> {
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizePet)
 }
 
 /** All active pets belonging to a specific owner */
@@ -110,7 +117,7 @@ export async function listPetsByOwnerId(
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizePet)
 }
 
 export async function getPetById(
@@ -133,5 +140,5 @@ export async function getPetById(
     )
   }
 
-  return data
+  return data ? normalizePet(data) : null
 }

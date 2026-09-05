@@ -26,11 +26,11 @@ import type { ServiceListFilters } from "@/lib/constants/service-filters"
 import { deleteService } from "@/lib/supabase/mutations/services"
 import type {
   ServiceCategoryRow,
-  ServiceRow,
+  ServiceListRow,
 } from "@/lib/supabase/types"
 
 type ServicesManagerProps = {
-  services: ServiceRow[]
+  services: ServiceListRow[]
   categories: ServiceCategoryRow[]
   filters: ServiceListFilters
 }
@@ -47,10 +47,10 @@ export function ServicesManager({
   const [formOpen, setFormOpen] = useState(false)
 
   const [editingService, setEditingService] =
-    useState<ServiceRow | null>(null)
+    useState<ServiceListRow | null>(null)
 
   const [deletingService, setDeletingService] =
-    useState<ServiceRow | null>(null)
+    useState<ServiceListRow | null>(null)
 
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -63,7 +63,7 @@ export function ServicesManager({
     setFormOpen(true)
   }
 
-  function openEdit(service: ServiceRow) {
+  function openEdit(service: ServiceListRow) {
     setEditingService(service)
     setFormOpen(true)
   }

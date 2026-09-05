@@ -48,137 +48,151 @@ preferred_employee:employees!appointments_preferred_employee_id_fkey (
 ` as const
 
 function escapeIlikePattern(value: string) {
-    return value.replace(/[%_\\]/g, "\\$&")
+  return value.replace(/[%_\\]/g, "\\$&")
+}
+
+function normalizeAppointment(row: any): AppointmentRow {
+  return {
+    ...row,
+    owner: Array.isArray(row.owner) ? row.owner[0] : row.owner,
+    pet: Array.isArray(row.pet) ? row.pet[0] : row.pet,
+    service: Array.isArray(row.service) ? row.service[0] : row.service,
+    package: Array.isArray(row.package) ? row.package[0] : row.package,
+    employee: Array.isArray(row.employee) ? row.employee[0] : row.employee,
+    preferred_employee: Array.isArray(row.preferred_employee)
+      ? row.preferred_employee[0]
+      : row.preferred_employee,
+  }
 }
 
 /** Admin list — supports server-side search and status filter */
 export async function listAppointments(
-    filters: AppointmentListFilters = {}
+  filters: AppointmentListFilters = {}
 ): Promise<AppointmentRow[]> {
-    const supabase = await createClient()
-    const { search, status = "all" } = filters
+  const supabase = await createClient()
+  const { search, status = "all" } = filters
 
-    let query = supabase
-        .from("appointments")
-        .select(APPOINTMENT_COLUMNS)
+  let query = supabase
+    .from("appointments")
+    .select(APPOINTMENT_COLUMNS)
 
-    if (status !== "all") {
-        query = query.eq("status", status)
-    }
+  if (status !== "all") {
+    query = query.eq("status", status)
+  }
 
-    if (search) {
-        const pattern = `%${escapeIlikePattern(search)}%`
+  if (search) {
+    const pattern = `%${escapeIlikePattern(search)}%`
 
-        query = query.or(
-            `notes.ilike.${pattern},cancel_reason.ilike.${pattern}`
-        )
-    }
+    query = query.or(
+      `notes.ilike.${pattern},cancel_reason.ilike.${pattern}`
+    )
+  }
 
-    const { data, error } = await query
-        .order("starts_at", { ascending: true })
+  const { data, error } = await query
+    .order("starts_at", { ascending: true })
 
-    if (error) {
-        throw new Error(
-            getSupabaseErrorMessage(
-                error,
-                "Failed to load appointments"
-            )
-        )
-    }
+  if (error) {
+    throw new Error(
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load appointments"
+      )
+    )
+  }
 
-    return data ?? []
+  return (data ?? []).map(normalizeAppointment)
 }
 
 /** Upcoming appointments — active appointment statuses only */
 export async function listUpcomingAppointments(): Promise<
-    AppointmentRow[]
+  AppointmentRow[]
 > {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-        .from("appointments")
-        .select(APPOINTMENT_COLUMNS)
-        .gte("starts_at", new Date().toISOString())
-        .not("status", "in", "(cancelled,no_show,completed)")
-        .order("starts_at", { ascending: true })
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(APPOINTMENT_COLUMNS)
+    .gte("starts_at", new Date().toISOString())
+    .not("status", "in", "(cancelled,no_show,completed)")
+    .order("starts_at", { ascending: true })
 
-    if (error) {
-        throw new Error(
-            getSupabaseErrorMessage(
-                error,
-                "Failed to load upcoming appointments"
-            )
-        )
-    }
+  if (error) {
+    throw new Error(
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load upcoming appointments"
+      )
+    )
+  }
 
-    return data ?? []
+  return (data ?? []).map(normalizeAppointment)
 }
 
 export async function listAppointmentsByPetId(
-    petId: string
+  petId: string
 ): Promise<AppointmentRow[]> {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-        .from("appointments")
-        .select(APPOINTMENT_COLUMNS)
-        .eq("pet_id", petId)
-        .order("starts_at", { ascending: false })
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(APPOINTMENT_COLUMNS)
+    .eq("pet_id", petId)
+    .order("starts_at", { ascending: false })
 
-    if (error) {
-        throw new Error(
-            getSupabaseErrorMessage(
-                error,
-                "Failed to load pet appointments"
-            )
-        )
-    }
+  if (error) {
+    throw new Error(
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load pet appointments"
+      )
+    )
+  }
 
-    return data ?? []
+  return (data ?? []).map(normalizeAppointment)
 }
 
 export async function listAppointmentsByOwnerId(
-    ownerId: string
+  ownerId: string
 ): Promise<AppointmentRow[]> {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-        .from("appointments")
-        .select(APPOINTMENT_COLUMNS)
-        .eq("owner_id", ownerId)
-        .order("starts_at", { ascending: false })
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(APPOINTMENT_COLUMNS)
+    .eq("owner_id", ownerId)
+    .order("starts_at", { ascending: false })
 
-    if (error) {
-        throw new Error(
-            getSupabaseErrorMessage(
-                error,
-                "Failed to load owner appointments"
-            )
-        )
-    }
+  if (error) {
+    throw new Error(
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load owner appointments"
+      )
+    )
+  }
 
-    return data ?? []
+  return (data ?? []).map(normalizeAppointment)
 }
 
 export async function getAppointmentById(
-    id: string
+  id: string
 ): Promise<AppointmentRow | null> {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-        .from("appointments")
-        .select(APPOINTMENT_COLUMNS)
-        .eq("id", id)
-        .maybeSingle()
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(APPOINTMENT_COLUMNS)
+    .eq("id", id)
+    .maybeSingle()
 
-    if (error) {
-        throw new Error(
-            getSupabaseErrorMessage(
-                error,
-                "Failed to load appointment"
-            )
-        )
-    }
+  if (error) {
+    throw new Error(
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load appointment"
+      )
+    )
+  }
 
-    return data 
+  return data ? normalizeAppointment(data) : null
 }

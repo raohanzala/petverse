@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { ServiceListFilters } from "@/lib/constants/service-filters"
-import type { ServiceRow } from "@/lib/supabase/types"
+import type { ServiceListRow, ServiceRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const SERVICE_COLUMNS = `
@@ -25,10 +25,19 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
+function normalizeService(row: any): ServiceListRow {
+  return {
+    ...row,
+    category: Array.isArray(row.category)
+      ? (row.category[0] ?? null)
+      : (row.category ?? null),
+  }
+}
+
 /** Admin list — supports server-side search and filters */
 export async function listServices(
   filters: ServiceListFilters = {}
-): Promise<ServiceRow[]> {
+): Promise<ServiceListRow[]> {
   const supabase = await createClient()
 
   const {
@@ -78,7 +87,7 @@ export async function listServices(
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizeService)
 }
 
 /** Public booking / marketing — active and public services only */
@@ -98,7 +107,7 @@ export async function listActiveServices(): Promise<ServiceRow[]> {
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizeService)
 }
 
 export async function getServiceById(
@@ -118,5 +127,5 @@ export async function getServiceById(
     )
   }
 
-  return data
+  return data ? normalizeService(data) : null
 }
