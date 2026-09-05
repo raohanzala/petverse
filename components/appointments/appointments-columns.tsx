@@ -94,10 +94,10 @@ export function getAppointmentColumns({
       cell: ({ row }) => (
         <div>
           <p className="font-medium text-foreground">
-            {row.original.owner[0]?.name}
+            {row.original.owner?.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {row.original.owner[0]?.phone}
+            {row.original.owner?.phone}
           </p>
         </div>
       ),
@@ -113,10 +113,10 @@ export function getAppointmentColumns({
       cell: ({ row }) => (
         <div>
           <p className="font-medium text-foreground">
-            {row.original.pet[0]?.name}
+            {row.original.pet?.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {row.original.pet[0]?.species}
+            {row.original.pet?.species}
           </p>
         </div>
       ),
@@ -131,8 +131,8 @@ export function getAppointmentColumns({
       ),
       cell: ({ row }) => (
         <span>
-          {row.original.service[0]?.name ??
-            row.original.package[0]?.name ??
+          {row.original.service?.name ??
+            row.original.package?.name ??
             "—"}
         </span>
       ),
@@ -147,7 +147,7 @@ export function getAppointmentColumns({
       ),
       cell: ({ row }) => (
         <span>
-          {row.original.employee[0]?.display_name ?? "Unassigned"}
+          {row.original.employee?.display_name ?? "Unassigned"}
         </span>
       ),
     },
@@ -182,45 +182,45 @@ export function getAppointmentColumns({
         </span>
       ),
     },
-    {
-      id: "actions",
-      header: "Actions",
-      enableHiding: false,
-      enableSorting: false,
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Actions for ${row.original.pet[0]?.name} appointment`}
-              />
-            }
-          >
-            <MoreHorizontal />
-          </DropdownMenuTrigger>
+    // {
+    //   id: "actions",
+    //   header: "Actions",
+    //   enableHiding: false,
+    //   enableSorting: false,
+    //   cell: ({ row }) => (
+    //     <DropdownMenu>
+    //       <DropdownMenuTrigger
+    //         render={
+    //           <Button
+    //             variant="ghost"
+    //             size="icon-sm"
+    //             aria-label={`Actions for ${row.original.pet[0]?.name} appointment`}
+    //           />
+    //         }
+    //       >
+    //         <MoreHorizontal />
+    //       </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => onEdit(row.original)}
-              >
-                <PencilIcon />
-                Edit
-              </DropdownMenuItem>
+    //       <DropdownMenuContent align="end">
+    //         <DropdownMenuGroup>
+    //           <DropdownMenuItem
+    //             onClick={() => onEdit(row.original)}
+    //           >
+    //             <PencilIcon />
+    //             Edit
+    //           </DropdownMenuItem>
 
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => onDelete(row.original)}
-              >
-                <Trash2Icon />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
+    //           <DropdownMenuItem
+    //             variant="destructive"
+    //             onClick={() => onDelete(row.original)}
+    //           >
+    //             <Trash2Icon />
+    //             Delete
+    //           </DropdownMenuItem>
+    //         </DropdownMenuGroup>
+    //       </DropdownMenuContent>
+    //     </DropdownMenu>
+    //   ),
+    // },
   ]
 }

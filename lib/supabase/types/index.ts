@@ -292,7 +292,7 @@ export type PetRow = {
   owner: {
     name: string
     phone: string
-  }[]
+  }
 }
 
 export type PetInsert = Pick<
@@ -401,28 +401,28 @@ export type AppointmentRow = {
   owner: {
     name: string
     phone: string
-  }[]
+  }
 
   pet: {
     name: string
     species: string
-  }[]
+  }
 
   service: {
     name: string
-  }[]
+  }
 
   package: {
     name: string
-  }[]
+  }
 
   employee: {
     display_name: string
-  }[]
+  }
 
   preferred_employee: {
     display_name: string
-  }[]
+  }
 }
 
 export type AppointmentInsert = Pick<

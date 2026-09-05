@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getServicePackageStepColumns } from "@/components/catalog/service-package-step-columns"
 import { ServicePackageStepsFilters } from "./service-package-steps-filters"
@@ -83,11 +83,19 @@ export function ServicePackageStepsManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Package step deleted")
+    toast.add({
+      type: "success",
+      description: "Package step deleted",
+      priority: "high",
+    })
 
     setDeletingStep(null)
     refreshList()

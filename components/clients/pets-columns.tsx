@@ -56,11 +56,11 @@ export function getPetColumns({
       cell: ({ row }) => (
         <div>
           <p className="font-medium text-foreground">
-            {row.original.owner[0]?.name}
+            {row.original.owner?.name}
           </p>
 
           <p className="text-xs text-muted-foreground">
-            {row.original.owner[0]?.phone}
+            {row.original.owner?.phone}
           </p>
         </div>
       ),

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getOwnerColumns } from "./owners-columns"
 import { OwnersFilters } from "./owners-filters"
@@ -67,11 +67,19 @@ export function OwnersManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Owner deleted")
+    toast.add({
+      type: "success",
+      description: "Owner deleted",
+      priority: "high",
+    })
     setDeletingOwner(null)
     refreshList()
   }

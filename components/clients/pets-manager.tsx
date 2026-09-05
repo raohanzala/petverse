@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getPetColumns } from "./pets-columns"
 import { PetsFilters } from "./pets-filters"
@@ -67,11 +67,19 @@ export function PetsManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Pet deleted")
+    toast.add({
+      type: "success",
+      description: "Pet deleted",
+      priority: "high",
+    })
     setDeletingPet(null)
     refreshList()
   }

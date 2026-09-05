@@ -111,9 +111,10 @@ export function DataTablePagination<TData extends RowData>({
 
           {getPageNumbers().map((page, index) =>
             page === "ellipsis" ? (
-                <PaginationEllipsis />
+                <PaginationEllipsis key={index} />
             ) : (
                 <PaginationLink
+                  key={index}
                   isActive={pageIndex === page}
                   onClick={() => table.setPageIndex(page)}
                 >

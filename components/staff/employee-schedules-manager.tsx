@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getEmployeeScheduleColumns } from "./employee-schedules-columns"
 import { EmployeeScheduleFormDialog } from "./employee-schedule-form-dialog"
@@ -69,11 +69,19 @@ export function EmployeeSchedulesManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Schedule deleted")
+    toast.add({
+      type: "success",
+      description: "Schedule deleted",
+      priority: "high",
+    })
     setDeletingSchedule(null)
     refreshList()
   }

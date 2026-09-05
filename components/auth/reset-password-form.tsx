@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { AuthCard } from "@/components/auth/auth-card"
 import { Button } from "@/components/ui/button"
@@ -70,7 +70,11 @@ export function ResetPasswordForm() {
     const result = await updatePassword({}, formData)
 
     if (result?.error) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       setIsSubmitting(false)
     }
   }

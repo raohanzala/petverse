@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -112,13 +112,19 @@ export function EmployeeFormDialog({
     setIsSubmitting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success(
-      isEditing ? "Employee updated" : "Employee created"
-    )
+    toast.add({
+      type: "success",
+      description: isEditing ? "Employee updated" : "Employee created",
+      priority: "high",
+    })
 
     onOpenChange(false)
     onSuccess()
@@ -126,7 +132,7 @@ export function EmployeeFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Edit employee" : "New employee"}
@@ -235,7 +241,7 @@ export function EmployeeFormDialog({
                 </Select>
 
                 <FieldDescription>
-                  Determines the employee's primary responsibility.
+                  Determines the employee&apos;s primary responsibility.
                 </FieldDescription>
 
                 <FieldError

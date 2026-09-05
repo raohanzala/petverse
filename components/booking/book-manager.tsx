@@ -14,7 +14,7 @@ import { DateTimeStep } from "./date-time-step"
 import { CustomerStep } from "./customer-step"
 import { ConfirmationStep } from "./confirmation-step"
 import { SelectedDetails } from "./selected-details"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { createPublicAppointment } from '@/lib/supabase/mutations/public-appointment'
 import { useRouter } from "next/navigation"
 
@@ -231,7 +231,11 @@ export function BookManager({
         const service = selectedService
 
         if (!service) {
-            toast.error("Please select a service")
+            toast.add({
+                type: "error",
+                description: "Please select a service",
+                priority: "high",
+            })
             return
         }
 
@@ -259,17 +263,29 @@ export function BookManager({
             })
 
             if (!result.success) {
-                toast.error(result.error)
+                 toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
                 return
             }
 
-            toast.success("Appointment requested successfully")
+            toast.add({
+                type: "success",
+                description: "Appointment requested successfully",
+                priority: "high",
+            })
 
             // You can replace this later with a dedicated
             // booking-success screen.
             setCurrentStep(4)
         } catch {
-            toast.error("Something went wrong. Please try again.")
+            toast.add({
+                type: "error",
+                description: "Something went wrong. Please try again.",
+                priority: "high",
+            })
         } finally {
             setIsSubmitting(false)
         }

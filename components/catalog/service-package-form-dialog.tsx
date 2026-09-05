@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -104,15 +104,19 @@ export function ServicePackageFormDialog({
     setIsSubmitting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success(
-      isEditing
-        ? "Package updated"
-        : "Package created"
-    )
+    toast.add({
+      type: "success",
+      description: isEditing ? "Package updated" : "Package created",
+      priority: "high",
+    })
 
     onOpenChange(false)
     onSuccess()
@@ -120,7 +124,7 @@ export function ServicePackageFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent >
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Edit package" : "New package"}

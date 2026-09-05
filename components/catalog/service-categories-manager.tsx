@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getServiceCategoryColumns } from "@/components/catalog/service-categories-columns"
 import { ServiceCategoriesFilters } from "@/components/catalog/service-categories-filters"
@@ -65,11 +65,19 @@ export function ServiceCategoriesManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Category deleted")
+    toast.add({
+      type: "success",
+      description: "Category deleted",
+      priority: "high",
+    })
     setDeletingCategory(null)
     refreshList()
   }

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -122,15 +122,19 @@ export function ServicePackageStepFormDialog({
     setIsSubmitting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success(
-      isEditing
-        ? "Package step updated"
-        : "Package step created"
-    )
+    toast.add({
+      type: "success",
+      description: isEditing ? "Package step updated" : "Package step created",
+      priority: "high",
+    })
 
     onOpenChange(false)
     onSuccess()
@@ -145,7 +149,7 @@ export function ServicePackageStepFormDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent >
         <DialogHeader>
           <DialogTitle>
             {isEditing
@@ -384,7 +388,7 @@ export function ServicePackageStepFormDialog({
                 />
 
                 <FieldDescription>
-                  Leave empty to use the service's default
+                  Leave empty to use the service&apos;s default
                   duration.
                 </FieldDescription>
 
@@ -428,7 +432,7 @@ export function ServicePackageStepFormDialog({
                 />
 
                 <FieldDescription>
-                  Leave empty to use the service's default
+                  Leave empty to use the service&apos;s default
                   price.
                 </FieldDescription>
 

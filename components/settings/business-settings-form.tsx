@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -77,12 +77,20 @@ export function BusinessSettingsForm({
     setIsSubmitting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
     form.reset(values)
-    toast.success("Business settings updated")
+    toast.add({
+      type: "success",
+      description: "Business settings updated",
+      priority: "high",
+    })
   }
 
   function onCancel() {
@@ -92,7 +100,7 @@ export function BusinessSettingsForm({
   const isDirty = form.formState.isDirty
   const canSubmit = isDirty && !isSubmitting
 
-  return (
+  return (<>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -290,5 +298,6 @@ export function BusinessSettingsForm({
         </div>
       </form>
     </Form>
+        </>
   )
 }

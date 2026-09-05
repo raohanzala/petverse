@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getServicePackageColumns } from "@/components/catalog/service-packages-columns"
 import { ServicePackagesFilters } from "@/components/catalog/service-packages-filters"
@@ -67,11 +67,19 @@ export function ServicePackagesManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Package deleted")
+    toast.add({
+      type: "success",
+      description: "Package deleted",
+      priority: "high",
+    })
     setDeletingPackage(null)
     refreshList()
   }

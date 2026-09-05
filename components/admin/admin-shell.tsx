@@ -13,11 +13,13 @@ export function AdminShell({
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider defaultOpen>
+    <SidebarProvider defaultOpen className="h-svh overflow-hidden">
       <AppSidebar user={user} />
-      <SidebarInset className="min-h-svh bg-background">
+      <SidebarInset className="min-w-0 overflow-hidden">
         <AdminHeader user={user} />
-        <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
+        <div className="min-h-0 min-w-0 flex-1 overflow-auto p-4 md:p-6">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -11,7 +11,7 @@ import {
   Users,
 } from "lucide-react"
 import { useMemo, useState } from "react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { LibrarySection } from "@/components/library/library-section"
 import {
@@ -721,7 +721,11 @@ const columns: AdminColumnDef<Appointment>[] = [
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => toast.success("Appointment saved")}
+                onClick={() => toast.add({
+                  type: "success",
+                  description: "Appointment saved",
+                  priority: "high",
+                })}
               >
                 Show toast
               </Button>

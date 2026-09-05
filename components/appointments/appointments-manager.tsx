@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { getAppointmentColumns } from "@/components/appointments/appointments-columns"
 import { AppointmentsFilters } from "@/components/appointments/appointments-filters"
@@ -86,11 +86,19 @@ export function AppointmentsManager({
     setIsDeleting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success("Appointment deleted")
+    toast.add({
+      type: "success",
+      description: "Appointment deleted",
+      priority: "high",
+    })
     setDeletingAppointment(null)
     refreshList()
   }
@@ -164,11 +172,11 @@ export function AppointmentsManager({
             <AlertDialogDescription>
               This will permanently delete the appointment for{" "}
               <strong>
-                {deletingAppointment?.pet[0]?.name}
+                {deletingAppointment?.pet?.name}
               </strong>{" "}
               owned by{" "}
               <strong>
-                {deletingAppointment?.owner[0]?.name}
+                {deletingAppointment?.owner?.name}
               </strong>
               .
             </AlertDialogDescription>
@@ -196,7 +204,6 @@ export function AppointmentsManager({
   )
 }
 
-/** Server-driven filters rendered in the DataTable toolbar row. */
 function ServerFiltersToolbar({
   filters,
   onLoadingChange,

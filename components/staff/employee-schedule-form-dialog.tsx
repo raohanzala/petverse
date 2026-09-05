@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -113,15 +113,19 @@ export function EmployeeScheduleFormDialog({
     setIsSubmitting(false)
 
     if (!result.success) {
-      toast.error(result.error)
+       toast.add({
+            type: "error",
+            description: result.error,
+            priority: "high",
+          })
       return
     }
 
-    toast.success(
-      isEditing
-        ? "Schedule updated"
-        : "Schedule created"
-    )
+    toast.add({
+      type: "success",
+      description: isEditing ? "Schedule updated" : "Schedule created",
+      priority: "high",
+    })
 
     onOpenChange(false)
     onSuccess()
