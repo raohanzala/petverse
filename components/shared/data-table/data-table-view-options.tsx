@@ -33,14 +33,6 @@ export function DataTableViewOptions<TData extends RowData>({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="outline" size="sm" className="ml-auto h-9" />
-        }
-      >
-        <Settings2Icon />
-        View
-      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>

@@ -1,22 +1,10 @@
 "use client"
 
 import type { ReactTable, RowData } from "@tanstack/react-table"
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-} from "lucide-react"
 
 import type { AdminTableFeatures } from "@/components/shared/data-table/data-table-features"
-import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { PaginationEllipsis, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { cn } from "@/lib/utils"
 
 type DataTablePaginationProps<TData extends RowData> = {
   table: ReactTable<AdminTableFeatures, TData>
@@ -34,6 +22,41 @@ export function DataTablePagination<TData extends RowData>({
   const pageSize = table.state.pagination.pageSize
   const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
+  const getPageNumbers = () => {
+    const pages: (number | "ellipsis")[] = []
+
+    const pageCount = table.getPageCount()
+    const pageIndex = table.state.pagination.pageIndex
+
+    if (pageCount <= 5) {
+      for (let i = 0; i < pageCount; i++) {
+        pages.push(i)
+      }
+
+      return pages
+    }
+
+    pages.push(0)
+
+    if (pageIndex > 2) {
+      pages.push("ellipsis")
+    }
+
+    const start = Math.max(1, pageIndex - 1)
+    const end = Math.min(pageCount - 2, pageIndex + 1)
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i)
+    }
+
+    if (pageIndex < pageCount - 3) {
+      pages.push("ellipsis")
+    }
+
+    pages.push(pageCount - 1)
+
+    return pages
+  }
 
   if (totalRows === 0) return null
 
@@ -51,7 +74,7 @@ export function DataTablePagination<TData extends RowData>({
       </div>
 
       <div className="flex flex-wrap items-center gap-4 lg:gap-6">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <p className="text-sm font-medium whitespace-nowrap">Rows per page</p>
           <Select
             value={`${pageSize}`}
@@ -69,52 +92,44 @@ export function DataTablePagination<TData extends RowData>({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
-        </div>
+          </Select> */}
+        {/* </div> */}
 
-        <div className="flex w-24 items-center justify-center text-sm font-medium">
+        {/* <div className="flex w-24 items-center justify-center text-sm font-medium">
           Page {pageIndex + 1} of {table.getPageCount() || 1}
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            className="hidden lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-            aria-label="Go to first page"
-          >
-            <ChevronsLeftIcon />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          <PaginationPrevious
             onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeftIcon className="size-4" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+            aria-disabled={!table.getCanPreviousPage()}
+            className={cn(
+              !table.getCanPreviousPage() &&
+              "pointer-events-none opacity-50"
+            )}
+          />
+
+          {getPageNumbers().map((page, index) =>
+            page === "ellipsis" ? (
+                <PaginationEllipsis />
+            ) : (
+                <PaginationLink
+                  isActive={pageIndex === page}
+                  onClick={() => table.setPageIndex(page)}
+                >
+                  {page + 1}
+                </PaginationLink>
+            )
+          )}
+
+          <PaginationNext
             onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <ChevronRightIcon className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            className="hidden lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-            aria-label="Go to last page"
-          >
-            <ChevronsRightIcon />
-          </Button>
+            aria-disabled={!table.getCanNextPage()}
+            className={cn(
+              !table.getCanNextPage() &&
+              "pointer-events-none opacity-50"
+            )}
+          />
         </div>
       </div>
     </div>

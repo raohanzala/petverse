@@ -138,9 +138,10 @@ export function EmployeeFormDialog({
 
         <Form {...form}>
           <form
+            id="employee-form"
             onSubmit={form.handleSubmit(onSubmit)}
             noValidate
-            className="space-y-5 h-100 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="sticky-form-content scroll-y-hidden"
           >
             <FieldGroup>
               <Field data-invalid={!!form.formState.errors.display_name}>
@@ -301,34 +302,38 @@ export function EmployeeFormDialog({
               </Field>
             </FieldGroup>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Spinner
-                      size="sm"
-                      className="text-primary-foreground"
-                    />
-                    Saving…
-                  </>
-                ) : isEditing ? (
-                  "Save changes"
-                ) : (
-                  "Create employee"
-                )}
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            form="employee-form"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  size="sm"
+                  className="text-primary-foreground"
+                />
+                Saving…
+              </>
+            ) : isEditing ? (
+              "Save changes"
+            ) : (
+              "Create employee"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

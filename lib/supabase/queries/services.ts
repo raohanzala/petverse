@@ -3,8 +3,23 @@ import type { ServiceListFilters } from "@/lib/constants/service-filters"
 import type { ServiceRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
-const SERVICE_COLUMNS =
-  "id, category_id, name, description, kind, duration_minutes, price, is_active, is_public, created_at, updated_at" as const
+const SERVICE_COLUMNS = `
+  id, 
+  category_id, 
+  name, 
+  description, 
+  kind, 
+  duration_minutes, 
+  price, 
+  is_active, 
+  is_public, 
+  created_at, 
+  updated_at,
+  category:service_categories (
+    id,
+    name
+  )
+  ` as const
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")

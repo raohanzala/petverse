@@ -134,7 +134,7 @@ export function EmployeeScheduleFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing
@@ -149,9 +149,10 @@ export function EmployeeScheduleFormDialog({
 
         <Form {...form}>
           <form
+            id="employee-schedule"
             onSubmit={form.handleSubmit(onSubmit)}
             noValidate
-            className="space-y-5 h-100 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="sticky-form-content scroll-y-hidden"
           >
             <FieldGroup>
               <Field
@@ -306,37 +307,38 @@ export function EmployeeScheduleFormDialog({
               </Field>
             </FieldGroup>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Spinner
-                      size="sm"
-                      className="text-primary-foreground"
-                    />
-                    Saving…
-                  </>
-                ) : isEditing ? (
-                  "Save changes"
-                ) : (
-                  "Create schedule"
-                )}
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            form="employee-schedule"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  size="sm"
+                  className="text-primary-foreground"
+                />
+                Saving…
+              </>
+            ) : isEditing ? (
+              "Save changes"
+            ) : (
+              "Create schedule"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

@@ -141,9 +141,10 @@ export function PetFormDialog({
 
         <Form {...form}>
           <form
+            id="pet"
             onSubmit={form.handleSubmit(onSubmit)}
             noValidate
-            className="space-y-5 h-100 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="sticky-form-content scroll-y-hidden"
           >
             <FieldGroup>
               <Field data-invalid={!!form.formState.errors.owner_id}>
@@ -366,37 +367,38 @@ export function PetFormDialog({
               </Field>
             </FieldGroup>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Spinner
-                      size="sm"
-                      className="text-primary-foreground"
-                    />
-                    Saving…
-                  </>
-                ) : isEditing ? (
-                  "Save changes"
-                ) : (
-                  "Create pet"
-                )}
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            form="pet"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  size="sm"
+                  className="text-primary-foreground"
+                />
+                Saving…
+              </>
+            ) : isEditing ? (
+              "Save changes"
+            ) : (
+              "Create pet"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

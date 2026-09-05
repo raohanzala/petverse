@@ -96,9 +96,9 @@ export function ServicePackageFormDialog({
 
     const result = isEditing
       ? await updateServicePackage({
-          id: servicePackage!.id,
-          ...values,
-        })
+        id: servicePackage!.id,
+        ...values,
+      })
       : await createServicePackage(values)
 
     setIsSubmitting(false)
@@ -133,9 +133,10 @@ export function ServicePackageFormDialog({
 
         <Form {...form}>
           <form
+            id="service-package"
             onSubmit={form.handleSubmit(onSubmit)}
             noValidate
-            className="space-y-5 h-100 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="sticky-form-content scroll-y-hidden"
           >
             <FieldGroup>
               <Field data-invalid={!!form.formState.errors.name}>
@@ -323,37 +324,38 @@ export function ServicePackageFormDialog({
               </Field>
             </FieldGroup>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Spinner
-                      size="sm"
-                      className="text-primary-foreground"
-                    />
-                    Saving…
-                  </>
-                ) : isEditing ? (
-                  "Save changes"
-                ) : (
-                  "Create package"
-                )}
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            form="service-package"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  size="sm"
+                  className="text-primary-foreground"
+                />
+                Saving…
+              </>
+            ) : isEditing ? (
+              "Save changes"
+            ) : (
+              "Create package"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

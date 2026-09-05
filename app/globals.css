@@ -177,3 +177,25 @@
 html {
   scroll-behavior: smooth;
 }
+
+
+@layer utilities {
+  .scroll-y-hidden {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .scroll-y-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sticky-form-content {
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    max-height: 50vh;
+  }
+
+  /* .sticky-footer-content > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.25rem;
+  } */
+}

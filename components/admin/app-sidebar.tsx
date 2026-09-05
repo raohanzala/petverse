@@ -27,8 +27,12 @@ export function AppSidebar({ user }: { user: AdminUserInfo }) {
   const pathname = usePathname()
 
   return (
-    <Sidebar collapsible="icon" className="border-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-5">
+    <Sidebar
+      collapsible="icon"
+      className="border-sidebar-border"
+      style={{ "--sidebar-width-icon": "4rem" } as React.CSSProperties}
+    >
+      <SidebarHeader className="border-b border-sidebar-border px-2 py-5">
         <Link
           href="/admin"
           className="flex items-center gap-2.5 text-sidebar-foreground"

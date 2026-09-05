@@ -15,17 +15,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { ServiceRow } from "@/lib/supabase/types"
+import type { ServiceListRow } from "@/lib/supabase/types"
 
 type ServiceColumnActions = {
-  onEdit: (service: ServiceRow) => void
-  onDelete: (service: ServiceRow) => void
+  onEdit: (service: ServiceListRow) => void
+  onDelete: (service: ServiceListRow) => void
 }
 
 export function getServiceColumns({
   onEdit,
   onDelete,
-}: ServiceColumnActions): AdminColumnDef<ServiceRow>[] {
+}: ServiceColumnActions): AdminColumnDef<ServiceListRow>[] {
   return [
     {
       accessorKey: "name",
@@ -54,7 +54,7 @@ export function getServiceColumns({
       ),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
-          {row.original.category_id ?? "Uncategorized"}
+          {row.original.category?.name ?? "Uncategorized"}
         </span>
       ),
     },
