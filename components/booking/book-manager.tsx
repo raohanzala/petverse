@@ -2,435 +2,517 @@
 
 import { useMemo, useState } from "react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import type {
-    ServiceCategoryRow,
-    ServiceRow,
+  ServiceCategoryRow,
+  ServiceRow,
 } from "@/lib/supabase/types"
-import { BookingProgress } from "./booking-progress"
+
+import { Stepper, type StepperStep } from "@/components/shared/stepper"
 import { ServiceStep } from "./service-step"
 import { DateTimeStep } from "./date-time-step"
 import { CustomerStep } from "./customer-step"
 import { ConfirmationStep } from "./confirmation-step"
 import { SelectedDetails } from "./selected-details"
+
 import { toast } from "@/components/ui/toast"
-import { createPublicAppointment } from '@/lib/supabase/mutations/public-appointment'
-import { useRouter } from "next/navigation"
+import { createPublicAppointment } from "@/lib/supabase/mutations/public-appointment"
 
 type BookingStep = 1 | 2 | 3 | 4
 
 type BookingState = {
-    serviceId: string | null
-    professionalId: string | null
-    date: string | null
-    time: string | null
+  serviceId: string | null
+  professionalId: string | null
+  date: string | null
+  time: string | null
 
-    customer: {
-        name: string
-        email: string
-        phone: string
-    }
+  customer: {
+    name: string
+    email: string
+    phone: string
+  }
 
-    pet: {
-        name: string
-        type: string
-    }
+  pet: {
+    name: string
+    type: string
+  }
 }
 
 type BookManagerProps = {
-    services: ServiceRow[]
-    categories: ServiceCategoryRow[]
-    onConfirm?: () => void
+  services: ServiceRow[]
+  categories: ServiceCategoryRow[]
+  onConfirm?: () => void
 }
 
 const INITIAL_BOOKING: BookingState = {
-    serviceId: null,
-    professionalId: null,
-    date: null,
-    time: null,
+  serviceId: null,
+  professionalId: null,
+  date: null,
+  time: null,
 
-    customer: {
-        name: "",
-        email: "",
-        phone: "",
-    },
+  customer: {
+    name: "",
+    email: "",
+    phone: "",
+  },
 
-    pet: {
-        name: "",
-        type: "",
-    },
+  pet: {
+    name: "",
+    type: "",
+  },
 }
 
-const STEPS = [
-    {
-        number: 1 as BookingStep,
-        label: "Service",
-    },
-    {
-        number: 2 as BookingStep,
-        label: "Date & Time",
-    },
-    {
-        number: 3 as BookingStep,
-        label: "Customer",
-    },
-    {
-        number: 4 as BookingStep,
-        label: "Confirm",
-    },
-] as const
+const STEPS: StepperStep[] = [
+  {
+    id: "service",
+    label: "Service",
+  },
+  {
+    id: "date-time",
+    label: "Date & Time",
+  },
+  {
+    id: "customer",
+    label: "Customer",
+  },
+  {
+    id: "confirm",
+    label: "Confirm",
+  },
+]
 
 export function BookManager({
-    services,
-    categories,
+  services,
+  categories,
 }: BookManagerProps) {
-    const router = useRouter()
-    const [currentStep, setCurrentStep] =
-        useState<BookingStep>(1)
+  const router = useRouter()
 
-    const [booking, setBooking] =
-        useState<BookingState>(INITIAL_BOOKING)
-    const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentStep, setCurrentStep] =
+    useState<BookingStep>(1)
 
-    const groupedServices = useMemo(() => {
-        const grouped = categories.map((category) => ({
-            category,
-            services: services.filter(
-                (service) =>
-                    service.category_id === category.id
-            ),
-        }))
+  const [booking, setBooking] =
+    useState<BookingState>(INITIAL_BOOKING)
 
-        const categorizedServiceIds = new Set(
-            grouped.flatMap((group) =>
-                group.services.map((service) => service.id)
-            )
-        )
+  const [isSubmitting, setIsSubmitting] =
+    useState(false)
 
-        const uncategorizedServices = services.filter(
-            (service) =>
-                service.category_id === null ||
-                !categorizedServiceIds.has(service.id)
-        )
+  const groupedServices = useMemo(() => {
+    const grouped = categories.map((category) => ({
+      category,
+      services: services.filter(
+        (service) =>
+          service.category_id === category.id
+      ),
+    }))
 
-        return {
-            grouped,
-            uncategorizedServices,
-        }
-    }, [services, categories])
-
-    const isComplete = Boolean(
-        booking.serviceId &&
-        booking.date &&
-        booking.time &&
-        booking.customer &&
-        booking.pet
+    const categorizedServiceIds = new Set(
+      grouped.flatMap((group) =>
+        group.services.map((service) => service.id)
+      )
     )
 
-    const selectedService = useMemo(
-        () =>
-            services.find(
-                (service) =>
-                    service.id === booking.serviceId
-            ) ?? null,
-        [services, booking.serviceId]
+    const uncategorizedServices = services.filter(
+      (service) =>
+        service.category_id === null ||
+        !categorizedServiceIds.has(service.id)
     )
 
-    const canContinue = useMemo(() => {
-        switch (currentStep) {
-            case 1:
-                return Boolean(booking.serviceId)
+    return {
+      grouped,
+      uncategorizedServices,
+    }
+  }, [services, categories])
 
-            case 2:
-                return Boolean(
-                    booking.date && booking.time
-                )
+  const selectedService = useMemo(
+    () =>
+      services.find(
+        (service) =>
+          service.id === booking.serviceId
+      ) ?? null,
+    [services, booking.serviceId]
+  )
 
-            case 3:
-                return Boolean(
-                    booking.customer.name.trim() &&
-                    booking.customer.phone.trim() &&
-                    booking.pet.name.trim() &&
-                    booking.pet.type.trim()
-                )
+  const isComplete = Boolean(
+    booking.serviceId &&
+      booking.date &&
+      booking.time &&
+      booking.customer.name.trim() &&
+      booking.customer.phone.trim() &&
+      booking.pet.name.trim() &&
+      booking.pet.type.trim()
+  )
 
-            case 4:
-                return true
+  const canContinue = useMemo(() => {
+    switch (currentStep) {
+      case 1:
+        return Boolean(booking.serviceId)
 
-            default:
-                return false
-        }
-    }, [currentStep, booking])
+      case 2:
+        return Boolean(
+          booking.date && booking.time
+        )
 
-    function updateBooking(
-        updates: Partial<BookingState>
+      case 3:
+        return Boolean(
+          booking.customer.name.trim() &&
+            booking.customer.phone.trim() &&
+            booking.pet.name.trim() &&
+            booking.pet.type.trim()
+        )
+
+      case 4:
+        return true
+
+      default:
+        return false
+    }
+  }, [currentStep, booking])
+
+  function updateBooking(
+    updates: Partial<BookingState>
+  ) {
+    setBooking((current) => ({
+      ...current,
+      ...updates,
+    }))
+  }
+
+  function selectService(service: ServiceRow) {
+    setBooking((current) => ({
+      ...current,
+      serviceId: service.id,
+      professionalId: null,
+      date: null,
+      time: null,
+    }))
+  }
+
+  function goNext() {
+    if (!canContinue) return
+
+    setCurrentStep((current) => {
+      if (current >= 4) return 4
+
+      return (current + 1) as BookingStep
+    })
+  }
+
+  function goBack() {
+    setCurrentStep((current) => {
+      if (current <= 1) return 1
+
+      return (current - 1) as BookingStep
+    })
+  }
+
+  function goToStep(step: BookingStep) {
+    if (step > currentStep) return
+
+    setCurrentStep(step)
+  }
+
+  async function handleConfirmBooking() {
+    if (
+      !booking.serviceId ||
+      !booking.date ||
+      !booking.time ||
+      !booking.customer.name.trim() ||
+      !booking.customer.phone.trim() ||
+      !booking.pet.name.trim() ||
+      !booking.pet.type.trim()
     ) {
-        setBooking((current) => ({
-            ...current,
-            ...updates,
-        }))
+      return
     }
 
-    function selectService(service: ServiceRow) {
-        /*
-         * Changing the service invalidates anything that
-         * depends on the previous service.
-         *
-         * Date/time availability may change when the service
-         * changes, so clear those values.
-         */
-        setBooking((current) => ({
-            ...current,
-            serviceId: service.id,
-            professionalId: null,
-            date: null,
-            time: null,
-        }))
+    const service = selectedService
+
+    if (!service) {
+      toast.add({
+        type: "error",
+        description: "Please select a service",
+        priority: "high",
+      })
+
+      return
     }
 
-    function goNext() {
-        if (!canContinue) return
+    setIsSubmitting(true)
 
-        setCurrentStep((current) => {
-            if (current >= 4) return 4
-            return (current + 1) as BookingStep
+    try {
+      const startsAt = new Date(
+        `${booking.date}T${booking.time}`
+      )
+
+      const endsAt = new Date(
+        startsAt.getTime() +
+          service.duration_minutes * 60 * 1000
+      )
+
+      const result =
+        await createPublicAppointment({
+          customer: booking.customer,
+          pet: booking.pet,
+          service_id: booking.serviceId,
+          preferred_employee_id:
+            booking.professionalId,
+          starts_at: startsAt.toISOString(),
+          ends_at: endsAt.toISOString(),
+          duration_minutes:
+            service.duration_minutes,
+          price: service.price,
         })
-    }
 
-    function goBack() {
-        setCurrentStep((current) => {
-            if (current <= 1) return 1
-            return (current - 1) as BookingStep
+      if (!result.success) {
+        toast.add({
+          type: "error",
+          description: result.error,
+          priority: "high",
         })
+
+        return
+      }
+
+      toast.add({
+        type: "success",
+        description:
+          "Appointment requested successfully",
+        priority: "high",
+      })
+
+      setCurrentStep(4)
+    } catch {
+      toast.add({
+        type: "error",
+        description:
+          "Something went wrong. Please try again.",
+        priority: "high",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
+  }
 
-    function goToStep(step: BookingStep) {
-        /*
-         * Don't allow jumping into future steps until the
-         * required previous information has been selected.
-         */
-        if (step > currentStep) return
+  return (
+    <div className="flex h-dvh flex-col overflow-hidden bg-background">
 
-        setCurrentStep(step)
-    }
+      {/* -------------------------------------------------
+          HEADER
+      ------------------------------------------------- */}
+      <header className="shrink-0 border-b border-border bg-card">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 lg:px-10">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <span className="font-heading text-sm font-semibold">
+                P
+              </span>
+            </div>
 
-    async function handleConfirmBooking() {
-        if (
-            !booking.serviceId ||
-            !booking.date ||
-            !booking.time ||
-            !booking.customer.name.trim() ||
-            !booking.customer.phone.trim() ||
-            !booking.pet.name.trim() ||
-            !booking.pet.type.trim()
-        ) {
-            return
-        }
+            <div>
+              <p className="font-heading text-sm font-semibold text-foreground">
+                Pet Company
+              </p>
+              <p className="hidden text-xs text-muted-foreground sm:block">
+                Pet care & wellness
+              </p>
+            </div>
+          </div>
 
-        const service = selectedService
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/")}
+            className="text-muted-foreground hover:text-primary"
+          >
+            <ArrowLeft />
+            Back to Home
+          </Button>
+        </div>
+      </header>
 
-        if (!service) {
-            toast.add({
-                type: "error",
-                description: "Please select a service",
-                priority: "high",
-            })
-            return
-        }
+      {/* -------------------------------------------------
+          MAIN
+      ------------------------------------------------- */}
+      <main className="min-h-0 flex-1 overflow-hidden">
+        <div className="mx-auto flex h-full max-w-[1440px] flex-col px-6 lg:px-10">
 
-        setIsSubmitting(true)
+          {/* -------------------------------------------------
+              PAGE INTRO
+          ------------------------------------------------- */}
+          <div className="shrink-0 pb-5 pt-6 lg:pt-7">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
-        try {
-            const startsAt = new Date(
-                `${booking.date}T${booking.time}`
-            )
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-gold">
+                  Appointment booking
+                </p>
 
-            const endsAt = new Date(
-                startsAt.getTime() +
-                service.duration_minutes * 60 * 1000
-            )
+                <h1 className="font-heading text-2xl font-semibold tracking-tight text-navy lg:text-3xl">
+                  Book Your Appointment
+                </h1>
 
-            const result = await createPublicAppointment({
-                customer: booking.customer,
-                pet: booking.pet,
-                service_id: booking.serviceId,
-                preferred_employee_id: booking.professionalId,
-                starts_at: startsAt.toISOString(),
-                ends_at: endsAt.toISOString(),
-                duration_minutes: service.duration_minutes,
-                price: service.price,
-            })
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Schedule a visit for your pet in just a few steps.
+                </p>
+              </div>
 
-            if (!result.success) {
-                 toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
-                return
-            }
-
-            toast.add({
-                type: "success",
-                description: "Appointment requested successfully",
-                priority: "high",
-            })
-
-            // You can replace this later with a dedicated
-            // booking-success screen.
-            setCurrentStep(4)
-        } catch {
-            toast.add({
-                type: "error",
-                description: "Something went wrong. Please try again.",
-                priority: "high",
-            })
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
-
-    return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="border-b bg-background">
-                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-                    <div className="flex items-center gap-3">
-                        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                            <span className="text-sm font-semibold">
-                                P
-                            </span>
-                        </div>
-
-                        <span className="font-semibold">
-                            Pet Company
-                        </span>
-                    </div>
-
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push('/')}
-                    >
-                        <ArrowLeft />
-                        Back to Home
-                    </Button>
-                </div>
-            </header>
-
-            {/* Page */}
-            <main className="mx-auto max-w-7xl px-6 py-8">
-                {/* Title */}
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-semibold tracking-tight">
-                        Book Your Appointment
-                    </h1>
-
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Follow the steps below to schedule your
-                        pet&apos;s visit
-                    </p>
-                </div>
-
-                {/* Progress */}
-                <BookingProgress
-                    currentStep={currentStep}
-                    steps={STEPS}
-                    onStepClick={goToStep}
+              <div className="hidden w-[520px] lg:block">
+                <Stepper
+                  steps={STEPS}
+                  currentStep={currentStep}
+                  className="w-full"
                 />
+              </div>
+            </div>
 
-                {/* Content */}
-                <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_280px]">
-                    <div className="min-w-0 rounded-xl border bg-background p-5">
-                        {currentStep === 1 ? (
-                            <ServiceStep
-                                groupedServices={
-                                    groupedServices.grouped
-                                }
-                                uncategorizedServices={
-                                    groupedServices.uncategorizedServices
-                                }
-                                selectedServiceId={
-                                    booking.serviceId
-                                }
-                                onSelectService={selectService}
-                            />
-                        ) : null}
+            {/* Mobile stepper */}
+            <div className="mt-5 lg:hidden">
+              <Stepper
+                steps={STEPS}
+                currentStep={currentStep}
+              />
+            </div>
+          </div>
 
-                        {currentStep === 2 ? (
-                            <DateTimeStep
-                                booking={booking}
-                                onUpdate={updateBooking}
-                            />
-                        ) : null}
+          {/* -------------------------------------------------
+              CONTENT AREA
+          ------------------------------------------------- */}
+          <div className="min-h-0 flex-1 pb-4">
 
-                        {currentStep === 3 ? (
-                            <CustomerStep
-                                booking={booking}
-                                onUpdate={updateBooking}
-                            />
-                        ) : null}
+            <div className="grid h-full min-h-0 gap-5 lg:grid-cols-[minmax(0,1fr)_330px]">
 
-                        {currentStep === 4 ? (
-                            <ConfirmationStep
-                                booking={booking}
-                                selectedService={selectedService}
-                                selectedCategory={
-                                    categories.find(
-                                        (category) =>
-                                            category.id === selectedService?.category_id
-                                    ) ?? null
-                                }
-                                onEditStep={goToStep}
-                                onConfirm={handleConfirmBooking}
-                                isSubmitting={isSubmitting}
-                            />
-                        ) : null}
-                    </div>
+              {/* LEFT CONTENT */}
+              <section className="min-h-0 overflow-hidden rounded-xl border border-border bg-card">
 
-                    {/* Selected details */}
-                    <SelectedDetails
+                <div className="flex h-full min-h-0 flex-col">
+
+                  {/* Step content */}
+                  <div className="min-h-0 flex-1 overflow-y-auto scrollbar-none">
+
+                    {currentStep === 1 ? (
+                      <ServiceStep
+                        groupedServices={
+                          groupedServices.grouped
+                        }
+                        uncategorizedServices={
+                          groupedServices.uncategorizedServices
+                        }
+                        selectedServiceId={
+                          booking.serviceId
+                        }
+                        onSelectService={
+                          selectService
+                        }
+                      />
+                    ) : null}
+
+                    {currentStep === 2 ? (
+                      <DateTimeStep
                         booking={booking}
-                        selectedService={selectedService}
-                        onEditStep={goToStep}
-                    />
-                </div>
+                        onUpdate={updateBooking}
+                      />
+                    ) : null}
 
-                {/* Navigation */}
-                <div className="mt-5 flex items-center justify-between">
-                    <Button
+                    {currentStep === 3 ? (
+                      <CustomerStep
+                        booking={booking}
+                        onUpdate={updateBooking}
+                      />
+                    ) : null}
+
+                    {currentStep === 4 ? (
+                      <ConfirmationStep
+                        booking={booking}
+                        selectedService={
+                          selectedService
+                        }
+                        selectedCategory={
+                          categories.find(
+                            (category) =>
+                              category.id ===
+                              selectedService?.category_id
+                          ) ?? null
+                        }
+                        onEditStep={goToStep}
+                        onConfirm={
+                          handleConfirmBooking
+                        }
+                        isSubmitting={
+                          isSubmitting
+                        }
+                      />
+                    ) : null}
+
+                  </div>
+
+                  {/* -------------------------------------------------
+                      BOTTOM ACTION BAR
+                  ------------------------------------------------- */}
+                  <div className="shrink-0 border-t border-border bg-card px-5 py-4">
+                    <div className="flex items-center justify-between">
+
+                      <Button
                         variant="outline"
                         type="button"
                         onClick={goBack}
-                        disabled={currentStep === 1}
-                    >
+                        disabled={
+                          currentStep === 1
+                        }
+                      >
                         <ArrowLeft />
                         Back
-                    </Button>
+                      </Button>
 
-                    {currentStep < 4 ? (
+                      {currentStep < 4 ? (
                         <Button
-                            type="button"
-                            onClick={goNext}
-                            disabled={!canContinue}
+                          type="button"
+                          onClick={goNext}
+                          disabled={!canContinue}
+                          className="min-w-32"
                         >
-                            Continue
-                            <ArrowRight />
+                          Continue
+                          <ArrowRight />
                         </Button>
-                    ) : (
+                      ) : (
                         <Button
-                            type="button"
-                            onClick={handleConfirmBooking}
-                            disabled={!isComplete || isSubmitting}
+                          type="button"
+                          onClick={
+                            handleConfirmBooking
+                          }
+                          disabled={
+                            !isComplete ||
+                            isSubmitting
+                          }
+                          className="min-w-40"
                         >
-                            {isSubmitting
-                                ? "Confirming..."
-                                : "Confirm Appointment"}
+                          {isSubmitting
+                            ? "Confirming..."
+                            : "Confirm Appointment"}
                         </Button>
-                    )}
+                      )}
+
+                    </div>
+                  </div>
+
                 </div>
-            </main>
+              </section>
+
+              {/* RIGHT SUMMARY */}
+              <aside className="hidden min-h-0 lg:block">
+                <SelectedDetails
+                  booking={booking}
+                  selectedService={
+                    selectedService
+                  }
+                  onEditStep={goToStep}
+                />
+              </aside>
+
+            </div>
+          </div>
         </div>
-    )
+      </main>
+    </div>
+  )
 }

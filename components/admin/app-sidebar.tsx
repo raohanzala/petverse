@@ -21,10 +21,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar
 } from "@/components/ui/sidebar"
 
 export function AppSidebar({ user }: { user: AdminUserInfo }) {
   const pathname = usePathname()
+  const { isMobile, setOpenMobile } = useSidebar()
 
   return (
     <Sidebar
@@ -63,6 +65,11 @@ export function AppSidebar({ user }: { user: AdminUserInfo }) {
                         isActive={isActive}
                         render={<Link href={item.href} />}
                         tooltip={item.title}
+                        onClick={() => {
+                          if (isMobile) {
+                            setOpenMobile(false)
+                          }
+                        }}
                       >
                         <item.icon />
                         <span>{item.title}</span>

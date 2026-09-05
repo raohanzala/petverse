@@ -16,7 +16,6 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ADMIN_NAV_GROUPS } from "@/lib/constants/admin-nav"
 
