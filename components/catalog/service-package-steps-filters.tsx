@@ -1,6 +1,6 @@
 "use client"
 
-import { SearchIcon } from "lucide-react"
+import { ListFilterIcon, SearchIcon } from "lucide-react"
 import {
   usePathname,
   useRouter,
@@ -13,7 +13,9 @@ import {
   useTransition,
 } from "react"
 
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -36,6 +38,8 @@ type ServicePackageStepsFiltersProps = {
     name: string
   }[]
   onLoadingChange?: (isLoading: boolean) => void
+  /** `bar` = labeled selects + clear; `search` = search input only */
+  section?: "bar" | "search"
   className?: string
 }
 
@@ -46,6 +50,7 @@ export function ServicePackageStepsFilters({
   packages = [],
   services = [],
   onLoadingChange,
+  section = "bar",
   className,
 }: ServicePackageStepsFiltersProps) {
   const router = useRouter()
@@ -66,32 +71,38 @@ export function ServicePackageStepsFilters({
   const selectedPackageLabel =
     initialPackageId === undefined
       ? "All packages"
-      : `Package: ${packages.find(
-        (pkg) => pkg.id === initialPackageId
-      )?.name ?? "All packages"}`
+      : (packages.find((pkg) => pkg.id === initialPackageId)?.name ??
+        "All packages")
 
   const selectedServiceLabel =
     initialServiceId === undefined
       ? "All services"
-      : `Service: ${services.find(
-        (service) => service.id === initialServiceId
-      )?.name ?? "All services"}`
+      : (services.find((service) => service.id === initialServiceId)?.name ??
+        "All services")
+
+  const hasActiveFilters =
+    Boolean(initialSearch) ||
+    initialPackageId !== undefined ||
+    Boolean(initialServiceId)
 
   const updateParams = useCallback(
-    (
-      updates: {
-        q?: string | null
-        packageId?: number | null
-        serviceId?: string | null
+    (updates: {
+      q?: string | null
+      packageId?: number | null
+      serviceId?: string | null
+      clear?: boolean
+    }) => {
+      if (updates.clear) {
+        startTransition(() => {
+          router.replace(pathname)
+        })
+        return
       }
-    ) => {
-      const params = new URLSearchParams(
-        searchParams.toString()
-      )
+
+      const params = new URLSearchParams(searchParams.toString())
 
       if (updates.q !== undefined) {
         const value = updates.q?.trim()
-
         if (value) {
           params.set("q", value)
         } else {
@@ -103,10 +114,7 @@ export function ServicePackageStepsFilters({
         if (updates.packageId === null) {
           params.delete("packageId")
         } else {
-          params.set(
-            "packageId",
-            String(updates.packageId)
-          )
+          params.set("packageId", String(updates.packageId))
         }
       }
 
@@ -121,9 +129,7 @@ export function ServicePackageStepsFilters({
       const query = params.toString()
 
       startTransition(() => {
-        router.replace(
-          query ? `${pathname}?${query}` : pathname
-        )
+        router.replace(query ? `${pathname}?${query}` : pathname)
       })
     },
     [pathname, router, searchParams]
@@ -132,6 +138,7 @@ export function ServicePackageStepsFilters({
   const urlSearch = searchParams.get("q") ?? ""
 
   useEffect(() => {
+    if (section !== "search") return
     if (search === urlSearch) return
 
     const timer = window.setTimeout(() => {
@@ -139,98 +146,115 @@ export function ServicePackageStepsFilters({
     }, 350)
 
     return () => window.clearTimeout(timer)
-  }, [search, urlSearch, updateParams])
+  }, [search, urlSearch, updateParams, section])
+
+  if (section === "search") {
+    return (
+      <div className={cn("relative w-full max-w-md", className)}>
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search packages or services…"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="h-10 rounded-lg border-border bg-card pl-9 shadow-none"
+          aria-label="Search packages or services"
+        />
+      </div>
+    )
+  }
 
   return (
     <div
       className={cn(
-        "flex flex-1 flex-wrap items-center gap-2",
+        "flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between",
         className
       )}
     >
-      <div className="relative w-full max-w-sm">
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex flex-1 flex-wrap items-end gap-3">
+        <div className="grid w-full gap-1.5 sm:w-[200px]">
+          <Label
+            htmlFor="package-step-package-filter"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Package
+          </Label>
+          <Select
+            value={
+              initialPackageId !== undefined
+                ? String(initialPackageId)
+                : "all"
+            }
+            onValueChange={(value) => {
+              if (!value) return
+              updateParams({
+                packageId: value === "all" ? null : Number(value),
+              })
+            }}
+          >
+            <SelectTrigger
+              id="package-step-package-filter"
+              className="h-10 w-full rounded-lg border-border bg-card shadow-none"
+            >
+              <SelectValue>{selectedPackageLabel}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All packages</SelectItem>
+              {packages.map((pkg) => (
+                <SelectItem key={pkg.id} value={String(pkg.id)}>
+                  {pkg.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Input
-          placeholder="Search packages or services…"
-          value={search}
-          onChange={(event) =>
-            setSearch(event.target.value)
-          }
-          className="h-9 bg-white pl-9 shadow-none"
-          aria-label="Search packages or services"
-        />
+        <div className="grid w-full gap-1.5 sm:w-[200px]">
+          <Label
+            htmlFor="package-step-service-filter"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Service
+          </Label>
+          <Select
+            value={initialServiceId ?? "all"}
+            onValueChange={(value) => {
+              if (!value) return
+              updateParams({
+                serviceId: value === "all" ? null : value,
+              })
+            }}
+          >
+            <SelectTrigger
+              id="package-step-service-filter"
+              className="h-10 w-full rounded-lg border-border bg-card shadow-none"
+            >
+              <SelectValue>{selectedServiceLabel}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All services</SelectItem>
+              {services.map((service) => (
+                <SelectItem key={service.id} value={service.id}>
+                  {service.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <Select
-        value={
-          initialPackageId !== undefined
-            ? String(initialPackageId)
-            : "all"
-        }
-        onValueChange={(value) => {
-          if (!value) return
-
-          updateParams({
-            packageId:
-              value === "all" ? null : Number(value),
-          })
+      <Button
+        type="button"
+        variant="outline"
+        className="h-10 shrink-0 rounded-lg border-border bg-card shadow-none"
+        disabled={!hasActiveFilters || isPending}
+        onClick={() => {
+          setSearch("")
+          updateParams({ clear: true })
         }}
       >
-        <SelectTrigger className="h-9 w-[190px]">
-          <SelectValue>
-            {selectedPackageLabel}
-          </SelectValue>
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value="all">
-            All packages
-          </SelectItem>
-
-          {packages.map((pkg) => (
-            <SelectItem
-              key={pkg.id}
-              value={String(pkg.id)}
-            >
-              {pkg.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={initialServiceId ?? "all"}
-        onValueChange={(value) => {
-          if (!value) return
-
-          updateParams({
-            serviceId:
-              value === "all" ? null : value,
-          })
-        }}
-      >
-        <SelectTrigger className="h-9 w-[190px]">
-          <SelectValue>
-            {selectedServiceLabel}
-          </SelectValue>
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value="all">
-            All services
-          </SelectItem>
-
-          {services.map((service) => (
-            <SelectItem
-              key={service.id}
-              value={service.id}
-            >
-              {service.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <ListFilterIcon className="size-4" />
+        Clear filters
+      </Button>
     </div>
   )
 }

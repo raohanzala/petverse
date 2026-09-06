@@ -56,6 +56,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -71,7 +72,7 @@
 
 :root {
   /* Brand colors */
-  --navy: #16213e;
+  --navy: #06152a;
   --navy-950: #0f1830;
   --navy-900: #16213e;
   --navy-800: #1c2b4d;
@@ -101,7 +102,7 @@
   --status-cancelled-fg: #b91c1c;
 
   /* shadcn mapped tokens */
-  --background: #f8fafc;
+  --background: #fafafc;
   --foreground: #1f2937;
   --card: #ffffff;
   --card-foreground: #1f2937;
@@ -135,6 +136,129 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: var(--gold);
+  --primary-hover: var(--navy-800);
+}
+
+/* Explicit alias — admin theme id "petcare" (existing brand) */
+[data-theme="petcare"] {
+  --navy: #06152a;
+  --navy-950: #0f1830;
+  --navy-900: #16213e;
+  --navy-800: #1c2b4d;
+  --navy-700: #243560;
+  --gold: #c9974c;
+  --gold-light: #dfc08a;
+  --cream: #f7f6f3;
+  --success: #22c55e;
+  --success-foreground: #15803d;
+  --warning: #f59e0b;
+  --warning-foreground: #b45309;
+  --info: #3b82f6;
+  --info-foreground: #1d4ed8;
+  --danger: #ef4444;
+  --danger-foreground: #b91c1c;
+  --status-confirmed: #dbeafe;
+  --status-confirmed-fg: #1d4ed8;
+  --status-pending: #fef3c7;
+  --status-pending-fg: #b45309;
+  --status-completed: #dcfce7;
+  --status-completed-fg: #15803d;
+  --status-cancelled: #fee2e2;
+  --status-cancelled-fg: #b91c1c;
+  --background: #fafafc;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+  --primary: var(--navy);
+  --primary-foreground: #ffffff;
+  --primary-hover: var(--navy-800);
+  --secondary: #ffffff;
+  --secondary-foreground: var(--navy);
+  --muted: #f1f5f9;
+  --muted-foreground: #6b7280;
+  --accent: var(--gold-light);
+  --accent-foreground: var(--navy);
+  --destructive: var(--danger);
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: var(--navy-700);
+  --chart-1: var(--gold);
+  --chart-2: var(--info);
+  --chart-3: var(--success);
+  --chart-4: var(--warning);
+  --chart-5: var(--navy-700);
+  --radius: 0.5rem;
+  --sidebar: var(--navy);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: var(--navy);
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--gold);
+}
+
+/* Admin theme — Professional Blue (enterprise SaaS) */
+[data-theme="professional-blue"] {
+  --navy: #0f172a;
+  --navy-950: #020617;
+  --navy-900: #0f172a;
+  --navy-800: #1d4ed8;
+  --navy-700: #1e40af;
+  --gold: #2563eb;
+  --gold-light: #93c5fd;
+  --cream: #f8fafc;
+  --success: #16a34a;
+  --success-foreground: #166534;
+  --warning: #d97706;
+  --warning-foreground: #92400e;
+  --info: #2563eb;
+  --info-foreground: #1d4ed8;
+  --danger: #dc2626;
+  --danger-foreground: #991b1b;
+  --status-confirmed: #dcfce7;
+  --status-confirmed-fg: #166534;
+  --status-pending: #ffedd5;
+  --status-pending-fg: #c2410c;
+  --status-completed: #f1f5f9;
+  --status-completed-fg: #475569;
+  --status-cancelled: #fee2e2;
+  --status-cancelled-fg: #991b1b;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --primary-hover: #1d4ed8;
+  --secondary: #ffffff;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #dbeafe;
+  --accent-foreground: #1e40af;
+  --destructive: var(--danger);
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2563eb;
+  --chart-1: #2563eb;
+  --chart-2: #0ea5e9;
+  --chart-3: #16a34a;
+  --chart-4: #d97706;
+  --chart-5: #0f172a;
+  --radius: 0.625rem;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #cbd5e1;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(37, 99, 235, 0.18);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(148, 163, 184, 0.16);
+  --sidebar-ring: #2563eb;
 }
 
 @layer base {
@@ -163,7 +287,7 @@
 }
 
 [data-slot="sidebar-group-label"] {
-  color: rgba(255, 255, 255, 0.45);
+  color: color-mix(in oklab, var(--sidebar-foreground) 55%, transparent);
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;

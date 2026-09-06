@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { BellIcon, SearchIcon } from "lucide-react"
 
 import { AdminUserAvatar, type AdminUserInfo } from "@/components/admin/nav-user"
+import { AdminThemeToggle } from "@/components/admin/admin-theme-toggle"
 import { Badge } from "@/components/ui/badge"
 import {
   Command,
@@ -97,6 +98,7 @@ export function AdminHeader({ user }: { user: AdminUserInfo }) {
       </CommandDialog>
 
       <div className="ml-auto flex items-center gap-2">
+        <AdminThemeToggle />
         <button
           type="button"
           className="relative flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
