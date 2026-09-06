@@ -51,6 +51,8 @@ type DataTableProps<TData extends RowData> = {
   enableColumnVisibility?: boolean
   enableRowSelection?: boolean
   showSelectionCount?: boolean
+  /** Noun used in pagination summary, e.g. "appointments" */
+  itemLabel?: string
   toolbar?: React.ReactNode
   onRowSelectionChange?: (rows: TData[]) => void
 }
@@ -86,6 +88,7 @@ export function DataTable<TData extends RowData>({
   enableColumnVisibility = true,
   enableRowSelection = false,
   showSelectionCount = false,
+  itemLabel,
   toolbar,
   onRowSelectionChange,
 }: DataTableProps<TData>) {
@@ -188,7 +191,10 @@ export function DataTable<TData extends RowData>({
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow
+                key={headerGroup.id}
+                className="border-border hover:bg-transparent"
+              >
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder ? null : (
@@ -234,6 +240,7 @@ export function DataTable<TData extends RowData>({
           table={table}
           pageSizeOptions={pageSizeOptions}
           showSelectionCount={showSelectionCount || enableRowSelection}
+          itemLabel={itemLabel}
         />
       ) : null}
     </div>

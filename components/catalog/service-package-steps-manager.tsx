@@ -76,18 +76,16 @@ export function ServicePackageStepsManager({
 
     setIsDeleting(true)
 
-    const result = await deleteServicePackageStep(
-      deletingStep.id
-    )
+    const result = await deleteServicePackageStep(deletingStep.id)
 
     setIsDeleting(false)
 
     if (!result.success) {
-       toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+      toast.add({
+        type: "error",
+        description: result.error,
+        priority: "high",
+      })
       return
     }
 
@@ -117,9 +115,23 @@ export function ServicePackageStepsManager({
       ? "No package steps match your filters."
       : "No package steps yet. Create your first one to get started."
 
+  const filterProps = {
+    initialSearch: filters.search ?? "",
+    initialPackageId: filters.packageId,
+    initialServiceId: filters.serviceId,
+    packages,
+    services,
+    onLoadingChange: setIsFiltering,
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
+        breadcrumbs={[
+          { label: "Dashboard", href: "/admin" },
+          { label: "Catalog", href: "/admin/catalog/packages" },
+          { label: "Package steps" },
+        ]}
         title="Package steps"
         description="Build service packages by defining the services included in each package and their execution order."
         actions={
@@ -130,22 +142,23 @@ export function ServicePackageStepsManager({
         }
       />
 
-      <DataTable
-        columns={columns}
-        data={steps}
-        pageSize={10}
-        isLoading={isFiltering}
-        enableColumnVisibility
-        emptyMessage={emptyMessage}
-        toolbar={
-          <ServerFiltersToolbar
-            filters={filters}
-            packages={packages}
-            services={services}
-            onLoadingChange={setIsFiltering}
-          />
-        }
-      />
+      <div className="space-y-4">
+        <ServicePackageStepsFilters section="bar" {...filterProps} />
+
+        <DataTable
+          columns={columns}
+          data={steps}
+          pageSize={10}
+          isLoading={isFiltering}
+          enableColumnVisibility
+          enableRowSelection
+          itemLabel="package steps"
+          emptyMessage={emptyMessage}
+          toolbar={
+            <ServicePackageStepsFilters section="search" {...filterProps} />
+          }
+        />
+      </div>
 
       <ServicePackageStepFormDialog
         open={formOpen}
@@ -164,27 +177,17 @@ export function ServicePackageStepsManager({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Delete package step?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Delete package step?</AlertDialogTitle>
 
             <AlertDialogDescription>
               This will permanently remove the{" "}
-              <strong>
-                {deletingStep?.service.name}
-              </strong>{" "}
-              step from{" "}
-              <strong>
-                {deletingStep?.package.name}
-              </strong>
-              .
+              <strong>{deletingStep?.service.name}</strong> step from{" "}
+              <strong>{deletingStep?.package.name}</strong>.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
 
             <AlertDialogAction
               variant="destructive"
@@ -200,35 +203,5 @@ export function ServicePackageStepsManager({
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
-}
-
-/** Server-driven filters rendered in the DataTable toolbar row. */
-function ServerFiltersToolbar({
-  filters,
-  packages,
-  services,
-  onLoadingChange,
-}: {
-  filters: ServicePackageStepListFilters
-  packages: {
-    id: number
-    name: string
-  }[]
-  services: {
-    id: string
-    name: string
-  }[]
-  onLoadingChange: (loading: boolean) => void
-}) {
-  return (
-    <ServicePackageStepsFilters
-      initialSearch={filters.search ?? ""}
-      initialPackageId={filters.packageId}
-      initialServiceId={filters.serviceId}
-      packages={packages}
-      services={services}
-      onLoadingChange={onLoadingChange}
-    />
   )
 }

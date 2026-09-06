@@ -70,14 +70,15 @@ function Pagination<TData extends RowData>({
 
         {getPageNumbers().map((page, index) =>
           page === "ellipsis" ? (
-              <PaginationEllipsis />
+            <PaginationEllipsis key={`ellipsis-${index}`} />
           ) : (
-              <PaginationLink
-                isActive={pageIndex === page}
-                onClick={() => table.setPageIndex(page)}
-              >
-                {page + 1}
-              </PaginationLink>
+            <PaginationLink
+              key={page}
+              isActive={pageIndex === page}
+              onClick={() => table.setPageIndex(page)}
+            >
+              {page + 1}
+            </PaginationLink>
           )
         )}
 
@@ -90,7 +91,7 @@ function Pagination<TData extends RowData>({
           )}
         />
       </PaginationContent>
-    </nav >
+    </nav>
   )
 }
 
@@ -101,7 +102,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex items-center gap-0.5", className)}
+      className={cn("flex items-center gap-1", className)}
       {...props}
     />
   )
@@ -110,64 +111,62 @@ function PaginationContent({
 type PaginationLinkProps = {
   isActive?: boolean
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  React.ComponentProps<"button">
 
 function PaginationLink({
   className,
   isActive,
-  size = "icon",
+  size = "sm",
   ...props
 }: PaginationLinkProps) {
   return (
     <Button
-      variant={isActive ? "outline" : "ghost"}
+      type="button"
+      variant={isActive ? "default" : "outline"}
       size={size}
-      className={cn(className)}
-      nativeButton={false}
-      render={
-        <a
-          aria-current={isActive ? "page" : undefined}
-          data-slot="pagination-link"
-          data-active={isActive}
-          {...props}
-        />
-      }
+      aria-current={isActive ? "page" : undefined}
+      data-slot="pagination-link"
+      data-active={isActive}
+      className={cn(
+        "h-8 min-w-8 rounded-md px-2.5 text-sm font-medium shadow-none",
+        isActive
+          ? "border-primary bg-primary text-primary-foreground hover:bg-primary-hover"
+          : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground",
+        className
+      )}
+      {...props}
     />
   )
 }
 
 function PaginationPrevious({
   className,
-  text = "Previous",
   ...props
-}: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+}: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
       aria-label="Go to previous page"
-      size="default"
-      className={cn("pl-1.5!", className)}
+      size="icon-sm"
+      className={cn(className)}
       {...props}
     >
-      <ChevronLeftIcon data-icon="inline-start" size={1}/>
-      <span className="hidden sm:block text-sm">{text}</span>
+      <ChevronLeftIcon className="size-4" />
     </PaginationLink>
   )
 }
 
 function PaginationNext({
   className,
-  text = "Next",
   ...props
-}: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+}: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
       aria-label="Go to next page"
-      size="default"
-      className={cn("pr-1.5!", className)}
+      size="icon-sm"
+      className={cn(className)}
       {...props}
     >
-      <span className="hidden sm:block text-sm">{text}</span>
-      <ChevronRightIcon data-icon="inline-end" size={1} />
+      <ChevronRightIcon className="size-4" />
     </PaginationLink>
   )
 }
@@ -181,13 +180,12 @@ function PaginationEllipsis({
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
+        "flex size-8 items-center justify-center text-muted-foreground [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
     >
-      <MoreHorizontalIcon
-      />
+      <MoreHorizontalIcon />
       <span className="sr-only">More pages</span>
     </span>
   )
@@ -197,7 +195,6 @@ export {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
-  // PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,

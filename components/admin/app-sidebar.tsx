@@ -40,7 +40,7 @@ export function AppSidebar({ user }: { user: AdminUserInfo }) {
           className="flex items-center gap-2.5 text-sidebar-foreground"
         >
           <span className="flex size-9 items-center justify-center rounded-lg bg-sidebar-accent">
-            <PawPrint className="size-5 text-gold" />
+            <PawPrint className="size-5 text-sidebar-primary" />
           </span>
           <span className="text-lg font-bold tracking-tight group-data-[collapsible=icon]:hidden">
             PetCare

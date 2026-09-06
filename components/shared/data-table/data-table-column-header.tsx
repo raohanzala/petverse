@@ -32,7 +32,11 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return (
+      <div className={cn("text-xs font-semibold tracking-wide", className)}>
+        {title}
+      </div>
+    )
   }
 
   return (
@@ -43,17 +47,17 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
             <Button
               variant="ghost"
               size="sm"
-              className="-ml-2 h-8 data-open:bg-accent"
+              className="-ml-3 h-8 gap-1 px-2 text-xs font-semibold tracking-wide text-muted-foreground hover:bg-transparent hover:text-foreground data-open:bg-transparent"
             />
           }
         >
           <span>{title}</span>
           {column.getIsSorted() === "desc" ? (
-            <ArrowDownIcon className="size-4" />
+            <ArrowDownIcon className="size-3.5" />
           ) : column.getIsSorted() === "asc" ? (
-            <ArrowUpIcon className="size-4" />
+            <ArrowUpIcon className="size-3.5" />
           ) : (
-            <ChevronsUpDownIcon className="size-4 text-muted-foreground" />
+            <ChevronsUpDownIcon className="size-3.5 opacity-60" />
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">

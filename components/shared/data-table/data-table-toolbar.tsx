@@ -59,13 +59,13 @@ export function DataTableToolbar<TData extends RowData>({
     >
       <div className="flex flex-1 flex-wrap items-center gap-2">
         {showSearch ? (
-          <div className="relative w-full max-w-sm">
+          <div className="relative w-full max-w-md">
             <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(event) => handleSearchChange(event.target.value)}
-              className="h-9 bg-muted/40 pl-9 shadow-none"
+              className="h-10 rounded-lg border-border bg-card pl-9 shadow-none"
             />
           </div>
         ) : null}
