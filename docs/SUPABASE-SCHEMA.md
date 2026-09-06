@@ -540,6 +540,8 @@ create policy "staff manage appointments"
 
 Add when core booking is stable. Enables boarding, daycare, and payments.
 
+> **Full column definitions + `CREATE TABLE` SQL for Phase 2 & 3:** see [SUPABASE-SCHEMA-PHASE-2-3.md](./SUPABASE-SCHEMA-PHASE-2-3.md).
+
 ## 2.1 Enums
 
 ```sql
