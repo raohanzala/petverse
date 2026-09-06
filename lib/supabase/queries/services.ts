@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { ServiceListFilters } from "@/lib/constants/service-filters"
-import type { ServiceListRow, ServiceRow } from "@/lib/supabase/types"
+import type { ServiceListRow} from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const SERVICE_COLUMNS = `
@@ -91,7 +91,7 @@ export async function listServices(
 }
 
 /** Public booking / marketing — active and public services only */
-export async function listActiveServices(): Promise<ServiceRow[]> {
+export async function listActiveServices(): Promise<ServiceListRow[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -112,7 +112,7 @@ export async function listActiveServices(): Promise<ServiceRow[]> {
 
 export async function getServiceById(
   id: string
-): Promise<ServiceRow | null> {
+): Promise<ServiceListRow | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase

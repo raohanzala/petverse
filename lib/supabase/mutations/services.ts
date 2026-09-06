@@ -10,7 +10,7 @@ import {
   type MutationResult,
 } from "@/lib/supabase/errors"
 import { createClient } from "@/lib/supabase/server"
-import type { ServiceRow } from "@/lib/supabase/types"
+import type { ServiceListRow } from "@/lib/supabase/types"
 import {
   createServiceSchema,
   deleteServiceSchema,
@@ -38,7 +38,7 @@ function normalizeDescription(value: string | null | undefined) {
 
 export async function createService(
   input: CreateServiceInput
-): Promise<MutationResult<ServiceRow>> {
+): Promise<MutationResult<ServiceListRow>> {
   await requireStaff()
 
   const parsed = createServiceSchema.safeParse({
@@ -79,7 +79,7 @@ export async function createService(
 
 export async function updateService(
   input: UpdateServiceInput
-): Promise<MutationResult<ServiceRow>> {
+): Promise<MutationResult<ServiceListRow>> {
   await requireStaff()
 
   const parsed = updateServiceSchema.safeParse({

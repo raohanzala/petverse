@@ -95,10 +95,7 @@ export type ServiceInsert = Pick<
 >
 
 export type ServiceListRow = ServiceRow & {
-  category: {
-    id: string
-    name: string
-  } | null
+  category: ServiceCategoryRow | null
 }
 
 export type ServiceUpdate = Partial<ServiceInsert>

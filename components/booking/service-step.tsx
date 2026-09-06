@@ -30,20 +30,20 @@ import { cn } from "@/lib/utils"
 
 import type {
   ServiceCategoryRow,
-  ServiceRow,
+  ServiceListRow,
 } from "@/lib/supabase/types"
 
 type GroupedService = {
   category: ServiceCategoryRow
-  services: ServiceRow[]
+  services: ServiceListRow[]
 }
 
 type ServiceStepProps = {
   groupedServices: GroupedService[]
-  uncategorizedServices: ServiceRow[]
+  uncategorizedServices: ServiceListRow[]
   selectedServiceId: string | null
   onSelectService: (
-    service: ServiceRow
+    service: ServiceListRow
   ) => void
 }
 
@@ -88,7 +88,7 @@ function ServiceOption({
   selected,
   onSelect,
 }: {
-  service: ServiceRow
+  service: ServiceListRow
   selected: boolean
   onSelect: () => void
 }) {
@@ -159,10 +159,10 @@ function ServiceAccordionItem({
   onSelectService,
 }: {
   category: ServiceCategoryRow
-  services: ServiceRow[]
+  services: ServiceListRow[]
   selectedServiceId: string | null
   onSelectService: (
-    service: ServiceRow
+    service: ServiceListRow
   ) => void
 }) {
   if (!services.length) return null

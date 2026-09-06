@@ -97,7 +97,7 @@ export function DateTimeStep({
   const dates = getUpcomingDates(14)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* Heading */}
       <div>
         <h2 className="text-lg font-semibold">

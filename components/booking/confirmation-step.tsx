@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 
 import type {
   ServiceCategoryRow,
+  ServiceListRow,
   ServiceRow,
 } from "@/lib/supabase/types"
 
@@ -38,7 +39,7 @@ type BookingState = {
 
 type ConfirmationStepProps = {
   booking: BookingState
-  selectedService: ServiceRow | null
+  selectedService: ServiceListRow | null
   selectedCategory: ServiceCategoryRow | null
   onEditStep: (step: 1 | 2 | 3) => void
   onConfirm?: () => void
@@ -124,7 +125,7 @@ export function ConfirmationStep({
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* Heading */}
       <div>
         <h2 className="text-lg font-semibold">

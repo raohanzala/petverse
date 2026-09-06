@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import type {
   ServiceCategoryRow,
-  ServiceRow,
+  ServiceListRow,
 } from "@/lib/supabase/types"
 
 import { Stepper, type StepperStep } from "@/components/shared/stepper"
@@ -41,8 +41,8 @@ type BookingState = {
 }
 
 type BookManagerProps = {
-  services: ServiceRow[]
-  categories: ServiceCategoryRow[]
+  services: ServiceListRow[]
+  // categories: ServiceCategoryRow[]
   onConfirm?: () => void
 }
 
@@ -85,7 +85,7 @@ const STEPS: StepperStep[] = [
 
 export function BookManager({
   services,
-  categories,
+  // categories,
 }: BookManagerProps) {
   const router = useRouter()
 
@@ -99,31 +99,39 @@ export function BookManager({
     useState(false)
 
   const groupedServices = useMemo(() => {
-    const grouped = categories.map((category) => ({
-      category,
-      services: services.filter(
-        (service) =>
-          service.category_id === category.id
-      ),
-    }))
+    const groups = new Map<
+      string,
+      {
+        category: ServiceCategoryRow
+        services: ServiceListRow[]
+      }
+    >()
 
-    const categorizedServiceIds = new Set(
-      grouped.flatMap((group) =>
-        group.services.map((service) => service.id)
-      )
-    )
+    const uncategorizedServices: ServiceListRow[] = []
 
-    const uncategorizedServices = services.filter(
-      (service) =>
-        service.category_id === null ||
-        !categorizedServiceIds.has(service.id)
-    )
+    services.forEach((service) => {
+      if (!service.category) {
+        uncategorizedServices.push(service)
+        return
+      }
+
+      const existing = groups.get(service.category.id)
+
+      if (existing) {
+        existing.services.push(service)
+      } else {
+        groups.set(service.category.id, {
+          category: service.category,
+          services: [service],
+        })
+      }
+    })
 
     return {
-      grouped,
+      grouped: Array.from(groups.values()),
       uncategorizedServices,
     }
-  }, [services, categories])
+  }, [services])
 
   const selectedService = useMemo(
     () =>
@@ -136,12 +144,12 @@ export function BookManager({
 
   const isComplete = Boolean(
     booking.serviceId &&
-      booking.date &&
-      booking.time &&
-      booking.customer.name.trim() &&
-      booking.customer.phone.trim() &&
-      booking.pet.name.trim() &&
-      booking.pet.type.trim()
+    booking.date &&
+    booking.time &&
+    booking.customer.name.trim() &&
+    booking.customer.phone.trim() &&
+    booking.pet.name.trim() &&
+    booking.pet.type.trim()
   )
 
   const canContinue = useMemo(() => {
@@ -157,9 +165,9 @@ export function BookManager({
       case 3:
         return Boolean(
           booking.customer.name.trim() &&
-            booking.customer.phone.trim() &&
-            booking.pet.name.trim() &&
-            booking.pet.type.trim()
+          booking.customer.phone.trim() &&
+          booking.pet.name.trim() &&
+          booking.pet.type.trim()
         )
 
       case 4:
@@ -179,7 +187,7 @@ export function BookManager({
     }))
   }
 
-  function selectService(service: ServiceRow) {
+  function selectService(service: ServiceListRow) {
     setBooking((current) => ({
       ...current,
       serviceId: service.id,
@@ -247,7 +255,7 @@ export function BookManager({
 
       const endsAt = new Date(
         startsAt.getTime() +
-          service.duration_minutes * 60 * 1000
+        service.duration_minutes * 60 * 1000
       )
 
       const result =
@@ -281,7 +289,7 @@ export function BookManager({
         priority: "high",
       })
 
-      setCurrentStep(4)
+      router.push("/")
     } catch {
       toast.add({
         type: "error",
@@ -428,11 +436,7 @@ export function BookManager({
                           selectedService
                         }
                         selectedCategory={
-                          categories.find(
-                            (category) =>
-                              category.id ===
-                              selectedService?.category_id
-                          ) ?? null
+                          selectedService?.category ?? null
                         }
                         onEditStep={goToStep}
                         onConfirm={

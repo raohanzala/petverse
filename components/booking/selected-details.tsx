@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
-import type { ServiceRow } from "@/lib/supabase/types"
+import type { ServiceListRow, ServiceRow } from "@/lib/supabase/types"
 
 type BookingState = {
   serviceId: string | null
@@ -34,7 +34,7 @@ type BookingState = {
 
 type SelectedDetailsProps = {
   booking: BookingState
-  selectedService: ServiceRow | null
+  selectedService: ServiceListRow | null
   onEditStep?: (step: 1 | 2 | 3) => void
 }
 
