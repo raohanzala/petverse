@@ -47,8 +47,19 @@ export default async function BillingPage({
   const appointments =
     await listAppointments()
 
+  const tab =
+    typeof params.tab === "string"
+      ? params.tab
+      : "invoices"
+
   return (
     <BillingPageContent
+      tab={
+        tab as
+        | "invoices"
+        | "deposits"
+        | "payment-links"
+      }
       owners={owners}
       appointments={appointments}
       invoices={invoices}

@@ -22,7 +22,13 @@ import type {
   PaymentLinkListFilters,
 } from "@/lib/constants/payment-link-filters"
 
+type BillingTab =
+  | "invoices"
+  | "deposits"
+  | "payment-links"
+
 type BillingPageContentProps = {
+  tab: BillingTab
   owners: OwnerRow[]
   appointments: AppointmentRow[]
   invoices: InvoiceRow[]
@@ -34,6 +40,7 @@ type BillingPageContentProps = {
 }
 
 export function BillingPageContent({
+  tab,
   owners,
   appointments,
   invoices,
@@ -45,6 +52,7 @@ export function BillingPageContent({
 }: BillingPageContentProps) {
   return (
     <BillingTabs
+      tab={tab}
       owners={owners}
       appointments={appointments}
       invoices={invoices}
