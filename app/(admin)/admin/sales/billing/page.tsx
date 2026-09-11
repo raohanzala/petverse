@@ -19,7 +19,7 @@ type BillingPageProps = {
 export default async function BillingPage({
   searchParams,
 }: BillingPageProps) {
-  const params = await searchParams
+    const params = await searchParams
 
   const invoiceFilters =
     parseInvoiceListFilters(params)
@@ -47,19 +47,9 @@ export default async function BillingPage({
   const appointments =
     await listAppointments()
 
-  const tab =
-    typeof params.tab === "string"
-      ? params.tab
-      : "invoices"
-
   return (
     <BillingPageContent
-      tab={
-        tab as
-        | "invoices"
-        | "deposits"
-        | "payment-links"
-      }
+      tab="invoices"
       owners={owners}
       appointments={appointments}
       invoices={invoices}
@@ -67,9 +57,7 @@ export default async function BillingPage({
       paymentLinks={paymentLinks}
       invoiceFilters={invoiceFilters}
       depositFilters={depositFilters}
-      paymentLinkFilters={
-        paymentLinkFilters
-      }
+      paymentLinkFilters={paymentLinkFilters}
     />
   )
 }

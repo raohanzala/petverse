@@ -47,6 +47,7 @@ import { DatePickerTime } from "@/components/ui/date-picker-with-time"
 import { format } from "date-fns"
 import { InvoiceLineItems } from "./line-items/invoice-line-items"
 import {
+    CreateInvoiceOutput,
     createInvoiceSchema,
     type CreateInvoiceInput
 } from "@/lib/validations/invoice"
@@ -115,7 +116,7 @@ export function InvoiceFormDialog({
     const form = useForm<
         CreateInvoiceInput,
         unknown,
-        CreateInvoiceInput
+        CreateInvoiceOutput
     >({
         resolver: zodResolver(createInvoiceSchema),
         defaultValues,
@@ -169,7 +170,7 @@ export function InvoiceFormDialog({
         Math.max(0, Number(tax) || 0)
 
     async function onSubmit(
-        values: CreateInvoiceInput
+        values: CreateInvoiceOutput
     ) {
         setIsSubmitting(true)
 

@@ -95,7 +95,11 @@ export const updateInvoiceSchema = invoiceBaseSchema.partial().extend({
   id: z.string().uuid("Invalid invoice id"),
 })
 
-export type CreateInvoiceInput = z.infer<
+export type CreateInvoiceInput = z.input<
+  typeof createInvoiceSchema
+>
+
+export type CreateInvoiceOutput = z.output<
   typeof createInvoiceSchema
 >
 
