@@ -75,7 +75,7 @@ export function BoardingTabs({
 
       <TabsContent value="attendance">
         <AttendanceTab
-          params={params}
+          // params={params}
           searchParams={searchParams}
         />
       </TabsContent>
