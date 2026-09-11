@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,8 @@ import {
   createPetSchema,
   type CreatePetInput,
 } from "@/lib/validations/pet"
+import { DatePicker } from "../ui/date-picker"
+import { format } from "date-fns"
 
 type PetFormDialogProps = {
   open: boolean
@@ -117,11 +119,11 @@ export function PetFormDialog({
     setIsSubmitting(false)
 
     if (!result.success) {
-       toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+      toast.add({
+        type: "error",
+        description: result.error,
+        priority: "high",
+      })
       return
     }
 
@@ -274,15 +276,35 @@ export function PetFormDialog({
               </Field>
 
               <Field data-invalid={!!form.formState.errors.birth_date}>
-                <FieldLabel htmlFor="pet-birth-date">
-                  Birth date
-                </FieldLabel>
 
-                <Input
-                  id="pet-birth-date"
-                  type="date"
-                  aria-invalid={!!form.formState.errors.birth_date}
-                  {...form.register("birth_date")}
+                <Controller
+                  control={form.control}
+                  name="birth_date"
+                  render={({ field, fieldState }) => {
+                    const selectedDate = field.value
+                      ? new Date(`${field.value}T00:00:00`)
+                      : undefined
+
+                    return (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="pet-birth-date">
+                          Birth date
+                        </FieldLabel>
+
+                        <DatePicker
+                          date={selectedDate}
+                          onDateChange={(date) => {
+                            field.onChange(
+                              date ? format(date, "yyyy-MM-dd") : ""
+                            )
+                          }}
+                          placeholder="Pick a birth date"
+                        />
+
+                        <FieldError errors={[fieldState.error]} />
+                      </Field>
+                    )
+                  }}
                 />
 
                 <FieldError

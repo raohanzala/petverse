@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
@@ -48,6 +48,8 @@ import {
     createAppointmentSchema,
     type CreateAppointmentInput,
 } from "@/lib/validations/appointments"
+import { format } from "date-fns"
+import { DatePickerTime } from "../ui/date-picker-with-time"
 
 type AppointmentFormDialogProps = {
     open: boolean
@@ -149,9 +151,30 @@ export function AppointmentFormDialog({
     }, [open, appointment, form])
 
     const selectedOwnerId = form.watch("owner_id")
+    const selectedPetId = form.watch("pet_id")
     const selectedServiceId = form.watch("service_id")
     const selectedPackageId = form.watch("package_id")
+    const selectedEmployeeId = form.watch("employee_id")
+    const selectedPreferredEmployeeId = form.watch(
+        "preferred_employee_id"
+    )
     const selectedStatus = form.watch("status")
+
+    const selectedPet = pets.find(
+        (pet) => pet.id === selectedPetId
+    )
+
+    const selectedPackage = packages.find(
+        (pkg) => pkg.id === Number(selectedPackageId)
+    )
+
+    const selectedEmployee = employees.find(
+        (employee) => employee.id === selectedEmployeeId
+    )
+
+    const selectedPreferredEmployee = employees.find(
+        (employee) => employee.id === selectedPreferredEmployeeId
+    )
 
     const ownerPets = pets.filter(
         (pet) => pet.owner_id === selectedOwnerId
@@ -210,11 +233,11 @@ export function AppointmentFormDialog({
         setIsSubmitting(false)
 
         if (!result.success) {
-             toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+            toast.add({
+                type: "error",
+                description: result.error,
+                priority: "high",
+            })
             return
         }
 
@@ -222,7 +245,7 @@ export function AppointmentFormDialog({
             type: "success",
             description: isEditing ? "Appointment updated" : "Appointment created",
             priority: "high",
-          })
+        })
 
         onOpenChange(false)
         onSuccess()
@@ -231,6 +254,40 @@ export function AppointmentFormDialog({
     const selectedService = services.find(
         (service) => service.id === form.watch("service_id")
     )
+
+    function parseDateTime(value: string) {
+        if (!value) {
+            return {
+                date: undefined,
+                time: "",
+            }
+        }
+
+        const [datePart, timePart] = value.split("T")
+
+        return {
+            date: datePart
+                ? new Date(`${datePart}T00:00:00`)
+                : undefined,
+            time: timePart ?? "",
+        }
+    }
+
+    function combineDateTime(
+        date: Date | undefined,
+        time: string
+    ) {
+        if (!date) return ""
+
+        const datePart = format(date, "yyyy-MM-dd")
+
+        // If no time has been selected yet,
+        // use the current time.
+        const finalTime =
+            time || format(new Date(), "HH:mm:ss")
+
+        return `${datePart}T${finalTime}`
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -250,6 +307,7 @@ export function AppointmentFormDialog({
 
                 <Form {...form}>
                     <form
+                        id="appointment"
                         onSubmit={form.handleSubmit(onSubmit)}
                         noValidate
                         className="space-y-5 h-100 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -303,24 +361,13 @@ export function AppointmentFormDialog({
                                 />
                             </Field>
 
-                            <Field
-                                data-invalid={
-                                    !!form.formState.errors.pet_id
-                                }
-                            >
-                                <FieldLabel htmlFor="appointment-pet">
-                                    Pet
-                                </FieldLabel>
-
+                            <Field data-invalid={!!form.formState.errors.pet_id} >
+                                <FieldLabel htmlFor="appointment-pet"> Pet </FieldLabel>
                                 <Select
                                     value={form.watch("pet_id")}
                                     onValueChange={(value) => {
                                         if (!value) return
-
-                                        form.setValue("pet_id", value, {
-                                            shouldDirty: true,
-                                            shouldValidate: true,
-                                        })
+                                        form.setValue("pet_id", value, { shouldDirty: true, shouldValidate: true, })
                                     }}
                                     disabled={!selectedOwnerId}
                                 >
@@ -336,26 +383,20 @@ export function AppointmentFormDialog({
                                                     ? "Select pet"
                                                     : "Select owner first"
                                             }
-                                        />
+                                        >
+                                            {selectedPet?.name ??
+                                                (selectedOwnerId
+                                                    ? "Select pet"
+                                                    : "Select owner first")}
+                                        </SelectValue>
                                     </SelectTrigger>
-
                                     <SelectContent>
-                                        {ownerPets.map((pet) => (
-                                            <SelectItem
-                                                key={pet.id}
-                                                value={pet.id}
-                                            >
-                                                {pet.name} — {pet.species}
-                                            </SelectItem>
-                                        ))}
+                                        {ownerPets.map((pet) =>
+                                            (<SelectItem key={pet.id} value={pet.id} > {pet.name} — {pet.species} </SelectItem>))
+                                        }
                                     </SelectContent>
                                 </Select>
-
-                                <FieldError
-                                    errors={[
-                                        form.formState.errors.pet_id,
-                                    ]}
-                                />
+                                <FieldError errors={[form.formState.errors.pet_id,]} />
                             </Field>
 
                             <Field
@@ -414,14 +455,16 @@ export function AppointmentFormDialog({
                                 </FieldLabel>
 
                                 <Select
-                                    value={selectedServiceId ?? ""}
+                                    value={selectedPackageId ?? ""}
                                     onValueChange={(value) => {
                                         if (!value) return
-                                        handleServiceChange(value)
+                                        handlePackageChange(value)
                                     }}
                                 >
                                     <SelectTrigger id="appointment-package">
-                                        <SelectValue placeholder="Select package" />
+                                        <SelectValue placeholder="Select package">
+                                            {selectedPackage?.name ?? "Select package"}
+                                        </SelectValue>
                                     </SelectTrigger>
 
                                     <SelectContent>
@@ -443,7 +486,7 @@ export function AppointmentFormDialog({
                                 </FieldLabel>
 
                                 <Select
-                                    value={form.watch("employee_id") ?? ""}
+                                    value={selectedEmployeeId ?? ""}
                                     onValueChange={(value) => {
                                         form.setValue(
                                             "employee_id",
@@ -456,7 +499,10 @@ export function AppointmentFormDialog({
                                     }}
                                 >
                                     <SelectTrigger id="appointment-staff">
-                                        <SelectValue placeholder="Assign staff" />
+                                        <SelectValue placeholder="Assign staff">
+                                            {selectedEmployee?.display_name ??
+                                                "Assign staff"}
+                                        </SelectValue>
                                     </SelectTrigger>
 
                                     <SelectContent>
@@ -480,11 +526,7 @@ export function AppointmentFormDialog({
                                 </FieldLabel>
 
                                 <Select
-                                    value={
-                                        form.watch(
-                                            "preferred_employee_id"
-                                        ) ?? ""
-                                    }
+                                    value={selectedPreferredEmployeeId ?? ""}
                                     onValueChange={(value) => {
                                         form.setValue(
                                             "preferred_employee_id",
@@ -497,7 +539,10 @@ export function AppointmentFormDialog({
                                     }}
                                 >
                                     <SelectTrigger id="appointment-preferred-staff">
-                                        <SelectValue placeholder="No preference" />
+                                        <SelectValue placeholder="No preference">
+                                            {selectedPreferredEmployee?.display_name ??
+                                                "No preference"}
+                                        </SelectValue>
                                     </SelectTrigger>
 
                                     <SelectContent>
@@ -515,55 +560,113 @@ export function AppointmentFormDialog({
                                 </Select>
                             </Field>
 
-                            <Field
-                                data-invalid={
-                                    !!form.formState.errors.starts_at
-                                }
-                            >
-                                <FieldLabel htmlFor="appointment-starts-at">
-                                    Start
-                                </FieldLabel>
+                            <Controller
+                                control={form.control}
+                                name="starts_at"
+                                render={({ field, fieldState }) => {
+                                    const { date, time } = parseDateTime(field.value)
 
-                                <Input
-                                    id="appointment-starts-at"
-                                    type="datetime-local"
-                                    aria-invalid={
-                                        !!form.formState.errors.starts_at
-                                    }
-                                    {...form.register("starts_at")}
-                                />
+                                    return (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <DatePickerTime
+                                                date={date}
+                                                onDateChange={(selectedDate) => {
+                                                    if (!selectedDate) {
+                                                        field.onChange("")
+                                                        return
+                                                    }
 
-                                <FieldError
-                                    errors={[
-                                        form.formState.errors.starts_at,
-                                    ]}
-                                />
-                            </Field>
+                                                    const currentValue = field.value
 
-                            <Field
-                                data-invalid={
-                                    !!form.formState.errors.ends_at
-                                }
-                            >
-                                <FieldLabel htmlFor="appointment-ends-at">
-                                    End
-                                </FieldLabel>
+                                                    const currentTime = currentValue
+                                                        ? parseDateTime(currentValue).time
+                                                        : format(new Date(), "HH:mm:ss")
 
-                                <Input
-                                    id="appointment-ends-at"
-                                    type="datetime-local"
-                                    aria-invalid={
-                                        !!form.formState.errors.ends_at
-                                    }
-                                    {...form.register("ends_at")}
-                                />
+                                                    field.onChange(
+                                                        combineDateTime(
+                                                            selectedDate,
+                                                            currentTime
+                                                        )
+                                                    )
+                                                }}
+                                                time={time}
+                                                onTimeChange={(selectedTime) => {
+                                                    const currentDate =
+                                                        parseDateTime(field.value).date
 
-                                <FieldError
-                                    errors={[
-                                        form.formState.errors.ends_at,
-                                    ]}
-                                />
-                            </Field>
+                                                    field.onChange(
+                                                        combineDateTime(
+                                                            currentDate,
+                                                            selectedTime
+                                                        )
+                                                    )
+                                                }}
+                                                dateLabel="Start date"
+                                                timeLabel="Time"
+                                                datePlaceholder="Select date"
+                                            />
+
+                                            <FieldError
+                                                errors={[fieldState.error]}
+                                            />
+                                        </Field>
+                                    )
+                                }}
+                            />
+
+                            <Controller
+                                control={form.control}
+                                name="ends_at"
+                                render={({ field, fieldState }) => {
+                                    const { date, time } = parseDateTime(field.value)
+
+                                    return (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <DatePickerTime
+                                                date={date}
+                                                onDateChange={(selectedDate) => {
+                                                    if (!selectedDate) {
+                                                        field.onChange("")
+                                                        return
+                                                    }
+
+                                                    const currentValue = field.value
+
+                                                    const currentTime = currentValue
+                                                        ? parseDateTime(currentValue).time
+                                                        : format(new Date(), "HH:mm:ss")
+
+                                                    field.onChange(
+                                                        combineDateTime(
+                                                            selectedDate,
+                                                            currentTime
+                                                        )
+                                                    )
+                                                }}
+                                                time={time}
+                                                onTimeChange={(selectedTime) => {
+                                                    const currentDate =
+                                                        parseDateTime(field.value).date
+
+                                                    field.onChange(
+                                                        combineDateTime(
+                                                            currentDate,
+                                                            selectedTime
+                                                        )
+                                                    )
+                                                }}
+                                                dateLabel="End date"
+                                                timeLabel="Time"
+                                                datePlaceholder="Select date"
+                                            />
+
+                                            <FieldError
+                                                errors={[fieldState.error]}
+                                            />
+                                        </Field>
+                                    )
+                                }}
+                            />
 
                             <Field
                                 data-invalid={
@@ -763,36 +866,37 @@ export function AppointmentFormDialog({
                             ) : null}
                         </FieldGroup>
 
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                                disabled={isSubmitting}
-                            >
-                                Cancel
-                            </Button>
-
-                            <Button
-                                type="submit"
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Spinner
-                                            size="sm"
-                                            className="text-primary-foreground"
-                                        />
-                                        Saving…
-                                    </>
-                                ) : isEditing ? (
-                                    "Save changes"
-                                ) : (
-                                    "Create appointment"
-                                )}
-                            </Button>
-                        </DialogFooter>
                     </form>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => onOpenChange(false)}
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            form="appointment"
+                            type="submit"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Spinner
+                                        size="sm"
+                                        className="text-primary-foreground"
+                                    />
+                                    Saving…
+                                </>
+                            ) : isEditing ? (
+                                "Save changes"
+                            ) : (
+                                "Create appointment"
+                            )}
+                        </Button>
+                    </DialogFooter>
                 </Form>
             </DialogContent>
         </Dialog>

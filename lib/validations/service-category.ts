@@ -37,4 +37,4 @@ export type UpdateServiceCategoryInput = z.infer<typeof updateServiceCategorySch
 
 export const deleteServiceCategorySchema = z.object({
   id: z.string().uuid("Invalid category id"),
-})
+}) 

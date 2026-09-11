@@ -444,3 +444,458 @@ export type AppointmentInsert = Pick<
 >
 
 export type AppointmentUpdate = Partial<AppointmentInsert>
+
+export type FacilityResourceType =
+  | "kennel"
+  | "suite"
+  | "playroom"
+  | "other"
+
+export type FacilityResourceRow = {
+  id: string
+  name: string
+  type: FacilityResourceType
+  column_label: string | null
+  row_number: number | null
+  capacity: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type FacilityResourceInsert = Pick<
+  FacilityResourceRow,
+  | "name"
+  | "type"
+  | "column_label"
+  | "row_number"
+  | "capacity"
+  | "is_active"
+>
+
+export type FacilityResourceUpdate =
+  Partial<FacilityResourceInsert>
+
+export type ReservationStatus =
+  | "pending"
+  | "confirmed"
+  | "checked_in"
+  | "checked_out"
+  | "cancelled"
+
+export type ReservationRow = {
+  id: string
+
+  pet_id: string
+  owner_id: string
+  resource_id: string | null
+  service_id: string | null
+
+  status: ReservationStatus
+
+  check_in_at: string
+  check_out_at: string
+
+  notes: string | null
+
+  created_at: string
+  updated_at: string
+
+  pet: {
+    name: string
+    species: string
+  }
+
+  owner: {
+    name: string
+    phone: string
+  }
+
+  resource: {
+    name: string
+    type: FacilityResourceType
+  }
+
+  service: {
+    name: string
+  }
+}
+
+export type ReservationInsert = Pick<
+  ReservationRow,
+  | "pet_id"
+  | "owner_id"
+  | "resource_id"
+  | "service_id"
+  | "status"
+  | "check_in_at"
+  | "check_out_at"
+  | "notes"
+>
+
+export type ReservationUpdate =
+  Partial<ReservationInsert>
+
+export type AttendanceEntryType =
+  | "check_in"
+  | "check_out"
+  | "note"
+  | "incident"
+
+export type AttendanceEntryRow = {
+  id: string
+  reservation_id: string
+  type: AttendanceEntryType
+  recorded_at: string
+  recorded_by: string | null
+  flags: string[]
+  notes: string | null
+
+  reservation: {
+    id: string
+    pet: {
+      name: string
+      species: string
+    }
+  }
+
+  employee: {
+    display_name: string
+    initials: string | null
+  } | null
+}
+
+export type AttendanceEntryInsert = Pick<
+  AttendanceEntryRow,
+  | "reservation_id"
+  | "type"
+  | "recorded_by"
+  | "flags"
+  | "notes"
+>
+
+export type AttendanceEntryUpdate =
+  Partial<AttendanceEntryInsert>
+
+export type DaycarePricingRow = {
+  id: string
+  full_day_price: number
+  half_day_price: number
+  updated_at: string
+}
+
+export type DaycarePackageRow = {
+  id: string
+  name: string
+  visit_count: number
+  price: number
+  valid_days: number | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type DaycareWalletRow = {
+  id: string
+  owner_id: string
+  pet_id: string | null
+  package_id: string
+  visits_remaining: number
+  expires_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type DaycareScheduleRow = {
+  id: string
+  pet_id: string
+  day_of_week: number
+  start_time: string
+  end_time: string
+  is_active: boolean
+}
+
+export type DaycareSessionStatus =
+  | "scheduled"
+  | "checked_in"
+  | "checked_out"
+  | "cancelled"
+
+export type DaycareTransactionRow = {
+  id: string
+  pet_id: string
+  owner_id: string
+  wallet_id: string | null
+  status: DaycareSessionStatus
+  scheduled_at: string | null
+  check_in_at: string | null
+  check_out_at: string | null
+  amount: number | null
+  notes: string | null
+  created_at: string
+}
+
+export type InvoiceStatus =
+  | "draft"
+  | "open"
+  | "paid"
+  | "void"
+
+export type InvoiceRow = {
+  id: string
+  owner_id: string
+  appointment_id: string | null
+  number: number | null
+  status: InvoiceStatus
+  subtotal: number
+  tax: number
+  total: number
+  currency: string
+  issued_at: string | null
+  paid_at: string | null
+  voided_at: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type InvoiceInsert = Pick<
+  InvoiceRow,
+  | "owner_id"
+  | "appointment_id"
+  | "number"
+  | "status"
+  | "subtotal"
+  | "tax"
+  | "total"
+  | "currency"
+  | "issued_at"
+  | "paid_at"
+  | "voided_at"
+  | "notes"
+>
+
+export type InvoiceUpdate =
+  Partial<InvoiceInsert>
+
+
+export type InvoiceLineItemRow = {
+  id: string
+  invoice_id: string
+  appointment_id: string | null
+  product_id: string | null
+  description: string
+  quantity: number
+  unit_price: number
+  total: number
+}
+
+export type InvoiceLineItemInsert = Pick<
+  InvoiceLineItemRow,
+  | "invoice_id"
+  | "appointment_id"
+  | "product_id"
+  | "description"
+  | "quantity"
+  | "unit_price"
+  | "total"
+>
+
+export type InvoiceLineItemUpdate =
+  Partial<InvoiceLineItemInsert>
+
+
+export type DepositRow = {
+  id: string
+  owner_id: string
+  appointment_id: string | null
+  invoice_id: string | null
+  amount: number
+  paid_at: string | null
+  provider_ref: string | null
+  created_at: string
+}
+
+export type DepositInsert = Pick<
+  DepositRow,
+  | "owner_id"
+  | "appointment_id"
+  | "invoice_id"
+  | "amount"
+  | "paid_at"
+  | "provider_ref"
+>
+
+export type DepositUpdate =
+  Partial<DepositInsert>
+
+
+export type PaymentTokenRow = {
+  id: string
+  token: string
+  invoice_id: string
+  expires_at: string
+  used_at: string | null
+  created_at: string
+}
+
+export type PaymentTokenInsert = Pick<
+  PaymentTokenRow,
+  "token" | "invoice_id" | "expires_at" | "used_at"
+>
+
+export type PaymentTokenUpdate =
+  Partial<PaymentTokenInsert>
+
+export type PaymentLinkListRow =
+  PaymentTokenRow & {
+    invoice: {
+      id: string
+      number: number | null
+      total: number
+      currency: string
+      status: string
+    } | null
+  }
+
+export type BoardingWaitlistRow = {
+  id: string
+
+  pet_id: string
+  owner_id: string
+
+  desired_from: string
+  desired_to: string
+
+  notes: string | null
+
+  created_at: string
+}
+
+export type BoardingWaitlistInsert = Pick<
+  BoardingWaitlistRow,
+  | "pet_id"
+  | "owner_id"
+  | "desired_from"
+  | "desired_to"
+  | "notes"
+>
+
+export type BoardingWaitlistUpdate =
+  Partial<BoardingWaitlistInsert>
+
+export type BoardingWaitlistListRow =
+  BoardingWaitlistRow & {
+    pet: {
+      name: string
+      species: string
+    }
+
+    owner: {
+      name: string
+      phone: string
+    }
+  }
+
+export type PetBoardingInstructionsRow = {
+  id: string
+
+  pet_id: string
+  reservation_id: string | null
+
+  feeding_notes: string | null
+  medication_notes: string | null
+  behavior_notes: string | null
+
+  updated_at: string
+}
+
+export type PetBoardingInstructionsInsert = Pick<
+  PetBoardingInstructionsRow,
+  | "pet_id"
+  | "reservation_id"
+  | "feeding_notes"
+  | "medication_notes"
+  | "behavior_notes"
+>
+
+export type PetBoardingInstructionsUpdate =
+  Partial<PetBoardingInstructionsInsert>
+
+  export type PetBoardingInstructionsHistoryRow = {
+  id: string
+
+  instruction_id: string
+
+  snapshot: Record<string, unknown>
+
+  created_at: string
+}
+
+export type PetBoardingInstructionsHistoryInsert = Pick<
+  PetBoardingInstructionsHistoryRow,
+  | "instruction_id"
+  | "snapshot"
+>
+
+export type PetBoardingInstructionsListRow =
+  PetBoardingInstructionsRow & {
+    pet: {
+      name: string
+      species: string
+    }
+
+    reservation: {
+      id: string
+      status: ReservationStatus
+      check_in_at: string
+      check_out_at: string
+    } | null
+  }
+
+export type RoomTransferRow = {
+  id: string
+  reservation_id: string
+  from_resource_id: string | null
+  to_resource_id: string
+  transferred_at: string
+  notes: string | null
+}
+
+export type RoomTransferInsert = Pick<
+  RoomTransferRow,
+  | "reservation_id"
+  | "from_resource_id"
+  | "to_resource_id"
+  | "notes"
+>
+
+export type RoomTransferListRow =
+  RoomTransferRow & {
+    reservation: {
+      id: string
+      pet: {
+        name: string
+        species: string
+      }
+      owner: {
+        name: string
+        phone: string
+      }
+    }
+
+    from_resource: {
+      id: string
+      name: string
+      type: FacilityResourceType
+    } | null
+
+    to_resource: {
+      id: string
+      name: string
+      type: FacilityResourceType
+    }
+  }
+
+export type RoomTransferUpdate =
+  Partial<RoomTransferInsert>

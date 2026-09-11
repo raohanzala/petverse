@@ -1,18 +1,15 @@
 "use client"
 
 import type { ReactTable, RowData } from "@tanstack/react-table"
-import { Settings2Icon } from "lucide-react"
 
 import type { AdminTableFeatures } from "@/components/shared/data-table/data-table-features"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 
 type DataTableViewOptionsProps<TData extends RowData> = {
@@ -33,18 +30,6 @@ export function DataTableViewOptions<TData extends RowData>({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="outline"
-            size="icon-sm"
-            className="size-10 shrink-0 rounded-lg border-border bg-card shadow-none"
-            aria-label="Toggle columns"
-          />
-        }
-      >
-        <Settings2Icon className="size-4 text-muted-foreground" />
-      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
