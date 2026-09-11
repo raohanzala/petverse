@@ -1,13 +1,23 @@
 import {
+  BellRing,
   CalendarCheck,
+  CalendarClock,
   ClipboardList,
+  DollarSign,
+  FileText,
   FolderTree,
+  Inbox,
   LayoutDashboard,
+  MessageSquareText,
   Package,
   PawPrint,
+  Send,
   Settings,
+  ShoppingCart,
   Stethoscope,
+  Tags,
   Users,
+  UsersRound,
   Wrench,
   type LucideIcon,
 } from "lucide-react"
@@ -59,20 +69,32 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       },
       { title: "Services", href: "/admin/catalog/services", icon: Wrench },
       { title: "Packages", href: "/admin/catalog/packages", icon: Package },
-      { title: "Packages Steps", href: "/admin/catalog/package-steps", icon: Package },
+      { title: "Packages Steps", href: "/admin/catalog/package-steps", icon: Tags },
     ],
   },
   {
     label: "Staff",
     items: [
-      { title: "Employees", href: "/admin/staff/employees", icon: Stethoscope },
+      { title: "Employees", href: "/admin/staff/employees", icon: Users },
       { title: "Schedules", href: "/admin/staff/schedule", icon: ClipboardList },
     ],
   },
   {
     label: "Sales",
     items: [
-      { title: "Billing", href: "/admin/sales/billing", icon: Stethoscope }
+      { title: "Billing", href: "/admin/sales/billing", icon: DollarSign }
+    ],
+  },
+  {
+    label: "Communications",
+    items: [
+      { title: "Conversations", href: "/admin/communications/conversations", icon: MessageSquareText },
+      { title: "Inbox", href: "/admin/communications/inbox", icon: Inbox },
+      { title: "Message Templates", href: "/admin/communications/message-templates", icon: FileText },
+      { title: "Reminder Logs", href: "/admin/communications/reminder-logs", icon: BellRing },
+      { title: "Campaign Contacts", href: "/admin/communications/campaign-contacts", icon: UsersRound },
+      { title: "Outbound Campaigns", href: "/admin/communications/outbound-campaigns", icon: Send },
+      { title: "Campaign Blackout Periods", href: "/admin/communications/campaign-blackout-periods", icon: CalendarClock }
     ],
   },
   {
