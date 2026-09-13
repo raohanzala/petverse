@@ -1238,7 +1238,9 @@ create index idx_commission_tiers_employee
 
 | Phase | Table | Section |
 |-------|-------|---------|
-| 2 | `facility_resources` | Boarding |
+
+---COMPLETED---
+<!-- | 2 | `facility_resources` | Boarding |
 | 2 | `reservations` | Boarding |
 | 2 | `boarding_waitlist` | Boarding |
 | 2 | `pet_boarding_instructions` | Boarding |
@@ -1254,8 +1256,10 @@ create index idx_commission_tiers_employee
 | 2 | `invoices` | Billing |
 | 2 | `invoice_line_items` | Billing |
 | 2 | `deposits` | Billing |
-| 2 | `payment_tokens` | Billing |
-| 3 | `conversations` | Communications |
+| 2 | `payment_tokens` | Billing | -->
+------
+
+<!-- | 3 | `conversations` | Communications |
 | 3 | `conversation_messages` | Communications |
 | 3 | `message_templates` | Communications |
 | 3 | `reminder_log` | Communications |
@@ -1266,9 +1270,13 @@ create index idx_commission_tiers_employee
 | 3 | `pet_vaccinations` | Compliance |
 | 3 | `consent_form_templates` | Compliance |
 | 3 | `service_consent_forms` | Compliance |
-| 3 | `consent_form_submissions` | Compliance |
-| 3 | `owner_retention_settings` | CRM |
-| 3 | `business_targets` | CRM |
+| 3 | `consent_form_submissions` | Compliance | -->
+------
+
+<!-- | 3 | `owner_retention_settings` | CRM |
+| 3 | `business_targets` | CRM | -->
+------
+
 | 3 | `daily_updates` | Media |
 | 3 | `pet_update_images` | Media |
 | 3 | `pet_photos` | Media |

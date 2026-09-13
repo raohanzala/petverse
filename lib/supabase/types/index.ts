@@ -822,7 +822,7 @@ export type PetBoardingInstructionsInsert = Pick<
 export type PetBoardingInstructionsUpdate =
   Partial<PetBoardingInstructionsInsert>
 
-  export type PetBoardingInstructionsHistoryRow = {
+export type PetBoardingInstructionsHistoryRow = {
   id: string
 
   instruction_id: string
@@ -899,3 +899,671 @@ export type RoomTransferListRow =
 
 export type RoomTransferUpdate =
   Partial<RoomTransferInsert>
+
+export type ConversationStage =
+  | "inquiry"
+  | "engaged"
+  | "quoted"
+  | "booked"
+  | "visited"
+  | "closed_lost"
+  | "closed_won"
+
+export type ConversationRow = {
+  id: string
+
+  owner_id: string | null
+  channel: string
+  external_id: string | null
+
+  stage: ConversationStage
+
+  closed_lost_reason: string | null
+  quoted_amount: number | null
+  lost_revenue: number | null
+
+  assigned_employee_id: string | null
+  first_staff_response_at: string | null
+
+  ai_handled: boolean
+
+  created_at: string
+  updated_at: string
+}
+
+export type ConversationInsert = Pick<
+  ConversationRow,
+  | "owner_id"
+  | "channel"
+  | "external_id"
+  | "stage"
+  | "closed_lost_reason"
+  | "quoted_amount"
+  | "lost_revenue"
+  | "assigned_employee_id"
+  | "first_staff_response_at"
+  | "ai_handled"
+>
+
+export type ConversationEmployeeOption = {
+  id: string
+  name: string
+}
+
+export type ConversationUpdate =
+  Partial<ConversationInsert>
+
+export type MessageDirection =
+  | "inbound"
+  | "outbound"
+
+export type ConversationMessageRow = {
+  id: string
+
+  conversation_id: string
+  direction: MessageDirection
+  body: string
+  sent_at: string
+  external_id: string | null
+}
+
+export type ConversationMessageInsert = {
+  conversation_id: string
+  direction: MessageDirection
+  body: string
+  sent_at?: string
+  external_id?: string | null
+}
+
+export type ConversationMessageUpdate =
+  Partial<ConversationMessageInsert>
+
+export type MessageTemplateRow = {
+  id: string
+  name: string
+  channel: string
+  body: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type MessageTemplateInsert = Pick<
+  MessageTemplateRow,
+  | "name"
+  | "channel"
+  | "body"
+  | "is_active"
+>
+
+export type MessageTemplateUpdate =
+  Partial<MessageTemplateInsert>
+
+export type ReminderLogRow = {
+  id: string
+  owner_id: string | null
+  appointment_id: string | null
+  channel: string
+  template_key: string | null
+  status: string
+  sent_at: string
+  error_message: string | null
+}
+
+export type CampaignStatus =
+  | "draft"
+  | "scheduled"
+  | "running"
+  | "completed"
+  | "cancelled"
+
+export type OutboundCampaignRow = {
+  id: string
+  name: string
+  channel: string
+  status: CampaignStatus
+  scheduled_at: string | null
+  created_at: string
+}
+
+export type OutboundCampaignInsert = Pick<
+  OutboundCampaignRow,
+  | "name"
+  | "channel"
+  | "status"
+  | "scheduled_at"
+>
+
+export type OutboundCampaignUpdate =
+  Partial<OutboundCampaignInsert>
+
+export type CampaignContactStatus =
+  | "pending"
+  | "sent"
+  | "delivered"
+  | "failed"
+  | "unsubscribed"
+
+export type CampaignContactRow = {
+  id: string
+  campaign_id: string
+  owner_id: string
+  status: CampaignContactStatus
+  sent_at: string | null
+}
+
+export type CampaignContactWithRelations =
+  CampaignContactRow & {
+    campaign: {
+      id: string
+      name: string
+    } | null
+    owner: {
+      id: string
+      name: string
+    } | null
+  }
+
+export type CampaignContactInsert = Pick<
+  CampaignContactRow,
+  | "campaign_id"
+  | "owner_id"
+  | "status"
+  | "sent_at"
+>
+
+export type CampaignContactUpdate =
+  Partial<CampaignContactInsert>
+
+export type CampaignBlackoutPeriodRow = {
+  id: string
+  campaign_id: string
+  starts_at: string
+  ends_at: string
+}
+
+export type CampaignBlackoutPeriodInsert = Pick<
+  CampaignBlackoutPeriodRow,
+  | "campaign_id"
+  | "starts_at"
+  | "ends_at"
+>
+
+export type CampaignBlackoutPeriodUpdate =
+  Partial<CampaignBlackoutPeriodInsert>
+
+export type VaccineTypeRow = {
+  id: string
+  name: string
+  species: string | null
+  interval_months: number | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type VaccineTypeInsert = Pick<
+  VaccineTypeRow,
+  | "name"
+  | "species"
+  | "interval_months"
+  | "is_active"
+>
+
+export type VaccineTypeUpdate =
+  Partial<VaccineTypeInsert>
+
+export type PetVaccinationRow = {
+  id: string
+  pet_id: string
+  vaccine_type_id: string
+  administered_at: string
+  expires_at: string | null
+  notes: string | null
+  recorded_by: string | null
+}
+
+export type PetVaccinationWithRelations =
+  PetVaccinationRow & {
+    pet: {
+      id: string
+      name: string
+    } | null
+
+    vaccine_type: {
+      id: string
+      name: string
+    } | null
+
+    employee: {
+      id: string
+      display_name: string
+    } | null
+  }
+
+export type PetVaccinationInsert = Pick<
+  PetVaccinationRow,
+  | "pet_id"
+  | "vaccine_type_id"
+  | "administered_at"
+  | "expires_at"
+  | "notes"
+  | "recorded_by"
+>
+
+export type PetVaccinationUpdate =
+  Partial<PetVaccinationInsert>
+
+export type ConsentFormTemplateRow = {
+  id: string
+  name: string
+  body_html: string
+  version: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ConsentFormTemplateInsert = Pick<
+  ConsentFormTemplateRow,
+  | "name"
+  | "body_html"
+  | "version"
+  | "is_active"
+>
+
+export type ConsentFormTemplateUpdate =
+  Partial<ConsentFormTemplateInsert>
+
+export type ServiceConsentFormRow = {
+  service_id: string
+  template_id: string
+}
+
+export type ServiceConsentFormInsert =
+  ServiceConsentFormRow
+
+export type ServiceConsentFormWithTemplate =
+  ServiceConsentFormRow & {
+    template: {
+      id: string
+      name: string
+      version: number
+      is_active: boolean
+    } | null
+  }
+
+export type ServiceConsentFormServiceOption = {
+  id: string
+  name: string
+}
+
+export type ServiceConsentFormTemplateOption = {
+  id: string
+  name: string
+  version: number
+  is_active: boolean
+}
+
+export type ConsentFormSubmissionRow = {
+  id: string
+  template_id: string
+  appointment_id: string | null
+  owner_id: string
+  pet_id: string | null
+  signed_at: string
+  signature_data: Record<string, unknown> | null
+}
+
+export type ConsentFormSubmissionWithRelations =
+  ConsentFormSubmissionRow & {
+    template: {
+      id: string
+      name: string
+      version: number
+    } | null
+
+    appointment: {
+      id: string
+      starts_at: string
+    } | null
+
+    owner: {
+      id: string
+      name: string
+      phone: string
+    } | null
+
+    pet: {
+      id: string
+      name: string
+      species: string
+    } | null
+  }
+
+export type ConsentFormSubmissionInsert = Pick<
+  ConsentFormSubmissionRow,
+  | "template_id"
+  | "appointment_id"
+  | "owner_id"
+  | "pet_id"
+  | "signed_at"
+  | "signature_data"
+>
+
+export type ConsentFormSubmissionUpdate =
+  Partial<ConsentFormSubmissionInsert>
+
+export type ConsentFormSubmissionTemplateOption = {
+  id: string
+  name: string
+  version: number
+}
+
+export type ConsentFormSubmissionAppointmentOption = {
+  id: string
+  starts_at: string
+  status: AppointmentStatus
+  owner_id: string
+  pet_id: string
+}
+
+export type ConsentFormSubmissionOwnerOption = {
+  id: string
+  name: string
+  phone: string
+}
+
+export type ConsentFormSubmissionPetOption = {
+  id: string
+  name: string
+  species: string
+  owner_id: string
+}
+
+export type OwnerRetentionSettingsRow = {
+  id: string
+  owner_id: string
+  lapsed_after_days: number
+  reengagement_queued_at: string | null
+  opt_out: boolean
+}
+
+export type OwnerRetentionSettingsWithOwner =
+  OwnerRetentionSettingsRow & {
+    owner: {
+      id: string
+      name: string
+      phone: string
+      email: string | null
+    } | null
+  }
+
+export type OwnerRetentionSettingsInsert = Pick<
+  OwnerRetentionSettingsRow,
+  | "owner_id"
+  | "lapsed_after_days"
+  | "reengagement_queued_at"
+  | "opt_out"
+>
+
+export type OwnerRetentionSettingsUpdate =
+  Partial<OwnerRetentionSettingsInsert>
+
+export type OwnerRetentionSettingsOwnerOption = {
+  id: string
+  name: string
+  phone: string
+  email: string | null
+}
+
+export type BusinessTargetRow = {
+  id: string
+  metric_key: string
+  target_value: number
+  period_start: string
+  period_end: string
+  notes: string | null
+  created_at: string
+}
+
+export type BusinessTargetInsert = Pick<
+  BusinessTargetRow,
+  | "metric_key"
+  | "target_value"
+  | "period_start"
+  | "period_end"
+  | "notes"
+>
+
+export type BusinessTargetUpdate =
+  Partial<BusinessTargetInsert>
+
+export type DailyUpdateRow = {
+  id: string
+  pet_id: string
+  appointment_id: string | null
+  author_id: string | null
+  body: string
+  sent_to_owner_at: string | null
+  created_at: string
+}
+
+export type DailyUpdateWithRelations = DailyUpdateRow & {
+  pet: {
+    id: string
+    name: string
+    species: string
+    owner: {
+      id: string
+      name: string
+      phone: string
+    } | null
+  } | null
+  appointment: {
+    id: string
+    starts_at: string
+    status: AppointmentStatus
+  } | null
+  author: {
+    id: string
+    display_name: string
+    initials: string | null
+  } | null
+}
+
+export type DailyUpdateInsert = Pick<
+  DailyUpdateRow,
+  | "pet_id"
+  | "appointment_id"
+  | "author_id"
+  | "body"
+  | "sent_to_owner_at"
+>
+
+export type DailyUpdateUpdate = Partial<DailyUpdateInsert>
+
+export type DailyUpdatePetOption = {
+  id: string
+  name: string
+  species: string
+  owner_id: string
+  owner: {
+    name: string
+    phone: string
+  } | null
+}
+
+export type DailyUpdateAppointmentOption = {
+  id: string
+  pet_id: string
+  starts_at: string
+  status: AppointmentStatus
+}
+
+export type DailyUpdateEmployeeOption = {
+  id: string
+  display_name: string
+  initials: string | null
+}
+
+export type PetUpdateImageRow = {
+  id: string
+  daily_update_id: string | null
+  pet_id: string
+  file_url: string
+  sorted_at: string | null
+  created_at: string
+}
+
+export type PetUpdateImageInsert = Pick<
+  PetUpdateImageRow,
+  | "daily_update_id"
+  | "pet_id"
+  | "file_url"
+  | "sorted_at"
+>
+
+export type PetUpdateImageUpdate =
+  Partial<PetUpdateImageInsert>
+
+export type PetUpdateImageWithRelations =
+  PetUpdateImageRow & {
+    pet: {
+      id: string
+      name: string
+      species: string
+    } | null
+
+    daily_update: {
+      id: string
+      body: string
+      created_at: string
+    } | null
+  }
+
+export type PetPhotoRow = {
+  id: string
+  pet_id: string
+  file_url: string
+  caption: string | null
+  created_at: string
+}
+
+export type PetPhotoInsert = Pick<
+  PetPhotoRow,
+  | "pet_id"
+  | "file_url"
+  | "caption"
+>
+
+export type PetPhotoUpdate =
+  Partial<PetPhotoInsert>
+
+export type PetPhotoWithRelations =
+  PetPhotoRow & {
+    pet: {
+      id: string
+      name: string
+      species: string
+    } | null
+  }
+
+export const SUPPLIER_STATUS_FILTERS = [
+  "all",
+  "active",
+  "inactive",
+] as const
+
+export type SupplierStatusFilter =
+  (typeof SUPPLIER_STATUS_FILTERS)[number]
+
+export const SUPPLIER_STATUS_LABELS: Record<
+  SupplierStatusFilter,
+  string
+> = {
+  all: "All statuses",
+  active: "Active only",
+  inactive: "Inactive only",
+}
+
+export type SupplierRow = {
+  id: string
+  name: string
+  contact_name: string | null
+  email: string | null
+  phone: string | null
+  notes: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type SupplierInsert = Pick<
+  SupplierRow,
+  | "name"
+  | "contact_name"
+  | "email"
+  | "phone"
+  | "notes"
+  | "is_active"
+>
+
+export type SupplierUpdate =
+  Partial<SupplierInsert>
+
+export const PRODUCT_STATUS_FILTERS = [
+  "all",
+  "active",
+  "inactive",
+] as const
+
+export type ProductStatusFilter =
+  (typeof PRODUCT_STATUS_FILTERS)[number]
+
+export const PRODUCT_STATUS_LABELS: Record<
+  ProductStatusFilter,
+  string
+> = {
+  all: "All statuses",
+  active: "Active only",
+  inactive: "Inactive only",
+}
+
+export type ProductRow = {
+  id: string
+  supplier_id: string | null
+  sku: string | null
+  name: string
+  price: number
+  stock_qty: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ProductInsert = Pick<
+  ProductRow,
+  | "supplier_id"
+  | "sku"
+  | "name"
+  | "price"
+  | "stock_qty"
+  | "is_active"
+>
+
+export type ProductUpdate =
+  Partial<ProductInsert>
+
+export type ProductListRow =
+  ProductRow & {
+    supplier: {
+      id: string
+      name: string
+    } | null
+  }
+
+export type ProductSupplierOption = {
+  id: string
+  name: string
+}

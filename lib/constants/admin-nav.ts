@@ -73,10 +73,26 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     ],
   },
   {
+    label: "Compliance",
+    items: [
+      { title: "Vaccine Types", href: "/admin/compliance/vaccine-types", icon: FolderTree },
+      { title: "Pet Vaccinations", href: "/admin/compliance/pet-vaccinations", icon: Wrench },
+      { title: "Consent Form Templates", href: "/admin/compliance/consent-form-templates", icon: Package },
+      { title: "Consent Form Submissions", href: "/admin/compliance/consent-form-submissions", icon: Tags },
+    ],
+  },
+  {
     label: "Staff",
     items: [
       { title: "Employees", href: "/admin/staff/employees", icon: Users },
       { title: "Schedules", href: "/admin/staff/schedule", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "CRM",
+    items: [
+      { title: "Business Targets", href: "/admin/crm/business-targets", icon: Users },
+      { title: "Owner Retention Settings", href: "/admin/crm/owner-retention-settings", icon: ClipboardList },
     ],
   },
   {
@@ -94,7 +110,15 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { title: "Reminder Logs", href: "/admin/communications/reminder-logs", icon: BellRing },
       { title: "Campaign Contacts", href: "/admin/communications/campaign-contacts", icon: UsersRound },
       { title: "Outbound Campaigns", href: "/admin/communications/outbound-campaigns", icon: Send },
-      { title: "Campaign Blackout Periods", href: "/admin/communications/campaign-blackout-periods", icon: CalendarClock }
+      { title: "Campaign Blackout Periods", href: "/admin/communications/campaign-blackout-periods", icon: CalendarClock },
+      { title: "Daily Updates", href: "/admin/communications/daily-updates", icon: CalendarClock }
+    ],
+  },
+  {
+    label: "Inventory",
+    items: [
+      { title: "Suppliers", href: "/admin/inventory/suppliers", icon: MessageSquareText },
+      { title: "Products", href: "/admin/inventory/products", icon: Inbox }
     ],
   },
   {
