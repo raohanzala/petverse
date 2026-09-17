@@ -42,13 +42,14 @@ import {
   createReservationSchema,
   type CreateReservationInput,
 } from "@/lib/validations/reservation"
-import { format, parseISO } from "date-fns"
+import { format } from "date-fns"
 import { DatePickerTime } from "@/components/ui/date-picker-with-time"
 
 type ReservationFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   reservation?: ReservationRow | null
+  initialResourceId?: string | null
   services: ServiceListRow[]
   resources: FacilityResourceRow[]
   owners: OwnerRow[]
@@ -71,6 +72,7 @@ export function ReservationFormDialog({
   open,
   onOpenChange,
   reservation,
+  initialResourceId,
   services,
   resources,
   owners,
@@ -102,7 +104,10 @@ export function ReservationFormDialog({
       return
     }
 
-    form.reset(defaultValues)
+    form.reset({
+      ...defaultValues,
+      resource_id: initialResourceId ?? null,
+    })
   }, [open, reservation, form])
 
   async function onSubmit(values: CreateReservationInput) {
@@ -138,48 +143,6 @@ export function ReservationFormDialog({
     onSuccess()
   }
 
-  function getDateFromValue(value: string): Date | undefined {
-    if (!value) return undefined
-
-    const date = parseISO(value)
-
-    return Number.isNaN(date.getTime()) ? undefined : date
-  }
-
-  function getTimeFromValue(value: string): string {
-    if (!value) return ""
-
-    const date = parseISO(value)
-
-    if (Number.isNaN(date.getTime())) return ""
-
-    return format(date, "HH:mm:ss")
-  }
-
-  function combineDateAndTime(
-    date: Date | undefined,
-    time: string
-  ): string {
-    if (!date) return ""
-
-    const [hours, minutes, seconds = Number("00")] = (
-      time || format(new Date(), "HH:mm:ss")
-    )
-      .split(":")
-      .map(Number)
-
-    const result = new Date(date)
-
-    result.setHours(
-      hours || 0,
-      minutes || 0,
-      seconds || 0,
-      0
-    )
-
-    return result.toISOString()
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -211,10 +174,25 @@ export function ReservationFormDialog({
                   onValueChange={(value) => {
                     if (!value) return
 
+                    const selectedPet = pets.find(
+                      (pet) => pet.id === value
+                    )
+
                     form.setValue("pet_id", value, {
                       shouldDirty: true,
                       shouldValidate: true,
                     })
+
+                    if (selectedPet?.owner_id) {
+                      form.setValue(
+                        "owner_id",
+                        selectedPet.owner_id,
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                    }
                   }}
                 >
                   <SelectTrigger
@@ -257,6 +235,26 @@ export function ReservationFormDialog({
                       shouldDirty: true,
                       shouldValidate: true,
                     })
+
+                    const ownerPets = pets.filter(
+                      (pet) => pet.owner_id === value
+                    )
+
+                    if (ownerPets.length === 1) {
+                      form.setValue(
+                        "pet_id",
+                        ownerPets[0].id,
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                    } else {
+                      form.setValue("pet_id", "", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                   }}
                 >
                   <SelectTrigger

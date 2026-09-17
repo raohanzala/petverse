@@ -61,6 +61,10 @@ export function InvoicesManager({
         setFormOpen(true)
     }
 
+    function openDetails(invoice: InvoiceRow) {
+        router.push(`/admin/sales/billing/${invoice.id}`)
+      }
+
     async function confirmDelete() {
         if (!deletingInvoice) return
 
@@ -94,6 +98,7 @@ export function InvoicesManager({
             getInvoiceColumns({
                 onEdit: openEdit,
                 onDelete: setDeletingInvoice,
+                onView: openDetails
             }),
         []
     )

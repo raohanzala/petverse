@@ -57,6 +57,41 @@ export function getOwnerColumns({
       ),
     },
     {
+      accessorKey: "created_at",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Created"
+        />
+      ),
+      cell: ({ row }) => (
+        <span>
+          {new Date(row.original.created_at).toLocaleDateString([], {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "total_sales",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Sales"
+        />
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium">
+          ${row.original.total_sales.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
+      ),
+    },
+    {
       accessorKey: "preferred_contact",
       header: ({ column }) => (
         <DataTableColumnHeader

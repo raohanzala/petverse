@@ -1,6 +1,4 @@
-import { DaycareTabsNav } from "./daycare-tabs-nav"
 import { DaycareTabs } from "./daycare-tabs"
-import { PageHeader } from "@/components/shared"
 import type {
   DaycarePackageListFilters,
   DaycareWalletListFilters,
@@ -8,9 +6,11 @@ import type {
 import type {
   DaycarePackageRow,
   DaycarePricingRow,
+  DaycareScheduleListRow,
   DaycareScheduleRow,
   DaycareTransactionRow,
   DaycareWalletRow,
+  FacilityResourceRow,
   OwnerRow,
   PetRow,
 } from "@/lib/supabase/types"
@@ -33,10 +33,11 @@ type DaycarePageContentProps = {
   wallets: DaycareWalletRow[]
   packageFilters: DaycarePackageListFilters
   walletFilters: DaycareWalletListFilters
-  schedules: DaycareScheduleRow[]
+  schedules: DaycareScheduleListRow[]
   transactions: DaycareTransactionRow[]
   pets: PetRow[]
   owners: OwnerRow[]
+  resources: FacilityResourceRow[]
 }
 
 export async function DaycarePageContent({
@@ -50,12 +51,14 @@ export async function DaycarePageContent({
   schedules,
   transactions,
   pets,
-  owners
+  owners,
+  resources
 }: DaycarePageContentProps) {
   return (
     <Tabs className="space-y-6">
 
       <DaycareTabs
+      resources={resources}
         schedules={schedules}
         transactions={transactions}
         pets={pets}

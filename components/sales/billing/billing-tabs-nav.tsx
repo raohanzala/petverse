@@ -55,7 +55,7 @@ export function BillingTabsNav({
   return (
     <TabsList
       variant="line"
-      className="w-full justify-start gap-1 rounded-none bg-white"
+      className="w-full justify-start gap-1 bg-white py-2 rounded-md"
     >
       {BILLING_TABS.map((item) => {
         const Icon = item.icon

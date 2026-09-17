@@ -49,6 +49,7 @@ const defaultValues: CreateSupplierInput = {
   contact_name: "",
   email: "",
   phone: "",
+  address: "",
   notes: "",
   is_active: true,
 }
@@ -76,6 +77,7 @@ export function SupplierFormDialog({
         contact_name: supplier.contact_name ?? "",
         email: supplier.email ?? "",
         phone: supplier.phone ?? "",
+        address: supplier.address ?? "",
         notes: supplier.notes ?? "",
         is_active: supplier.is_active,
       })
@@ -90,9 +92,9 @@ export function SupplierFormDialog({
 
     const result = isEditing
       ? await updateSupplier({
-          id: supplier!.id,
-          ...values,
-        })
+        id: supplier!.id,
+        ...values,
+      })
       : await createSupplier(values)
 
     setIsSubmitting(false)
@@ -199,6 +201,24 @@ export function SupplierFormDialog({
                   {...form.register("phone")}
                 />
                 <FieldError errors={[form.formState.errors.phone]} />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.address}>
+                <FieldLabel htmlFor="supplier-address">
+                  Address
+                </FieldLabel>
+
+                <Textarea
+                  id="supplier-address"
+                  placeholder="123 Main Street, Lahore"
+                  rows={2}
+                  aria-invalid={!!form.formState.errors.address}
+                  {...form.register("address")}
+                />
+
+                <FieldError
+                  errors={[form.formState.errors.address]}
+                />
               </Field>
 
               <Field data-invalid={!!form.formState.errors.notes}>

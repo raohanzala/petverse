@@ -55,19 +55,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
 
   {
-    label: "Appointments",
+    label: "Schedule",
     items: [
       {
         title: "Appointments",
         href: "/admin/appointments",
         icon: CalendarCheck,
       },
-    ],
-  },
-
-  {
-    label: "Schedule",
-    items: [
       {
         title: "Boarding",
         href: "/admin/schedule/boarding",
@@ -93,101 +87,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Owners",
         href: "/admin/clients/owners",
         icon: UserRound,
-      },
-    ],
-  },
-
-  {
-    label: "Catalog",
-    items: [
-      {
-        title: "Categories",
-        href: "/admin/catalog/categories",
-        icon: FolderTree,
-      },
-      {
-        title: "Services",
-        href: "/admin/catalog/services",
-        icon: BriefcaseBusiness,
-      },
-      {
-        title: "Packages",
-        href: "/admin/catalog/packages",
-        icon: Package,
-      },
-      {
-        title: "Package Steps",
-        href: "/admin/catalog/package-steps",
-        icon: ListChecks,
-      },
-    ],
-  },
-
-  {
-    label: "Compliance",
-    items: [
-      {
-        title: "Vaccine Types",
-        href: "/admin/compliance/vaccine-types",
-        icon: Syringe,
-      },
-      {
-        title: "Pet Vaccinations",
-        href: "/admin/compliance/pet-vaccinations",
-        icon: ShieldCheck,
-      },
-      {
-        title: "Consent Form Templates",
-        href: "/admin/compliance/consent-form-templates",
-        icon: FilePenLine,
-      },
-      {
-        title: "Consent Form Submissions",
-        href: "/admin/compliance/consent-form-submissions",
-        icon: FileCheck2,
-      },
-    ],
-  },
-
-  {
-    label: "Staff",
-    items: [
-      {
-        title: "Employees",
-        href: "/admin/staff/employees",
-        icon: UsersRound,
-      },
-      {
-        title: "Schedules",
-        href: "/admin/staff/schedule",
-        icon: CalendarDays,
-      },
-    ],
-  },
-
-  {
-    label: "CRM",
-    items: [
-      {
-        title: "Business Targets",
-        href: "/admin/crm/business-targets",
-        icon: Target,
-      },
-      {
-        title: "Owner Retention Settings",
-        href: "/admin/crm/owner-retention-settings",
-        icon: UserRoundCog,
-      },
-    ],
-  },
-
-  {
-    label: "Sales",
-    items: [
-      {
-        title: "Billing",
-        href: "/admin/sales/billing",
-        icon: ReceiptText,
       },
     ],
   },
@@ -239,6 +138,33 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
 
   {
+    label: "CRM",
+    items: [
+      {
+        title: "Business Targets",
+        href: "/admin/crm/business-targets",
+        icon: Target,
+      },
+      {
+        title: "Owner Retention Settings",
+        href: "/admin/crm/owner-retention-settings",
+        icon: UserRoundCog,
+      },
+    ],
+  },
+
+  {
+    label: "Sales",
+    items: [
+      {
+        title: "Billing",
+        href: "/admin/sales/billing",
+        icon: ReceiptText,
+      },
+    ],
+  },
+
+  {
     label: "Inventory",
     items: [
       {
@@ -250,6 +176,74 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Products",
         href: "/admin/inventory/products",
         icon: Boxes,
+      },
+    ],
+  },
+
+  {
+    label: "Compliance",
+    items: [
+      {
+        title: "Vaccine Types",
+        href: "/admin/compliance/vaccine-types",
+        icon: Syringe,
+      },
+      {
+        title: "Pet Vaccinations",
+        href: "/admin/compliance/pet-vaccinations",
+        icon: ShieldCheck,
+      },
+      {
+        title: "Consent Form Templates",
+        href: "/admin/compliance/consent-form-templates",
+        icon: FilePenLine,
+      },
+      {
+        title: "Consent Form Submissions",
+        href: "/admin/compliance/consent-form-submissions",
+        icon: FileCheck2,
+      },
+    ],
+  },
+
+  {
+    label: "Catalog",
+    items: [
+      {
+        title: "Categories",
+        href: "/admin/catalog/categories",
+        icon: FolderTree,
+      },
+      {
+        title: "Services",
+        href: "/admin/catalog/services",
+        icon: BriefcaseBusiness,
+      },
+      {
+        title: "Packages",
+        href: "/admin/catalog/packages",
+        icon: Package,
+      },
+      {
+        title: "Package Steps",
+        href: "/admin/catalog/package-steps",
+        icon: ListChecks,
+      },
+    ],
+  },
+
+  {
+    label: "Staff",
+    items: [
+      {
+        title: "Employees",
+        href: "/admin/staff/employees",
+        icon: UsersRound,
+      },
+      {
+        title: "Schedules",
+        href: "/admin/staff/schedule",
+        icon: CalendarDays,
       },
     ],
   },

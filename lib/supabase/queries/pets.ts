@@ -26,10 +26,26 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
-function normalizePet(row: any): PetRow {
+type PetRelation<T> = T | T[] | null
+
+type RawPetRow = Omit<PetRow, "owner"> & {
+  owner: PetRelation<PetRow["owner"]>
+}
+
+function normalizePet(row: RawPetRow): PetRow {
+  const owner = Array.isArray(row.owner)
+    ? row.owner[0]
+    : row.owner
+
+  if (!owner) {
+    throw new Error(
+      "Pet is missing its owner relation"
+    )
+  }
+
   return {
     ...row,
-    owner: Array.isArray(row.owner) ? row.owner[0] : row.owner,
+    owner,
   }
 }
 

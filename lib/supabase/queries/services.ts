@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { ServiceListFilters } from "@/lib/constants/service-filters"
-import type { ServiceListRow} from "@/lib/supabase/types"
+import type { ServiceCategoryListRelation, ServiceListRow} from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const SERVICE_COLUMNS = `
@@ -25,12 +25,14 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
-function normalizeService(row: any): ServiceListRow {
+type RawServiceRow = Omit<ServiceListRow, "category"> & {
+  category: ServiceCategoryListRelation[]
+}
+
+function normalizeService(row: RawServiceRow): ServiceListRow {
   return {
     ...row,
-    category: Array.isArray(row.category)
-      ? (row.category[0] ?? null)
-      : (row.category ?? null),
+    category: row.category[0] ?? null,
   }
 }
 

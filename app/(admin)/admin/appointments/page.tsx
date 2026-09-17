@@ -2,7 +2,7 @@ import { Suspense } from "react"
 
 import { AppointmentsManager } from "@/components/appointments/appointments-manager"
 import { PageLoader } from "@/components/shared/page-loader"
-import { parseAppointmentListFilters } from "@/lib/constants/appointment-filters"
+import { parseAppointmentFilters } from "@/lib/constants/appointment-filters"
 import { listAppointments } from "@/lib/supabase/queries/appointments"
 import { listOwnersForSelection } from "@/lib/supabase/queries/owners"
 import { listActivePets } from "@/lib/supabase/queries/pets"
@@ -21,7 +21,7 @@ export default async function AppointmentsPage({
 }: AppointmentsPageProps) {
   const params = await searchParams
 
-  const filters = parseAppointmentListFilters(params)
+  const filters = parseAppointmentFilters(params)
 
   const [
     appointments,

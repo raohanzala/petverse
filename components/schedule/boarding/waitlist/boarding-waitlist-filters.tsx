@@ -35,10 +35,6 @@ export function BoardingWaitlistFilters({
   const [search, setSearch] = useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])
 

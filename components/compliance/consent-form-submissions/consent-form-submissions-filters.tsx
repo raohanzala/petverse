@@ -42,10 +42,6 @@ export function ConsentFormSubmissionsFilters({
     useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [
     isPending,

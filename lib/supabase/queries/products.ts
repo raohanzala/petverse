@@ -7,15 +7,35 @@ import type {
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 import { ProductListFilters } from "@/lib/constants/product-filters"
 
-const PRODUCT_COLUMNS =
-  "id, supplier_id, sku, name, price, stock_qty, is_active, created_at, updated_at" as const
+const PRODUCT_COLUMNS = `
+  id,
+  supplier_id,
+  sku,
+  name,
+  brand,
+  category,
+  retail_price,
+  cost_price,
+  stock_qty,
+  is_active,
+  created_at,
+  updated_at,
+
+  supplier:suppliers (
+    id,
+    name
+  )
+`
 
 const PRODUCT_LIST_COLUMNS = `
   id,
   supplier_id,
   sku,
   name,
-  price,
+  brand,
+  category,
+  retail_price,
+  cost_price,
   stock_qty,
   is_active,
   created_at,
@@ -105,7 +125,10 @@ export async function listActiveProducts(): Promise<ProductRow[]> {
     )
   }
 
-  return data ?? []
+  return (data ?? []).map((row) => ({
+    ...row,
+    supplier: normalizeRelation(row.supplier),
+  }))
 }
 
 /** Active products with supplier information */

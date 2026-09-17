@@ -71,6 +71,7 @@ import { DatePickerTime } from "@/components/ui/date-picker-with-time"
 
 import { PetUpdateImages } from "./pet-update-images"
 import { uploadPetUpdateImage } from "@/lib/supabase/storage/pet-update-images"
+import { parseDateTime } from "@/lib/utils"
 
 type DailyUpdateFormDialogProps = {
   open: boolean
@@ -243,29 +244,6 @@ export function DailyUpdateFormDialog({
           shouldValidate: true,
         }
       )
-    }
-  }
-
-  function parseDateTime(value: string | null) {
-    if (!value) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    const parsed = new Date(value)
-
-    if (Number.isNaN(parsed.getTime())) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    return {
-      date: parsed,
-      time: format(parsed, "HH:mm:ss"),
     }
   }
 

@@ -59,10 +59,6 @@ export function DailyUpdatesFilters({
     useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])
 

@@ -25,11 +25,43 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
-function normalizePackageStep(row: any): ServicePackageStepListRow {
+type PackageStepRelation<T> = T | T[] | null
+
+type RawServicePackageStepRow = Omit<
+  ServicePackageStepListRow,
+  "package" | "service"
+> & {
+  package: PackageStepRelation<{
+    id: number
+    name: string
+  }>
+  service: PackageStepRelation<{
+    id: string
+    name: string
+  }>
+}
+
+function normalizePackageStep(
+  row: RawServicePackageStepRow
+): ServicePackageStepListRow {
+  const packageRelation = Array.isArray(row.package)
+    ? row.package[0]
+    : row.package
+
+  const serviceRelation = Array.isArray(row.service)
+    ? row.service[0]
+    : row.service
+
+  if (!packageRelation || !serviceRelation) {
+    throw new Error(
+      "Package step is missing its package or service relation"
+    )
+  }
+
   return {
     ...row,
-    package: Array.isArray(row.package) ? row.package[0] : row.package,
-    service: Array.isArray(row.service) ? row.service[0] : row.service,
+    package: packageRelation,
+    service: serviceRelation,
   }
 }
 

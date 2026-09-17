@@ -283,7 +283,7 @@ export function RoomTransferFormDialog({
                                 </Select>
 
                                 <FieldDescription>
-                                    The reservation's current room.
+                                    The reservation&apos;s current room.
                                 </FieldDescription>
 
                                 <FieldError

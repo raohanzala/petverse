@@ -50,6 +50,7 @@ import {
 } from "@/lib/validations/appointments"
 import { format } from "date-fns"
 import { DatePickerTime } from "../ui/date-picker-with-time"
+import { parseDateTime } from "@/lib/utils"
 
 type AppointmentFormDialogProps = {
     open: boolean
@@ -186,10 +187,18 @@ export function AppointmentFormDialog({
             shouldValidate: true,
         })
 
-        form.setValue("pet_id", "", {
-            shouldDirty: true,
-            shouldValidate: true,
-        })
+        const ownerPets = pets.filter(
+            (pet) => pet.owner_id === ownerId
+        )
+
+        form.setValue(
+            "pet_id",
+            ownerPets.length === 1 ? ownerPets[0].id : "",
+            {
+                shouldDirty: true,
+                shouldValidate: true,
+            }
+        )
     }
 
     function handleServiceChange(serviceId: string) {
@@ -254,24 +263,6 @@ export function AppointmentFormDialog({
     const selectedService = services.find(
         (service) => service.id === form.watch("service_id")
     )
-
-    function parseDateTime(value: string) {
-        if (!value) {
-            return {
-                date: undefined,
-                time: "",
-            }
-        }
-
-        const [datePart, timePart] = value.split("T")
-
-        return {
-            date: datePart
-                ? new Date(`${datePart}T00:00:00`)
-                : undefined,
-            time: timePart ?? "",
-        }
-    }
 
     function combineDateTime(
         date: Date | undefined,
@@ -364,18 +355,20 @@ export function AppointmentFormDialog({
                             <Field data-invalid={!!form.formState.errors.pet_id} >
                                 <FieldLabel htmlFor="appointment-pet"> Pet </FieldLabel>
                                 <Select
-                                    value={form.watch("pet_id")}
+                                    value={selectedPetId}
                                     onValueChange={(value) => {
                                         if (!value) return
-                                        form.setValue("pet_id", value, { shouldDirty: true, shouldValidate: true, })
+
+                                        form.setValue("pet_id", value, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        })
                                     }}
                                     disabled={!selectedOwnerId}
                                 >
                                     <SelectTrigger
                                         id="appointment-pet"
-                                        aria-invalid={
-                                            !!form.formState.errors.pet_id
-                                        }
+                                        aria-invalid={!!form.formState.errors.pet_id}
                                     >
                                         <SelectValue
                                             placeholder={
@@ -390,10 +383,16 @@ export function AppointmentFormDialog({
                                                     : "Select owner first")}
                                         </SelectValue>
                                     </SelectTrigger>
+
                                     <SelectContent>
-                                        {ownerPets.map((pet) =>
-                                            (<SelectItem key={pet.id} value={pet.id} > {pet.name} — {pet.species} </SelectItem>))
-                                        }
+                                        {ownerPets.map((pet) => (
+                                            <SelectItem
+                                                key={pet.id}
+                                                value={pet.id}
+                                            >
+                                                {pet.name} — {pet.species}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <FieldError errors={[form.formState.errors.pet_id,]} />
@@ -603,7 +602,7 @@ export function AppointmentFormDialog({
                                                 }}
                                                 dateLabel="Start date"
                                                 timeLabel="Time"
-                                                datePlaceholder="Select date"
+                                                datePlaceholder="Select Start date"
                                             />
 
                                             <FieldError
@@ -657,7 +656,7 @@ export function AppointmentFormDialog({
                                                 }}
                                                 dateLabel="End date"
                                                 timeLabel="Time"
-                                                datePlaceholder="Select date"
+                                                datePlaceholder="Select End date"
                                             />
 
                                             <FieldError

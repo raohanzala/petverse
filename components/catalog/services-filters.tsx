@@ -122,22 +122,20 @@ export function ServicesFilters({
   })
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])
 
-  useEffect(() => {
-    if (moreOpen) {
+  function handleMoreOpenChange(open: boolean) {
+    if (open) {
       setDraftKind(initialKind)
       setDraftVisibility(initialVisibility)
     }
-  }, [moreOpen, initialKind, initialVisibility])
 
-  useEffect(() => {
-    if (mobileOpen) {
+    setMoreOpen(open)
+  }
+
+  function handleMobileOpenChange(open: boolean) {
+    if (open) {
       setMobileDraft({
         categoryId: initialCategoryId ?? null,
         kind: initialKind,
@@ -145,13 +143,9 @@ export function ServicesFilters({
         visibility: initialVisibility,
       })
     }
-  }, [
-    mobileOpen,
-    initialCategoryId,
-    initialKind,
-    initialStatus,
-    initialVisibility,
-  ])
+
+    setMobileOpen(open)
+  }
 
   const updateParams = useCallback(
     (updates: FilterUpdates) => {
@@ -159,31 +153,48 @@ export function ServicesFilters({
 
       if (updates.q !== undefined) {
         const value = updates.q?.trim()
-        if (value) params.set("q", value)
-        else params.delete("q")
+
+        if (value) {
+          params.set("q", value)
+        } else {
+          params.delete("q")
+        }
       }
 
       if (updates.categoryId !== undefined) {
-        if (updates.categoryId) params.set("categoryId", updates.categoryId)
-        else params.delete("categoryId")
+        if (updates.categoryId) {
+          params.set("categoryId", updates.categoryId)
+        } else {
+          params.delete("categoryId")
+        }
       }
 
       if (updates.kind !== undefined) {
-        if (updates.kind === "all") params.delete("kind")
-        else params.set("kind", updates.kind)
+        if (updates.kind === "all") {
+          params.delete("kind")
+        } else {
+          params.set("kind", updates.kind)
+        }
       }
 
       if (updates.status !== undefined) {
-        if (updates.status === "all") params.delete("status")
-        else params.set("status", updates.status)
+        if (updates.status === "all") {
+          params.delete("status")
+        } else {
+          params.set("status", updates.status)
+        }
       }
 
       if (updates.visibility !== undefined) {
-        if (updates.visibility === "all") params.delete("visibility")
-        else params.set("visibility", updates.visibility)
+        if (updates.visibility === "all") {
+          params.delete("visibility")
+        } else {
+          params.set("visibility", updates.visibility)
+        }
       }
 
       const query = params.toString()
+
       startTransition(() => {
         router.replace(query ? `${pathname}?${query}` : pathname)
       })
@@ -209,7 +220,8 @@ export function ServicesFilters({
   )
 
   const moreFiltersCount =
-    (initialKind !== "all" ? 1 : 0) + (initialVisibility !== "all" ? 1 : 0)
+    (initialKind !== "all" ? 1 : 0) +
+    (initialVisibility !== "all" ? 1 : 0)
 
   const allFiltersCount =
     (initialCategoryId ? 1 : 0) +
@@ -270,6 +282,7 @@ export function ServicesFilters({
       kind: draftKind,
       visibility: draftVisibility,
     })
+
     setMoreOpen(false)
   }
 
@@ -280,6 +293,7 @@ export function ServicesFilters({
       status: mobileDraft.status,
       visibility: mobileDraft.visibility,
     })
+
     setMobileOpen(false)
   }
 
@@ -290,12 +304,14 @@ export function ServicesFilters({
       status: "all",
       visibility: "all",
     })
+
     updateParams({
       categoryId: null,
       kind: "all",
       status: "all",
       visibility: "all",
     })
+
     setMobileOpen(false)
   }
 
@@ -313,6 +329,7 @@ export function ServicesFilters({
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <div className="relative w-full max-w-sm min-w-[12rem] flex-1 sm:flex-none">
           <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+
           <Input
             placeholder="Search services…"
             value={search}
@@ -333,7 +350,8 @@ export function ServicesFilters({
                   size="sm"
                   className={cn(
                     "h-9 min-w-[10rem] justify-between gap-2 font-normal",
-                    initialCategoryId && "border-primary/30 bg-primary/5"
+                    initialCategoryId &&
+                      "border-primary/30 bg-primary/5"
                   )}
                 />
               }
@@ -343,18 +361,23 @@ export function ServicesFilters({
                   ? selectedCategory.name
                   : "All categories"}
               </span>
+
               <ListFilterIcon className="size-3.5 opacity-50" />
             </PopoverTrigger>
 
             <PopoverContent align="start" className="w-72 p-0">
               <Command>
                 <CommandInput placeholder="Search categories…" />
+
                 <CommandList>
                   <CommandEmpty>No categories found.</CommandEmpty>
+
                   <CommandGroup>
                     <CommandItem
                       value="all-categories"
-                      data-checked={!initialCategoryId || undefined}
+                      data-checked={
+                        !initialCategoryId || undefined
+                      }
                       onSelect={() => {
                         updateParams({ categoryId: null })
                         setCategoryOpen(false)
@@ -362,15 +385,20 @@ export function ServicesFilters({
                     >
                       All categories
                     </CommandItem>
+
                     {categories.map((category) => {
-                      const selected = initialCategoryId === category.id
+                      const selected =
+                        initialCategoryId === category.id
+
                       return (
                         <CommandItem
                           key={category.id}
                           value={category.name}
                           data-checked={selected || undefined}
                           onSelect={() => {
-                            updateParams({ categoryId: category.id })
+                            updateParams({
+                              categoryId: category.id,
+                            })
                             setCategoryOpen(false)
                           }}
                         >
@@ -388,13 +416,17 @@ export function ServicesFilters({
             value={initialStatus}
             onValueChange={(value) => {
               if (!value) return
-              updateParams({ status: value as ServiceStatusFilter })
+
+              updateParams({
+                status: value as ServiceStatusFilter,
+              })
             }}
           >
             <SelectTrigger
               className={cn(
                 "h-9 w-[9.5rem]",
-                initialStatus !== "all" && "border-primary/30 bg-primary/5"
+                initialStatus !== "all" &&
+                  "border-primary/30 bg-primary/5"
               )}
             >
               <SelectValue>
@@ -403,14 +435,24 @@ export function ServicesFilters({
                   : formatStatusChip(initialStatus)}
               </SelectValue>
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="all">{STATUS_LABELS.all}</SelectItem>
-              <SelectItem value="active">{STATUS_LABELS.active}</SelectItem>
-              <SelectItem value="inactive">{STATUS_LABELS.inactive}</SelectItem>
+              <SelectItem value="all">
+                {STATUS_LABELS.all}
+              </SelectItem>
+              <SelectItem value="active">
+                {STATUS_LABELS.active}
+              </SelectItem>
+              <SelectItem value="inactive">
+                {STATUS_LABELS.inactive}
+              </SelectItem>
             </SelectContent>
           </Select>
 
-          <Popover open={moreOpen} onOpenChange={setMoreOpen}>
+          <Popover
+            open={moreOpen}
+            onOpenChange={handleMoreOpenChange}
+          >
             <PopoverTrigger
               render={
                 <Button
@@ -419,13 +461,16 @@ export function ServicesFilters({
                   size="sm"
                   className={cn(
                     "h-9 gap-2 font-normal",
-                    moreFiltersCount > 0 && "border-primary/30 bg-primary/5"
+                    moreFiltersCount > 0 &&
+                      "border-primary/30 bg-primary/5"
                   )}
                 />
               }
             >
               <ListFilterIcon className="size-4" />
+
               Filters
+
               {moreFiltersCount > 0 ? (
                 <Badge
                   variant="secondary"
@@ -444,11 +489,15 @@ export function ServicesFilters({
                     Type and visibility
                   </PopoverDescription>
                 </div>
+
                 <Button
                   type="button"
                   variant="ghost"
                   size="xs"
-                  disabled={draftKind === "all" && draftVisibility === "all"}
+                  disabled={
+                    draftKind === "all" &&
+                    draftVisibility === "all"
+                  }
                   onClick={() => {
                     setDraftKind("all")
                     setDraftVisibility("all")
@@ -460,19 +509,34 @@ export function ServicesFilters({
 
               <div className="space-y-4 p-3">
                 <div className="space-y-2">
-                  <Label htmlFor="service-filter-kind">Type</Label>
+                  <Label htmlFor="service-filter-kind">
+                    Type
+                  </Label>
+
                   <Select
                     value={draftKind}
                     onValueChange={(value) => {
                       if (!value) return
-                      setDraftKind(value as ServiceKindFilter | "all")
+
+                      setDraftKind(
+                        value as ServiceKindFilter | "all"
+                      )
                     }}
                   >
-                    <SelectTrigger id="service-filter-kind" className="h-9 w-full">
-                      <SelectValue>{formatKindLabel(draftKind)}</SelectValue>
+                    <SelectTrigger
+                      id="service-filter-kind"
+                      className="h-9 w-full"
+                    >
+                      <SelectValue>
+                        {formatKindLabel(draftKind)}
+                      </SelectValue>
                     </SelectTrigger>
+
                     <SelectContent>
-                      <SelectItem value="all">All types</SelectItem>
+                      <SelectItem value="all">
+                        All types
+                      </SelectItem>
+
                       {SERVICE_KINDS.map((kind) => (
                         <SelectItem key={kind} value={kind}>
                           {formatKindLabel(kind)}
@@ -483,12 +547,18 @@ export function ServicesFilters({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="service-filter-visibility">Visibility</Label>
+                  <Label htmlFor="service-filter-visibility">
+                    Visibility
+                  </Label>
+
                   <Select
                     value={draftVisibility}
                     onValueChange={(value) => {
                       if (!value) return
-                      setDraftVisibility(value as ServiceVisibilityFilter)
+
+                      setDraftVisibility(
+                        value as ServiceVisibilityFilter
+                      )
                     }}
                   >
                     <SelectTrigger
@@ -498,16 +568,21 @@ export function ServicesFilters({
                       <SelectValue>
                         {draftVisibility === "all"
                           ? VISIBILITY_LABELS.all
-                          : formatVisibilityChip(draftVisibility)}
+                          : formatVisibilityChip(
+                              draftVisibility
+                            )}
                       </SelectValue>
                     </SelectTrigger>
+
                     <SelectContent>
                       <SelectItem value="all">
                         {VISIBILITY_LABELS.all}
                       </SelectItem>
+
                       <SelectItem value="public">
                         {VISIBILITY_LABELS.public}
                       </SelectItem>
+
                       <SelectItem value="private">
                         {VISIBILITY_LABELS.private}
                       </SelectItem>
@@ -525,7 +600,12 @@ export function ServicesFilters({
                 >
                   Cancel
                 </Button>
-                <Button type="button" size="sm" onClick={applyMoreFilters}>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={applyMoreFilters}
+                >
                   Apply filters
                 </Button>
               </div>
@@ -534,7 +614,10 @@ export function ServicesFilters({
         </div>
 
         {/* Mobile: single filters sheet */}
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <Sheet
+          open={mobileOpen}
+          onOpenChange={handleMobileOpenChange}
+        >
           <SheetTrigger
             render={
               <Button
@@ -543,13 +626,16 @@ export function ServicesFilters({
                 size="sm"
                 className={cn(
                   "h-9 gap-2 font-normal md:hidden",
-                  allFiltersCount > 0 && "border-primary/30 bg-primary/5"
+                  allFiltersCount > 0 &&
+                    "border-primary/30 bg-primary/5"
                 )}
               />
             }
           >
             <ListFilterIcon className="size-4" />
+
             Filters
+
             {allFiltersCount > 0 ? (
               <Badge
                 variant="secondary"
@@ -560,24 +646,32 @@ export function ServicesFilters({
             ) : null}
           </SheetTrigger>
 
-          <SheetContent side="bottom" className="gap-0 p-0 md:hidden">
+          <SheetContent
+            side="bottom"
+            className="gap-0 p-0 md:hidden"
+          >
             <SheetHeader className="border-b px-4 py-3 text-left">
               <SheetTitle>Filters</SheetTitle>
+
               <SheetDescription>
-                Narrow down services by category, type, status, and visibility.
+                Narrow down services by category, type, status,
+                and visibility.
               </SheetDescription>
             </SheetHeader>
 
             <div className="space-y-4 px-4 py-4">
               <div className="space-y-2">
                 <Label>Category</Label>
+
                 <Select
                   value={mobileDraft.categoryId ?? "all"}
                   onValueChange={(value) => {
                     if (!value) return
+
                     setMobileDraft((prev) => ({
                       ...prev,
-                      categoryId: value === "all" ? null : value,
+                      categoryId:
+                        value === "all" ? null : value,
                     }))
                   }}
                 >
@@ -585,15 +679,24 @@ export function ServicesFilters({
                     <SelectValue>
                       {mobileDraft.categoryId
                         ? (categories.find(
-                            (category) => category.id === mobileDraft.categoryId
+                            (category) =>
+                              category.id ===
+                              mobileDraft.categoryId
                           )?.name ?? "All categories")
                         : "All categories"}
                     </SelectValue>
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value="all">All categories</SelectItem>
+                    <SelectItem value="all">
+                      All categories
+                    </SelectItem>
+
                     {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
+                      <SelectItem
+                        key={category.id}
+                        value={category.id}
+                      >
                         {category.name}
                       </SelectItem>
                     ))}
@@ -603,13 +706,17 @@ export function ServicesFilters({
 
               <div className="space-y-2">
                 <Label>Type</Label>
+
                 <Select
                   value={mobileDraft.kind}
                   onValueChange={(value) => {
                     if (!value) return
+
                     setMobileDraft((prev) => ({
                       ...prev,
-                      kind: value as ServiceKindFilter | "all",
+                      kind: value as
+                        | ServiceKindFilter
+                        | "all",
                     }))
                   }}
                 >
@@ -618,8 +725,12 @@ export function ServicesFilters({
                       {formatKindLabel(mobileDraft.kind)}
                     </SelectValue>
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value="all">All types</SelectItem>
+                    <SelectItem value="all">
+                      All types
+                    </SelectItem>
+
                     {SERVICE_KINDS.map((kind) => (
                       <SelectItem key={kind} value={kind}>
                         {formatKindLabel(kind)}
@@ -631,10 +742,12 @@ export function ServicesFilters({
 
               <div className="space-y-2">
                 <Label>Status</Label>
+
                 <Select
                   value={mobileDraft.status}
                   onValueChange={(value) => {
                     if (!value) return
+
                     setMobileDraft((prev) => ({
                       ...prev,
                       status: value as ServiceStatusFilter,
@@ -645,12 +758,21 @@ export function ServicesFilters({
                     <SelectValue>
                       {mobileDraft.status === "all"
                         ? STATUS_LABELS.all
-                        : formatStatusChip(mobileDraft.status)}
+                        : formatStatusChip(
+                            mobileDraft.status
+                          )}
                     </SelectValue>
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value="all">{STATUS_LABELS.all}</SelectItem>
-                    <SelectItem value="active">{STATUS_LABELS.active}</SelectItem>
+                    <SelectItem value="all">
+                      {STATUS_LABELS.all}
+                    </SelectItem>
+
+                    <SelectItem value="active">
+                      {STATUS_LABELS.active}
+                    </SelectItem>
+
                     <SelectItem value="inactive">
                       {STATUS_LABELS.inactive}
                     </SelectItem>
@@ -660,13 +782,16 @@ export function ServicesFilters({
 
               <div className="space-y-2">
                 <Label>Visibility</Label>
+
                 <Select
                   value={mobileDraft.visibility}
                   onValueChange={(value) => {
                     if (!value) return
+
                     setMobileDraft((prev) => ({
                       ...prev,
-                      visibility: value as ServiceVisibilityFilter,
+                      visibility:
+                        value as ServiceVisibilityFilter,
                     }))
                   }}
                 >
@@ -674,16 +799,21 @@ export function ServicesFilters({
                     <SelectValue>
                       {mobileDraft.visibility === "all"
                         ? VISIBILITY_LABELS.all
-                        : formatVisibilityChip(mobileDraft.visibility)}
+                        : formatVisibilityChip(
+                            mobileDraft.visibility
+                          )}
                     </SelectValue>
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="all">
                       {VISIBILITY_LABELS.all}
                     </SelectItem>
+
                     <SelectItem value="public">
                       {VISIBILITY_LABELS.public}
                     </SelectItem>
+
                     <SelectItem value="private">
                       {VISIBILITY_LABELS.private}
                     </SelectItem>
@@ -700,7 +830,11 @@ export function ServicesFilters({
               >
                 Clear
               </Button>
-              <Button type="button" onClick={applyMobileFilters}>
+
+              <Button
+                type="button"
+                onClick={applyMobileFilters}
+              >
                 Apply filters
               </Button>
             </SheetFooter>
@@ -717,6 +851,7 @@ export function ServicesFilters({
               className="h-7 gap-1 rounded-md px-2 font-normal"
             >
               {chip.label}
+
               <button
                 type="button"
                 onClick={chip.onClear}
@@ -727,6 +862,7 @@ export function ServicesFilters({
               </button>
             </Badge>
           ))}
+
           <Button
             type="button"
             variant="ghost"

@@ -45,6 +45,7 @@ import {
 } from "@/lib/validations/campaign-contacts"
 import { format } from "date-fns"
 import { DatePickerTime } from "@/components/ui/date-picker-with-time"
+import { parseDateTime } from "@/lib/utils"
 
 type CampaignContactFormDialogProps = {
   open: boolean
@@ -172,29 +173,6 @@ export function CampaignContactFormDialog({
   const selectedOwner = owners.find(
     (owner) => owner.id === selectedOwnerId
   )
-
-  function parseDateTime(value: string | null) {
-    if (!value) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    const date = new Date(value)
-
-    if (Number.isNaN(date.getTime())) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    return {
-      date,
-      time: format(date, "HH:mm:ss"),
-    }
-  }
 
   function combineDateTime(
     date: Date | undefined,

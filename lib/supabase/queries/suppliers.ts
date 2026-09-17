@@ -4,7 +4,7 @@ import type { SupplierRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const SUPPLIER_COLUMNS =
-  "id, name, contact_name, email, phone, notes, is_active, created_at, updated_at" as const
+  "id, name, contact_name, email, phone, address, notes, is_active, created_at, updated_at" as const
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
@@ -31,7 +31,7 @@ export async function listSuppliers(
     const pattern = `%${escapeIlikePattern(search)}%`
 
     query = query.or(
-      `name.ilike.${pattern},contact_name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern},notes.ilike.${pattern}`
+      `name.ilike.${pattern},contact_name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern},address.ilike.${pattern},notes.ilike.${pattern}`
     )
   }
 

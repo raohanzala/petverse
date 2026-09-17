@@ -1,24 +1,10 @@
 "use client"
 
 import {
-  MoreHorizontal,
-  PencilIcon,
-  Trash2Icon,
-} from "lucide-react"
-
-import {
   DataTableColumnHeader,
   type AdminColumnDef,
 } from "@/components/shared/data-table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import type { AppointmentRow } from "@/lib/supabase/types"
 
 type AppointmentColumnActions = {
@@ -181,46 +167,6 @@ export function getAppointmentColumns({
           })}
         </span>
       ),
-    },
-    // {
-    //   id: "actions",
-    //   header: "Actions",
-    //   enableHiding: false,
-    //   enableSorting: false,
-    //   cell: ({ row }) => (
-    //     <DropdownMenu>
-    //       <DropdownMenuTrigger
-    //         render={
-    //           <Button
-    //             variant="ghost"
-    //             size="icon-sm"
-    //             aria-label={`Actions for ${row.original.pet[0]?.name} appointment`}
-    //           />
-    //         }
-    //       >
-    //         <MoreHorizontal />
-    //       </DropdownMenuTrigger>
-
-    //       <DropdownMenuContent align="end">
-    //         <DropdownMenuGroup>
-    //           <DropdownMenuItem
-    //             onClick={() => onEdit(row.original)}
-    //           >
-    //             <PencilIcon />
-    //             Edit
-    //           </DropdownMenuItem>
-
-    //           <DropdownMenuItem
-    //             variant="destructive"
-    //             onClick={() => onDelete(row.original)}
-    //           >
-    //             <Trash2Icon />
-    //             Delete
-    //           </DropdownMenuItem>
-    //         </DropdownMenuGroup>
-    //       </DropdownMenuContent>
-    //     </DropdownMenu>
-    //   ),
-    // },
+    }
   ]
 }

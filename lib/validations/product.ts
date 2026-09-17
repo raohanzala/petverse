@@ -1,30 +1,29 @@
 import { z } from "zod"
 
 export const productBaseSchema = z.object({
-  supplier_id: z
-    .string()
-    .uuid("Invalid supplier id")
-    .optional()
-    .nullable(),
+  supplier_id: z.string().uuid().nullable(),
 
-  sku: z
-    .string()
-    .max(100, "SKU must be 100 characters or less")
-    .optional()
-    .nullable(),
+  sku: z.string().optional(),
 
   name: z
     .string()
-    .min(1, "Name is required")
-    .max(150, "Name must be 150 characters or less"),
+    .min(1, "Product name is required"),
 
-  price: z
+  brand: z.string().optional(),
+
+  category: z.string().optional(),
+
+  retail_price: z
     .number()
-    .min(0, "Price cannot be negative"),
+    .min(0, "Retail price cannot be negative"),
+
+  cost_price: z
+    .number()
+    .min(0, "Cost price cannot be negative"),
 
   stock_qty: z
     .number()
-    .int("Stock quantity must be a whole number")
+    .int()
     .min(0, "Stock quantity cannot be negative"),
 
   is_active: z.boolean(),

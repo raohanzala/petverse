@@ -51,35 +51,157 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
-function normalizeAppointment(row: any): AppointmentRow {
+type OwnerRelation = {
+  name: string
+  phone: string
+}
+
+type PetRelation = {
+  name: string
+  species: string
+}
+
+type ServiceRelation = {
+  name: string
+}
+
+type PackageRelation = {
+  name: string
+}
+
+type EmployeeRelation = {
+  display_name: string
+}
+
+type RawRelation<T> = T | T[] | null
+
+type RawAppointmentRow = Omit<
+  AppointmentRow,
+  | "owner"
+  | "pet"
+  | "service"
+  | "package"
+  | "employee"
+  | "preferred_employee"
+> & {
+  owner: RawRelation<OwnerRelation>
+  pet: RawRelation<PetRelation>
+  service: RawRelation<ServiceRelation>
+  package: RawRelation<PackageRelation>
+  employee: RawRelation<EmployeeRelation>
+  preferred_employee: RawRelation<EmployeeRelation>
+}
+
+function normalizeAppointment(
+  row: RawAppointmentRow
+): AppointmentRow {
+  const owner = Array.isArray(row.owner)
+    ? row.owner[0]
+    : row.owner
+
+  const pet = Array.isArray(row.pet)
+    ? row.pet[0]
+    : row.pet
+
+  const service = Array.isArray(row.service)
+    ? row.service[0]
+    : row.service
+
+  const packageRelation = Array.isArray(row.package)
+    ? row.package[0]
+    : row.package
+
+  const employee = Array.isArray(row.employee)
+    ? row.employee[0]
+    : row.employee
+
+  const preferredEmployee = Array.isArray(
+    row.preferred_employee
+  )
+    ? row.preferred_employee[0]
+    : row.preferred_employee
+
+  if (
+    !owner ||
+    !pet ||
+    !service ||
+    !packageRelation ||
+    !employee ||
+    !preferredEmployee
+  ) {
+    throw new Error(
+      "Appointment is missing a required relation"
+    )
+  }
+
   return {
     ...row,
-    owner: Array.isArray(row.owner) ? row.owner[0] : row.owner,
-    pet: Array.isArray(row.pet) ? row.pet[0] : row.pet,
-    service: Array.isArray(row.service) ? row.service[0] : row.service,
-    package: Array.isArray(row.package) ? row.package[0] : row.package,
-    employee: Array.isArray(row.employee) ? row.employee[0] : row.employee,
-    preferred_employee: Array.isArray(row.preferred_employee)
-      ? row.preferred_employee[0]
-      : row.preferred_employee,
+    owner,
+    pet,
+    service,
+    package: packageRelation,
+    employee,
+    preferred_employee: preferredEmployee,
   }
 }
 
-/** Admin list — supports server-side search and status filter */
+/** Admin list — supports server-side search, date range, staff, service and status filters */
 export async function listAppointments(
   filters: AppointmentListFilters = {}
 ): Promise<AppointmentRow[]> {
   const supabase = await createClient()
-  const { search, status = "all" } = filters
+
+  const {
+    search,
+    status = "all",
+    from,
+    to,
+    employee,
+    service,
+  } = filters
 
   let query = supabase
     .from("appointments")
     .select(APPOINTMENT_COLUMNS)
 
+  // Status
   if (status !== "all") {
     query = query.eq("status", status)
   }
 
+  // Date range
+  if (from) {
+    query = query.gte(
+      "starts_at",
+      `${from}T00:00:00`
+    )
+  }
+
+  if (to) {
+    const nextDay = new Date(`${to}T00:00:00`)
+    nextDay.setDate(nextDay.getDate() + 1)
+
+    const nextDayString = nextDay
+      .toISOString()
+      .split("T")[0]
+
+    query = query.lt(
+      "starts_at",
+      `${nextDayString}T00:00:00`
+    )
+  }
+
+  // Team member
+  if (employee) {
+    query = query.eq("employee_id", employee)
+  }
+
+  // Service
+  if (service) {
+    query = query.eq("service_id", service)
+  }
+
+  // Search
   if (search) {
     const pattern = `%${escapeIlikePattern(search)}%`
 

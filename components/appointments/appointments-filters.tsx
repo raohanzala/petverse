@@ -12,8 +12,14 @@ import {
   useState,
   useTransition,
 } from "react"
+import { format } from "date-fns"
 
-import type { AppointmentStatus } from "@/lib/supabase/types"
+import type {
+  AppointmentStatus,
+  EmployeeRow,
+  ServiceRow,
+} from "@/lib/supabase/types"
+
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -22,13 +28,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DatePicker } from "@/components/ui/date-picker"
 import { cn } from "@/lib/utils"
 
-type AppointmentStatusFilter = AppointmentStatus | "all"
+type AppointmentStatusFilter =
+  | AppointmentStatus
+  | "all"
 
 type AppointmentsFiltersProps = {
   initialSearch?: string
   initialStatus: AppointmentStatusFilter
+  initialFrom?: string
+  initialTo?: string
+  initialEmployee?: string
+  initialService?: string
+  employees: EmployeeRow[]
+  services: ServiceRow[]
   onLoadingChange?: (isLoading: boolean) => void
   className?: string
 }
@@ -50,6 +65,12 @@ const APPOINTMENT_STATUS_LABELS: Record<
 export function AppointmentsFilters({
   initialSearch = "",
   initialStatus,
+  initialFrom = "",
+  initialTo = "",
+  initialEmployee = "",
+  initialService = "",
+  employees,
+  services,
   onLoadingChange,
   className,
 }: AppointmentsFiltersProps) {
@@ -61,10 +82,6 @@ export function AppointmentsFilters({
   const [search, setSearch] = useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])
 
@@ -72,6 +89,10 @@ export function AppointmentsFilters({
     (updates: {
       q?: string | null
       status?: AppointmentStatusFilter
+      from?: string | null
+      to?: string | null
+      employee?: string | null
+      service?: string | null
     }) => {
       const params = new URLSearchParams(
         searchParams.toString()
@@ -95,11 +116,45 @@ export function AppointmentsFilters({
         }
       }
 
+      if (updates.from !== undefined) {
+        if (updates.from) {
+          params.set("from", updates.from)
+        } else {
+          params.delete("from")
+        }
+      }
+
+      if (updates.to !== undefined) {
+        if (updates.to) {
+          params.set("to", updates.to)
+        } else {
+          params.delete("to")
+        }
+      }
+
+      if (updates.employee !== undefined) {
+        if (updates.employee) {
+          params.set("employee", updates.employee)
+        } else {
+          params.delete("employee")
+        }
+      }
+
+      if (updates.service !== undefined) {
+        if (updates.service) {
+          params.set("service", updates.service)
+        } else {
+          params.delete("service")
+        }
+      }
+
       const query = params.toString()
 
       startTransition(() => {
         router.replace(
-          query ? `${pathname}?${query}` : pathname
+          query
+            ? `${pathname}?${query}`
+            : pathname
         )
       })
     },
@@ -118,6 +173,14 @@ export function AppointmentsFilters({
     return () => window.clearTimeout(timer)
   }, [search, urlSearch, updateParams])
 
+  const fromDate = initialFrom
+    ? new Date(`${initialFrom}T00:00:00`)
+    : undefined
+
+  const toDate = initialTo
+    ? new Date(`${initialTo}T00:00:00`)
+    : undefined
+
   return (
     <div
       className={cn(
@@ -125,6 +188,7 @@ export function AppointmentsFilters({
         className
       )}
     >
+      {/* Search */}
       <div className="relative w-full max-w-sm">
         <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
@@ -139,13 +203,117 @@ export function AppointmentsFilters({
         />
       </div>
 
+      {/* From date */}
+      <DatePicker
+        date={fromDate}
+        onDateChange={(date) => {
+          updateParams({
+            from: date
+              ? format(date, "yyyy-MM-dd")
+              : null,
+          })
+        }}
+        placeholder="From date"
+      />
+
+      {/* To date */}
+      <DatePicker
+        date={toDate}
+        onDateChange={(date) => {
+          updateParams({
+            to: date
+              ? format(date, "yyyy-MM-dd")
+              : null,
+          })
+        }}
+        placeholder="To date"
+      />
+
+      {/* Team member */}
+      <Select
+        value={initialEmployee || "all"}
+        onValueChange={(value) => {
+          updateParams({
+            employee:
+              value === "all" ? null : value,
+          })
+        }}
+      >
+        <SelectTrigger className="h-9 w-[170px]">
+          <SelectValue>
+            {initialEmployee
+              ? employees.find(
+                  (employee) =>
+                    employee.id ===
+                    initialEmployee
+                )?.display_name ??
+                "Team member"
+              : "Team member"}
+          </SelectValue>
+        </SelectTrigger>
+
+        <SelectContent>
+          <SelectItem value="all">
+            All team members
+          </SelectItem>
+
+          {employees.map((employee) => (
+            <SelectItem
+              key={employee.id}
+              value={employee.id}
+            >
+              {employee.display_name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Service */}
+      <Select
+        value={initialService || "all"}
+        onValueChange={(value) => {
+          updateParams({
+            service:
+              value === "all" ? null : value,
+          })
+        }}
+      >
+        <SelectTrigger className="h-9 w-[170px]">
+          <SelectValue>
+            {initialService
+              ? services.find(
+                  (service) =>
+                    service.id === initialService
+                )?.name ?? "Service"
+              : "Service"}
+          </SelectValue>
+        </SelectTrigger>
+
+        <SelectContent>
+          <SelectItem value="all">
+            All services
+          </SelectItem>
+
+          {services.map((service) => (
+            <SelectItem
+              key={service.id}
+              value={service.id}
+            >
+              {service.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Status */}
       <Select
         value={initialStatus}
         onValueChange={(value) => {
           if (!value) return
 
           updateParams({
-            status: value as AppointmentStatusFilter,
+            status:
+              value as AppointmentStatusFilter,
           })
         }}
       >
@@ -153,41 +321,45 @@ export function AppointmentsFilters({
           <SelectValue>
             {initialStatus === "all"
               ? APPOINTMENT_STATUS_LABELS.all
-              : `Status: ${APPOINTMENT_STATUS_LABELS[initialStatus]}`}
+              : `Status: ${
+                  APPOINTMENT_STATUS_LABELS[
+                    initialStatus
+                  ]
+                }`}
           </SelectValue>
         </SelectTrigger>
 
         <SelectContent>
           <SelectItem value="all">
-            {APPOINTMENT_STATUS_LABELS.all}
+            All statuses
           </SelectItem>
 
           <SelectItem value="requested">
-            {APPOINTMENT_STATUS_LABELS.requested}
+            Requested
           </SelectItem>
 
           <SelectItem value="confirmed">
-            {APPOINTMENT_STATUS_LABELS.confirmed}
+            Confirmed
           </SelectItem>
 
           <SelectItem value="arrived">
-            {APPOINTMENT_STATUS_LABELS.arrived}
+            Arrived
           </SelectItem>
 
           <SelectItem value="in_service">
-            {APPOINTMENT_STATUS_LABELS.in_service}
+            In service
           </SelectItem>
 
           <SelectItem value="completed">
-            {APPOINTMENT_STATUS_LABELS.completed}
+            Completed
           </SelectItem>
 
           <SelectItem value="cancelled">
-            {APPOINTMENT_STATUS_LABELS.cancelled}
+            Cancelled
           </SelectItem>
 
           <SelectItem value="no_show">
-            {APPOINTMENT_STATUS_LABELS.no_show}
+            No show
           </SelectItem>
         </SelectContent>
       </Select>

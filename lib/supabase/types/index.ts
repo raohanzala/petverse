@@ -54,6 +54,11 @@ export type ServiceCategoryRow = {
   updated_at: string
 }
 
+export type ServiceCategoryListRelation = {
+  id: string
+  name: string
+}
+
 export type ServiceCategoryInsert = Pick<
   ServiceCategoryRow,
   "name" | "slug" | "description" | "sort_order" | "is_active"
@@ -95,7 +100,7 @@ export type ServiceInsert = Pick<
 >
 
 export type ServiceListRow = ServiceRow & {
-  category: ServiceCategoryRow | null
+  category: ServiceCategoryListRelation | null
 }
 
 export type ServiceUpdate = Partial<ServiceInsert>
@@ -261,6 +266,7 @@ export type OwnerRow = {
   preferred_contact: string | null
   created_at: string
   updated_at: string
+  total_sales: number
 }
 
 export type OwnerInsert = Pick<
@@ -608,12 +614,44 @@ export type DaycareWalletRow = {
 
 export type DaycareScheduleRow = {
   id: string
+
   pet_id: string
-  day_of_week: number
-  start_time: string
-  end_time: string
+  owner_id: string
+  resource_id: string | null
+
+  starts_at: string
+  ends_at: string
+
+  days_of_week: number[]
+
   is_active: boolean
+
+  created_at: string
+  updated_at: string
 }
+
+export type DaycareScheduleListRow =
+  DaycareScheduleRow & {
+    pet: {
+      id: string
+      name: string
+      species: string
+    } | null
+
+    owner: {
+      id: string
+      name: string
+      phone: string
+    } | null
+
+    resource: {
+      id: string
+      name: string
+      type: FacilityResourceType
+    } | null
+
+    visits: number
+  }
 
 export type DaycareSessionStatus =
   | "scheduled"
@@ -646,7 +684,7 @@ export type InvoiceRow = {
   owner_id: string
   appointment_id: string | null
   number: number | null
-  status: InvoiceStatus
+  status: "draft" | "open" | "paid" | "void"
   subtotal: number
   tax: number
   total: number
@@ -657,6 +695,19 @@ export type InvoiceRow = {
   notes: string | null
   created_at: string
   updated_at: string
+
+  owner: {
+    id: string
+    name: string
+    phone: string
+    email: string | null
+  } | null
+
+  pet: {
+    id: string
+    name: string
+    species: string
+  } | null
 }
 
 export type InvoiceInsert = Pick<
@@ -1493,6 +1544,7 @@ export type SupplierRow = {
   contact_name: string | null
   email: string | null
   phone: string | null
+  address: string | null
   notes: string | null
   is_active: boolean
   created_at: string
@@ -1505,6 +1557,7 @@ export type SupplierInsert = Pick<
   | "contact_name"
   | "email"
   | "phone"
+  | "address"
   | "notes"
   | "is_active"
 >
@@ -1535,11 +1588,19 @@ export type ProductRow = {
   supplier_id: string | null
   sku: string | null
   name: string
-  price: number
+  brand: string | null
+  category: string | null
+  retail_price: number
+  cost_price: number
   stock_qty: number
   is_active: boolean
   created_at: string
   updated_at: string
+
+  supplier: {
+    id: string
+    name: string
+  } | null
 }
 
 export type ProductInsert = Pick<
@@ -1547,7 +1608,10 @@ export type ProductInsert = Pick<
   | "supplier_id"
   | "sku"
   | "name"
-  | "price"
+  | "brand"
+  | "category"
+  | "retail_price"
+  | "cost_price"
   | "stock_qty"
   | "is_active"
 >

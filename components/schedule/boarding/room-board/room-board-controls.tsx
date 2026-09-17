@@ -21,9 +21,7 @@ import { formatDate } from "./room-board-manager"
 
 type RoomBoardControlsProps = {
   filter: ResourceFilter
-  onFilterChange: (
-    filter: ResourceFilter
-  ) => void
+  onFilterChange: (filter: ResourceFilter) => void
   selectedDate: Date
   onPreviousDay: () => void
   onNextDay: () => void
@@ -38,23 +36,23 @@ const FILTERS: {
 }[] = [
   {
     value: "all",
-    label: "All",
+    label: "All"
   },
   {
     value: "kennel",
-    label: "Kennels",
+    label: "Kennels"
   },
   {
     value: "suite",
-    label: "Suites",
+    label: "Suites"
   },
   {
     value: "playroom",
-    label: "Playrooms",
+    label: "Playrooms"
   },
   {
     value: "other",
-    label: "Other",
+    label: "Other"
   },
 ]
 
@@ -69,46 +67,22 @@ export function RoomBoardControls({
   totalCount,
 }: RoomBoardControlsProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background p-2">
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-3 bg-background p-2">
+      {/* Resource filters */}
       <Tabs
         value={filter}
         onValueChange={(value) =>
-          onFilterChange(
-            value as ResourceFilter
-          )
+          onFilterChange(value as ResourceFilter)
         }
       >
-        <TabsList
-          variant="line"
-          className="h-9 w-auto justify-start gap-1 rounded-md p-0"
-        >
+        <TabsList>
           {FILTERS.map((item) => {
+
             return (
               <TabsTrigger
                 key={item.value}
                 value={item.value}
-                className="h-9 flex-none px-3"
               >
-                {item.value === "all" && (
-                  <Grid2X2 className="size-4" />
-                )}
-
-                {item.value === "kennel" && (
-                  <PawPrint className="size-4" />
-                )}
-
-                {item.value === "suite" && (
-                  <Grid2X2 className="size-4" />
-                )}
-
-                {item.value === "playroom" && (
-                  <PawPrint className="size-4" />
-                )}
-
-                {item.value === "other" && (
-                  <Grid2X2 className="size-4" />
-                )}
-
                 {item.label}
               </TabsTrigger>
             )
@@ -116,16 +90,8 @@ export function RoomBoardControls({
         </TabsList>
       </Tabs>
 
+      {/* Date + occupancy */}
       <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onToday}
-        >
-          Today
-        </Button>
-
         <div className="flex items-center rounded-md border">
           <Button
             type="button"

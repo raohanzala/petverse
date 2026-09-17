@@ -42,10 +42,8 @@ export async function createProduct(
 ): Promise<MutationResult<ProductRow>> {
   await requireStaff()
 
-  const parsed = createProductSchema.safeParse({
-    ...input,
-    sku: normalizeOptionalString(input.sku),
-  })
+  // Validate the original form values first.
+  const parsed = createProductSchema.safeParse(input)
 
   if (!parsed.success) {
     return mutationError(
@@ -59,9 +57,12 @@ export async function createProduct(
     .from("products")
     .insert({
       supplier_id: parsed.data.supplier_id,
-      sku: parsed.data.sku,
+      sku: normalizeOptionalString(parsed.data.sku),
       name: parsed.data.name.trim(),
-      price: parsed.data.price,
+      brand: normalizeOptionalString(parsed.data.brand),
+      category: normalizeOptionalString(parsed.data.category),
+      retail_price: parsed.data.retail_price,
+      cost_price: parsed.data.cost_price,
       stock_qty: parsed.data.stock_qty,
       is_active: parsed.data.is_active,
     })
@@ -78,6 +79,7 @@ export async function createProduct(
   }
 
   revalidateProductPaths()
+
   return mutationSuccess(data)
 }
 
@@ -86,13 +88,8 @@ export async function updateProduct(
 ): Promise<MutationResult<ProductRow>> {
   await requireStaff()
 
-  const parsed = updateProductSchema.safeParse({
-    ...input,
-    sku:
-      input.sku !== undefined
-        ? normalizeOptionalString(input.sku)
-        : undefined,
-  })
+  // Validate before normalizing optional strings.
+  const parsed = updateProductSchema.safeParse(input)
 
   if (!parsed.success) {
     return mutationError(
@@ -109,15 +106,27 @@ export async function updateProduct(
   }
 
   if (updates.sku !== undefined) {
-    payload.sku = updates.sku
+    payload.sku = normalizeOptionalString(updates.sku)
   }
 
   if (updates.name !== undefined) {
     payload.name = updates.name.trim()
   }
 
-  if (updates.price !== undefined) {
-    payload.price = updates.price
+  if (updates.brand !== undefined) {
+    payload.brand = normalizeOptionalString(updates.brand)
+  }
+
+  if (updates.category !== undefined) {
+    payload.category = normalizeOptionalString(updates.category)
+  }
+
+  if (updates.retail_price !== undefined) {
+    payload.retail_price = updates.retail_price
+  }
+
+  if (updates.cost_price !== undefined) {
+    payload.cost_price = updates.cost_price
   }
 
   if (updates.stock_qty !== undefined) {
@@ -151,6 +160,7 @@ export async function updateProduct(
   }
 
   revalidateProductPaths()
+
   return mutationSuccess(data)
 }
 
@@ -184,5 +194,6 @@ export async function deleteProduct(
   }
 
   revalidateProductPaths()
+
   return mutationSuccess(undefined)
 }

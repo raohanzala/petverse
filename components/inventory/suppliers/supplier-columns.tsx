@@ -85,6 +85,21 @@ export function getSupplierColumns({
     },
 
     {
+      accessorKey: "address",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Address"
+        />
+      ),
+      cell: ({ row }) => (
+        <span className="max-w-[240px] truncate text-sm">
+          {row.original.address ?? "—"}
+        </span>
+      ),
+    },
+
+    {
       accessorKey: "is_active",
       header: ({ column }) => (
         <DataTableColumnHeader

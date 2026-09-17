@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from "react"
 
 import {
@@ -24,17 +24,72 @@ type AdminThemeContextValue = {
   mounted: boolean
 }
 
-const AdminThemeContext = createContext<AdminThemeContextValue | null>(null)
+const AdminThemeContext =
+  createContext<AdminThemeContextValue | null>(null)
+
+const themeSubscribers = new Set<() => void>()
+
+function subscribeToTheme(callback: () => void) {
+  themeSubscribers.add(callback)
+
+  return () => {
+    themeSubscribers.delete(callback)
+  }
+}
+
+function notifyThemeSubscribers() {
+  themeSubscribers.forEach((callback) => callback())
+}
 
 function readStoredTheme(): AdminThemeId {
-  if (typeof window === "undefined") return DEFAULT_ADMIN_THEME
-  try {
-    const stored = window.localStorage.getItem(ADMIN_THEME_STORAGE_KEY)
-    if (isAdminThemeId(stored)) return stored
-  } catch {
-    // ignore storage access errors
+  if (typeof window === "undefined") {
+    return DEFAULT_ADMIN_THEME
   }
+
+  try {
+    const stored = window.localStorage.getItem(
+      ADMIN_THEME_STORAGE_KEY
+    )
+
+    if (isAdminThemeId(stored)) {
+      return stored
+    }
+  } catch {
+    // Ignore storage access errors.
+  }
+
   return DEFAULT_ADMIN_THEME
+}
+
+function getThemeSnapshot(): AdminThemeId {
+  return readStoredTheme()
+}
+
+function getThemeServerSnapshot(): AdminThemeId {
+  return DEFAULT_ADMIN_THEME
+}
+
+function subscribeToStorage(callback: () => void) {
+  const unsubscribe = subscribeToTheme(callback)
+
+  window.addEventListener("storage", callback)
+
+  return () => {
+    unsubscribe()
+    window.removeEventListener("storage", callback)
+  }
+}
+
+function getMountedSnapshot() {
+  return true
+}
+
+function getMountedServerSnapshot() {
+  return false
+}
+
+function subscribeToMounted() {
+  return () => {}
 }
 
 export function AdminThemeProvider({
@@ -42,20 +97,23 @@ export function AdminThemeProvider({
 }: {
   children: React.ReactNode
 }) {
-  const [theme, setThemeState] = useState<AdminThemeId>(DEFAULT_ADMIN_THEME)
-  const [mounted, setMounted] = useState(false)
+  const theme = useSyncExternalStore(
+    subscribeToStorage,
+    getThemeSnapshot,
+    getThemeServerSnapshot
+  )
 
-  useEffect(() => {
-    setThemeState(readStoredTheme())
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    subscribeToMounted,
+    getMountedSnapshot,
+    getMountedServerSnapshot
+  )
 
-  // Apply on <html> so portaled menus/dialogs inherit theme tokens.
-  // Clear on unmount so public pages stay on the default :root brand.
   useEffect(() => {
     if (!mounted) return
 
     const root = document.documentElement
+
     root.setAttribute("data-theme", theme)
 
     return () => {
@@ -64,12 +122,16 @@ export function AdminThemeProvider({
   }, [theme, mounted])
 
   const setTheme = useCallback((next: AdminThemeId) => {
-    setThemeState(next)
     try {
-      window.localStorage.setItem(ADMIN_THEME_STORAGE_KEY, next)
+      window.localStorage.setItem(
+        ADMIN_THEME_STORAGE_KEY,
+        next
+      )
     } catch {
-      // ignore storage access errors
+      // Ignore storage access errors.
     }
+
+    notifyThemeSubscribers()
   }, [])
 
   const value = useMemo(
@@ -84,15 +146,21 @@ export function AdminThemeProvider({
 
   return (
     <AdminThemeContext.Provider value={value}>
-      <div className="flex h-svh w-full overflow-hidden">{children}</div>
+      <div className="flex h-svh w-full overflow-hidden">
+        {children}
+      </div>
     </AdminThemeContext.Provider>
   )
 }
 
 export function useAdminTheme() {
   const context = useContext(AdminThemeContext)
+
   if (!context) {
-    throw new Error("useAdminTheme must be used within AdminThemeProvider")
+    throw new Error(
+      "useAdminTheme must be used within AdminThemeProvider"
+    )
   }
+
   return context
 }

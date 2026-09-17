@@ -59,10 +59,6 @@ export function OwnerRetentionSettingsFilters({
     useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [
     isPending,

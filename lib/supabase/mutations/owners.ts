@@ -167,10 +167,39 @@ export async function deleteOwner(
 
   const supabase = await createClient()
 
-  const { error } = await supabase
+  // Check for deposits before attempting to delete the owner
+  const { count: depositCount, error: depositError } = await supabase
+    .from("deposits")
+    .select("id", {
+      count: "exact",
+      head: true,
+    })
+    .eq("owner_id", parsed.data.id)
+
+  if (depositError) {
+    return mutationError(
+      getSupabaseErrorMessage(
+        depositError,
+        "Failed to check owner records"
+      )
+    )
+  }
+
+  if ((depositCount ?? 0) > 0) {
+    return mutationError(
+      `This owner cannot be deleted because they have ${depositCount} deposit ${
+        depositCount === 1 ? "record" : "records"
+      }. Delete or resolve ${
+        depositCount === 1 ? "this deposit" : "these deposits"
+      } first.`
+    )
+  }
+
+  const { data, error } = await supabase
     .from("owners")
     .delete()
     .eq("id", parsed.data.id)
+    .select("id")
 
   if (error) {
     return mutationError(
@@ -181,6 +210,13 @@ export async function deleteOwner(
     )
   }
 
+  if (!data || data.length === 0) {
+    return mutationError(
+      "Owner could not be deleted. It may not exist or you may not have permission to delete it."
+    )
+  }
+
   revalidateOwnerPaths()
+
   return mutationSuccess(undefined)
 }

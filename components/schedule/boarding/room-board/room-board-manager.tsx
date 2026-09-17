@@ -4,15 +4,23 @@ import { useMemo, useState } from "react"
 
 import type {
   FacilityResourceRow,
+  OwnerRow,
+  PetRow,
   ReservationRow,
+  ServiceListRow,
 } from "@/lib/supabase/types"
 
 import { RoomBoardControls } from "./room-board-controls"
 import { RoomBoardGroup } from "./room-board-group"
+import { EmptyState } from "@/components/shared"
+import { ReservationFormDialog } from "../reservations/reservations-form-dialog"
 
 type RoomBoardManagerProps = {
   resources: FacilityResourceRow[]
   reservations: ReservationRow[]
+  services: ServiceListRow[]
+  owners: OwnerRow[]
+  pets: PetRow[]
 }
 
 export type ResourceFilter =
@@ -94,13 +102,29 @@ export function formatDateRange(
 export function RoomBoardManager({
   resources,
   reservations,
+  owners,
+  pets,
+  services,
 }: RoomBoardManagerProps) {
   const [selectedDate, setSelectedDate] = useState(
     new Date()
   )
 
+  const [reservationDialogOpen, setReservationDialogOpen] =
+    useState(false)
+
+  const [selectedResource, setSelectedResource] =
+    useState<FacilityResourceRow | null>(null)
+
   const [filter, setFilter] =
     useState<ResourceFilter>("all")
+
+  function handleCreateReservation(
+    resource: FacilityResourceRow
+  ) {
+    setSelectedResource(resource)
+    setReservationDialogOpen(true)
+  }
 
   const filteredResources = useMemo(() => {
     if (filter === "all") {
@@ -207,9 +231,7 @@ export function RoomBoardManager({
       />
 
       {filteredResources.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          No facility resources found.
-        </div>
+        <EmptyState title="No facility resources found." />
       ) : (
         <>
           {groupedResources.map(
@@ -218,6 +240,7 @@ export function RoomBoardManager({
                 key={type}
                 type={type}
                 resources={groupResources}
+                onCreateReservation={handleCreateReservation}
                 reservationsByResource={
                   reservationsByResource
                 }
@@ -243,6 +266,27 @@ export function RoomBoardManager({
           </div>
         </>
       )}
+      <ReservationFormDialog
+        open={reservationDialogOpen}
+        onOpenChange={(open) => {
+          setReservationDialogOpen(open)
+
+          if (!open) {
+            setSelectedResource(null)
+          }
+        }}
+        reservation={null}
+        services={services}
+        resources={resources}
+        owners={owners}
+        pets={pets}
+        initialResourceId={selectedResource?.id ?? null}
+        onSuccess={() => {
+          setReservationDialogOpen(false)
+          setSelectedResource(null)
+        }}
+      />
     </div>
+
   )
 }

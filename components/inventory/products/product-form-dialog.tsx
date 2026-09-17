@@ -60,7 +60,10 @@ const defaultValues: CreateProductInput = {
   supplier_id: null,
   sku: "",
   name: "",
-  price: 0,
+  brand: "",
+  category: "",
+  retail_price: 0,
+  cost_price: 0,
   stock_qty: 0,
   is_active: true,
 }
@@ -86,12 +89,15 @@ export function ProductFormDialog({
 
     if (product) {
       form.reset({
-        supplier_id: product.supplier_id,
-        sku: product.sku ?? "",
-        name: product.name,
-        price: product.price,
-        stock_qty: product.stock_qty,
-        is_active: product.is_active,
+        supplier_id: null,
+        sku: "",
+        name: "",
+        brand: "",
+        category: "",
+        retail_price: 0,
+        cost_price: 0,
+        stock_qty: 0,
+        is_active: true,
       })
 
       return
@@ -105,9 +111,9 @@ export function ProductFormDialog({
 
     const result = isEditing
       ? await updateProduct({
-          id: product!.id,
-          ...values,
-        })
+        id: product!.id,
+        ...values,
+      })
       : await createProduct(values)
 
     setIsSubmitting(false)
@@ -224,10 +230,10 @@ export function ProductFormDialog({
                     <SelectValue>
                       {form.watch("supplier_id")
                         ? suppliers.find(
-                            (supplier) =>
-                              supplier.id ===
-                              form.watch("supplier_id")
-                          )?.name ?? "Select supplier"
+                          (supplier) =>
+                            supplier.id ===
+                            form.watch("supplier_id")
+                        )?.name ?? "Select supplier"
                         : "No supplier"}
                     </SelectValue>
                   </SelectTrigger>
@@ -259,29 +265,97 @@ export function ProductFormDialog({
                 />
               </Field>
 
-              <Field data-invalid={!!form.formState.errors.price}>
-                <FieldLabel htmlFor="product-price">
-                  Price
+              <Field data-invalid={!!form.formState.errors.brand}>
+                <FieldLabel htmlFor="product-brand">
+                  Brand
                 </FieldLabel>
 
                 <Input
-                  id="product-price"
+                  id="product-brand"
+                  placeholder="PetCare"
+                  aria-invalid={!!form.formState.errors.brand}
+                  {...form.register("brand")}
+                />
+
+                <FieldError
+                  errors={[form.formState.errors.brand]}
+                />
+              </Field>
+
+              <Field data-invalid={!!form.formState.errors.category}>
+                <FieldLabel htmlFor="product-category">
+                  Category
+                </FieldLabel>
+
+                <Input
+                  id="product-category"
+                  placeholder="Grooming"
+                  aria-invalid={!!form.formState.errors.category}
+                  {...form.register("category")}
+                />
+
+                <FieldError
+                  errors={[form.formState.errors.category]}
+                />
+              </Field>
+
+              <Field
+                data-invalid={!!form.formState.errors.retail_price}
+              >
+                <FieldLabel htmlFor="product-retail-price">
+                  Retail price
+                </FieldLabel>
+
+                <Input
+                  id="product-retail-price"
                   type="number"
                   min={0}
                   step="0.01"
                   placeholder="0.00"
-                  aria-invalid={!!form.formState.errors.price}
-                  {...form.register("price", {
+                  aria-invalid={!!form.formState.errors.retail_price}
+                  {...form.register("retail_price", {
                     valueAsNumber: true,
                   })}
                 />
 
                 <FieldDescription>
-                  Product selling price.
+                  Price charged to the customer.
                 </FieldDescription>
 
                 <FieldError
-                  errors={[form.formState.errors.price]}
+                  errors={[
+                    form.formState.errors.retail_price,
+                  ]}
+                />
+              </Field>
+
+              <Field
+                data-invalid={!!form.formState.errors.cost_price}
+              >
+                <FieldLabel htmlFor="product-cost-price">
+                  Cost price
+                </FieldLabel>
+
+                <Input
+                  id="product-cost-price"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="0.00"
+                  aria-invalid={!!form.formState.errors.cost_price}
+                  {...form.register("cost_price", {
+                    valueAsNumber: true,
+                  })}
+                />
+
+                <FieldDescription>
+                  Amount paid to the supplier.
+                </FieldDescription>
+
+                <FieldError
+                  errors={[
+                    form.formState.errors.cost_price,
+                  ]}
                 />
               </Field>
 

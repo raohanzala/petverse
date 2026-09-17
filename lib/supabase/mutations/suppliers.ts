@@ -47,6 +47,7 @@ export async function createSupplier(
     contact_name: normalizeOptionalText(input.contact_name),
     email: normalizeOptionalText(input.email),
     phone: normalizeOptionalText(input.phone),
+    address: normalizeOptionalText(input.address),
     notes: normalizeOptionalText(input.notes),
   })
 
@@ -65,6 +66,7 @@ export async function createSupplier(
       contact_name: parsed.data.contact_name,
       email: parsed.data.email,
       phone: parsed.data.phone,
+      address: parsed.data.address,
       notes: parsed.data.notes,
       is_active: parsed.data.is_active,
     })
@@ -108,6 +110,11 @@ export async function updateSupplier(
         ? normalizeOptionalText(input.phone)
         : undefined,
 
+    address:
+      input.address !== undefined
+        ? normalizeOptionalText(input.address)
+        : undefined,
+
     notes:
       input.notes !== undefined
         ? normalizeOptionalText(input.notes)
@@ -138,6 +145,10 @@ export async function updateSupplier(
 
   if (updates.phone !== undefined) {
     payload.phone = updates.phone
+  }
+
+  if (updates.address !== undefined) {
+    payload.address = updates.address
   }
 
   if (updates.notes !== undefined) {

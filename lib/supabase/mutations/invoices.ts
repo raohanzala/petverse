@@ -20,7 +20,7 @@ import {
 } from "@/lib/validations/invoice"
 
 const REVALIDATE_PATHS = [
-  "/admin/sales/invoices",
+  "/admin/sales/billing",
   "/admin/sales/checkout",
 ] as const
 
@@ -102,13 +102,13 @@ export async function updateInvoice(
     ...input,
     ...(input.notes !== undefined
       ? {
-          notes: normalizeNotes(input.notes),
-        }
+        notes: normalizeNotes(input.notes),
+      }
       : {}),
     ...(input.currency !== undefined
       ? {
-          currency: normalizeCurrency(input.currency),
-        }
+        currency: normalizeCurrency(input.currency),
+      }
       : {}),
   })
 
@@ -208,18 +208,52 @@ export async function deleteInvoice(
 
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  console.log("AUTH USER:", user?.id)
+  console.log("AUTH ERROR:", authError)
+
+  if (user) {
+    const { data: employee, error: employeeError } =
+      await supabase
+        .from("employees")
+        .select("id, user_id, display_name")
+        .eq("user_id", user.id)
+        .maybeSingle()
+
+    console.log("EMPLOYEE:", employee)
+    console.log("EMPLOYEE ERROR:", employeeError)
+  }
+
+  const { data, error } = await supabase
     .from("invoices")
     .delete()
     .eq("id", parsed.data.id)
+    .select("id")
+
+  console.log("DELETE DATA:", data)
+  console.log("DELETE ERROR:", error)
 
   if (error) {
     return mutationError(
-      getSupabaseErrorMessage(error, "Failed to delete invoice")
+      getSupabaseErrorMessage(
+        error,
+        "Failed to delete invoice"
+      )
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return mutationError(
+      "Invoice could not be deleted. It may not exist or you may not have permission to delete it."
     )
   }
 
   revalidateInvoicePaths()
+
   return mutationSuccess(undefined)
 }
 

@@ -47,10 +47,6 @@ export function ConsentFormTemplatesFilters({
     useState(initialSearch)
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])
 

@@ -1,37 +1,19 @@
 import { DaycareSchedulesManager } from "./daycare-schedules-manager"
-import { DaycareScheduleRow, PetRow } from "@/lib/supabase/types"
-
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-]
+import { DaycareScheduleListRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
 
 type SchedulesTabProps = {
-  schedules: DaycareScheduleRow[]
+  schedules: DaycareScheduleListRow[]
   pets: PetRow[]
+  owners: OwnerRow[]
+  resources: FacilityResourceRow[]
 }
 
-function formatTime(value: string) {
-  const [hours, minutes] = value.split(":").map(Number)
-
-  const date = new Date()
-  date.setHours(hours, minutes, 0, 0)
-
-  return date.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  })
-}
-
-export async function SchedulesTab({schedules, pets}: SchedulesTabProps) {
+export async function SchedulesTab({ schedules, pets, owners, resources }: SchedulesTabProps) {
 
   return (
     <DaycareSchedulesManager
+      owners={owners}
+      resources={resources}
       schedules={schedules}
       pets={pets}
     />

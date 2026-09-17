@@ -35,6 +35,7 @@ import {
 import { DatePickerTime } from "@/components/ui/date-picker-with-time"
 import { format } from "date-fns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { parseDateTime } from "@/lib/utils"
 
 type CampaignBlackoutPeriodFormDialogProps = {
   open: boolean
@@ -51,29 +52,6 @@ const defaultValues: CreateCampaignBlackoutPeriodInput = {
   campaign_id: "",
   starts_at: "",
   ends_at: "",
-}
-
-function parseDateTime(value: string) {
-  if (!value) {
-    return {
-      date: undefined,
-      time: "",
-    }
-  }
-
-  const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return {
-      date: undefined,
-      time: "",
-    }
-  }
-
-  return {
-    date,
-    time: format(date, "HH:mm:ss"),
-  }
 }
 
 function combineDateTime(

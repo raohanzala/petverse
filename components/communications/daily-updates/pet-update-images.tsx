@@ -5,8 +5,7 @@ import { Trash2 } from "lucide-react"
 
 import {
   Field,
-  FieldDescription,
-  FieldLabel,
+  FieldDescription
 } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -56,7 +55,6 @@ export function PetUpdateImages({
    */
   useEffect(() => {
   if (!dailyUpdateId) {
-    setImages([])
     return
   }
 

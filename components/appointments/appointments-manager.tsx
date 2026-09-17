@@ -28,15 +28,15 @@ import type {
   EmployeeRow,
   OwnerRow,
   PetRow,
+  ServiceListRow,
   ServicePackageRow,
-  ServiceRow,
 } from "@/lib/supabase/types"
 
 type AppointmentsManagerProps = {
   appointments: AppointmentRow[]
   owners: OwnerRow[]
   pets: PetRow[]
-  services: ServiceRow[]
+  services: ServiceListRow[]
   packages: ServicePackageRow[]
   employees: EmployeeRow[]
   filters: AppointmentListFilters
@@ -86,11 +86,11 @@ export function AppointmentsManager({
     setIsDeleting(false)
 
     if (!result.success) {
-       toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+      toast.add({
+        type: "error",
+        description: result.error,
+        priority: "high",
+      })
       return
     }
 
@@ -112,10 +112,17 @@ export function AppointmentsManager({
     []
   )
 
-  const emptyMessage =
-    filters.search || filters.status !== "all"
-      ? "No appointments match your filters."
-      : "No appointments yet. Create your first one to get started."
+  const hasFilters =
+    Boolean(filters.search) ||
+    filters.status !== "all" ||
+    Boolean(filters.from) ||
+    Boolean(filters.to) ||
+    Boolean(filters.employee) ||
+    Boolean(filters.service)
+
+  const emptyMessage = hasFilters
+    ? "No appointments match your filters."
+    : "No appointments yet. Create your first one to get started."
 
   return (
     <div className="space-y-6">
@@ -140,6 +147,8 @@ export function AppointmentsManager({
         toolbar={
           <ServerFiltersToolbar
             filters={filters}
+            employees={employees}
+            services={services}
             onLoadingChange={setIsFiltering}
           />
         }
@@ -207,14 +216,24 @@ export function AppointmentsManager({
 function ServerFiltersToolbar({
   filters,
   onLoadingChange,
+  employees,
+  services,
 }: {
   filters: AppointmentListFilters
   onLoadingChange: (loading: boolean) => void
+  employees: EmployeeRow[]
+  services: ServiceListRow[]
 }) {
   return (
     <AppointmentsFilters
+      employees={employees}
+      services={services}
       initialSearch={filters.search ?? ""}
       initialStatus={filters.status ?? "all"}
+      initialEmployee={filters.employee ?? ""}
+      initialFrom={filters.from ?? ""}
+      initialTo={filters.to ?? ""}
+      initialService={filters.service ?? ""}
       onLoadingChange={onLoadingChange}
     />
   )

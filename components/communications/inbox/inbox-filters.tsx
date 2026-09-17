@@ -48,10 +48,6 @@ export function InboxFilters({
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
-  useEffect(() => {
     const trimmedSearch = search.trim()
 
     const currentSearch =

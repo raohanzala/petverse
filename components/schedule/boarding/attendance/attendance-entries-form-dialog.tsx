@@ -101,7 +101,11 @@ export function AttendanceEntryFormDialog({
         notes: entry.notes ?? "",
       })
 
-      setFlagsInput(entry.flags.join(", "))
+      setFlagsInput(
+        Array.isArray(entry.flags)
+          ? entry.flags.join(", ")
+          : ""
+      )
       return
     }
 

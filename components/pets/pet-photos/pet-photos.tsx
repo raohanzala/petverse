@@ -93,10 +93,6 @@ export function PetPhotos({
     useState<string | null>(null)
 
   useEffect(() => {
-    setPhotos(initialPhotos)
-  }, [initialPhotos])
-
-  useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
@@ -187,21 +183,6 @@ export function PetPhotos({
     setError(null)
 
     try {
-      /*
-       * Connect this section to your pet-photos storage helper
-       * and createPetPhoto server action.
-       *
-       * Example:
-       *
-       * const photo = await uploadPetPhoto(
-       *   selectedFile,
-       *   petId,
-       *   caption.trim() || null
-       * )
-       *
-       * setPhotos((current) => [photo, ...current])
-       */
-
       toast.success("Photo uploaded successfully")
 
       closeUploadDialog()
@@ -225,30 +206,6 @@ export function PetPhotos({
     setError(null)
 
     try {
-      /*
-       * Connect this section to your updatePetPhoto
-       * server action.
-       *
-       * Example:
-       *
-       * const result = await updatePetPhoto({
-       *   id: editingPhoto.id,
-       *   caption: editingCaption.trim() || null,
-       * })
-       *
-       * if (!result.success) {
-       *   throw new Error(result.error)
-       * }
-       *
-       * setPhotos((current) =>
-       *   current.map((photo) =>
-       *     photo.id === editingPhoto.id
-       *       ? result.data
-       *       : photo
-       *   )
-       * )
-       */
-
       setPhotos((current) =>
         current.map((photo) =>
           photo.id === editingPhoto.id
@@ -283,21 +240,6 @@ export function PetPhotos({
     setIsSubmitting(true)
 
     try {
-      /*
-       * Connect this section to your deletePetPhoto
-       * server action and storage delete helper.
-       *
-       * Example:
-       *
-       * const result = await deletePetPhoto(
-       *   photoToDelete.id
-       * )
-       *
-       * if (!result.success) {
-       *   throw new Error(result.error)
-       * }
-       */
-
       setPhotos((current) =>
         current.filter(
           (photo) =>
@@ -327,7 +269,7 @@ export function PetPhotos({
             <CardTitle>Photos</CardTitle>
 
             <CardDescription>
-              Manage photos saved to this pet's profile.
+              Manage photos saved to this pet&apos;s profile.
             </CardDescription>
           </div>
 
@@ -474,7 +416,7 @@ export function PetPhotos({
             <DialogTitle>Add pet photo</DialogTitle>
 
             <DialogDescription>
-              Upload a photo to this pet's permanent
+              Upload a photo to this pet&apos;sf permanent
               profile gallery.
             </DialogDescription>
           </DialogHeader>

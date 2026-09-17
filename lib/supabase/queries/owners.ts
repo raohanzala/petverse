@@ -3,11 +3,45 @@ import type { OwnerListFilters } from "@/lib/constants/owner-filters"
 import type { OwnerRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
-const OWNER_COLUMNS =
-  "id, name, phone, email, preferred_contact, created_at, updated_at" as const
+const OWNER_COLUMNS = `
+  id,
+  name,
+  phone,
+  email,
+  preferred_contact,
+  created_at,
+  updated_at,
+  invoices (
+    total,
+    status,
+    paid_at
+  )
+`
+
+const OWNER_SELECTION_COLUMNS =
+  "id, name, phone, email, preferred_contact, created_at, updated_at"
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
+}
+
+function calculateTotalSales(
+  invoices: {
+    total: number | string | null
+    status: string
+    paid_at: string | null
+  }[] = []
+) {
+  return invoices
+    .filter(
+      (invoice) =>
+        invoice.status === "paid" &&
+        invoice.paid_at !== null
+    )
+    .reduce(
+      (sum, invoice) => sum + Number(invoice.total ?? 0),
+      0
+    )
 }
 
 /** Admin list — supports server-side search */
@@ -41,7 +75,10 @@ export async function listOwners(
     )
   }
 
-  return data ?? []
+  return (data ?? []).map((owner) => ({
+    ...owner,
+    total_sales: calculateTotalSales(owner.invoices ?? []),
+  }))
 }
 
 /** Booking / appointment — all owners available for selection */
@@ -52,7 +89,7 @@ export async function listOwnersForSelection(): Promise<
 
   const { data, error } = await supabase
     .from("owners")
-    .select(OWNER_COLUMNS)
+    .select(OWNER_SELECTION_COLUMNS)
     .order("name", { ascending: true })
 
   if (error) {
@@ -64,7 +101,10 @@ export async function listOwnersForSelection(): Promise<
     )
   }
 
-  return data ?? []
+  return (data ?? []).map((owner) => ({
+    ...owner,
+    total_sales: 0,
+  }))
 }
 
 export async function getOwnerById(
@@ -87,5 +127,12 @@ export async function getOwnerById(
     )
   }
 
-  return data
+  if (!data) {
+    return null
+  }
+
+  return {
+    ...data,
+    total_sales: calculateTotalSales(data.invoices ?? []),
+  }
 }

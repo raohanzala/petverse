@@ -3,35 +3,36 @@ import { z } from "zod"
 export const daycareScheduleBaseSchema = z.object({
   pet_id: z.string().uuid("Invalid pet id"),
 
-  day_of_week: z
-    .number()
-    .int("Day of week must be a whole number")
-    .min(0, "Day of week must be between 0 and 6")
-    .max(6, "Day of week must be between 0 and 6"),
+  owner_id: z.string().uuid("Invalid owner id"),
 
-  start_time: z
-    .string()
-    .regex(
-      /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/,
-      "Invalid start time"
-    ),
+  resource_id: z.string().uuid().nullable(),
 
-  end_time: z
-    .string()
-    .regex(
-      /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/,
-      "Invalid end time"
-    ),
+  days_of_week: z
+    .array(z.number().int().min(0).max(6))
+    .min(1, "Select at least one day"),
+
+  starts_at: z.string().min(
+    1,
+    "Start date and time is required"
+  ),
+
+  ends_at: z.string().min(
+    1,
+    "End date and time is required"
+  ),
 
   is_active: z.boolean(),
 })
 
 export const createDaycareScheduleSchema =
   daycareScheduleBaseSchema.refine(
-    (data) => data.end_time > data.start_time,
+    (data) => {
+      return new Date(data.ends_at) > new Date(data.starts_at)
+    },
     {
-      message: "End time must be after start time",
-      path: ["end_time"],
+      message:
+        "End date and time must be after start date and time",
+      path: ["ends_at"],
     }
   )
 
@@ -44,27 +45,28 @@ export const updateDaycareScheduleSchema =
     .refine(
       (data) => {
         if (
-          data.start_time === undefined ||
-          data.end_time === undefined
+          data.starts_at === undefined ||
+          data.ends_at === undefined
         ) {
           return true
         }
 
-        return data.end_time > data.start_time
+        return (
+          new Date(data.ends_at) >
+          new Date(data.starts_at)
+        )
       },
       {
-        message: "End time must be after start time",
-        path: ["end_time"],
+        message: "End date and time must be after start date and time",
+        path: ["ends_at"],
       }
     )
 
-export type CreateDaycareScheduleInput = z.infer<
-  typeof createDaycareScheduleSchema
->
+export type CreateDaycareScheduleInput =
+  z.infer<typeof createDaycareScheduleSchema>
 
-export type UpdateDaycareScheduleInput = z.infer<
-  typeof updateDaycareScheduleSchema
->
+export type UpdateDaycareScheduleInput =
+  z.infer<typeof updateDaycareScheduleSchema>
 
 export const deleteDaycareScheduleSchema = z.object({
   id: z.string().uuid("Invalid schedule id"),

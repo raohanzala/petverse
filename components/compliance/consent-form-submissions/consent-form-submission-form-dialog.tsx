@@ -51,6 +51,7 @@ import {
     createConsentFormSubmissionSchema,
     type CreateConsentFormSubmissionInput,
 } from "@/lib/validations/consent-form-submissions"
+import { parseDateTime } from "@/lib/utils"
 
 type ConsentFormSubmissionFormDialogProps = {
     open: boolean
@@ -70,27 +71,6 @@ const defaultValues: CreateConsentFormSubmissionInput = {
     pet_id: null,
     signed_at: new Date().toISOString(),
     signature_data: null,
-}
-
-function parseDateTime(value: string) {
-    if (!value) {
-        return {
-            date: undefined,
-            time: "",
-        }
-    }
-
-    const [datePart, timePart] =
-        value.split("T")
-
-    return {
-        date: datePart
-            ? new Date(
-                `${datePart}T00:00:00`
-            )
-            : undefined,
-        time: timePart ?? "",
-    }
 }
 
 function combineDateTime(

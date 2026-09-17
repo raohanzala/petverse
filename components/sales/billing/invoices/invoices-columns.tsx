@@ -1,6 +1,11 @@
 "use client"
 
-import { MoreHorizontal, PencilIcon, Trash2Icon } from "lucide-react"
+import {
+  EyeIcon,
+  MoreHorizontal,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react"
 
 import {
   DataTableColumnHeader,
@@ -20,48 +25,112 @@ import type { InvoiceRow } from "@/lib/supabase/types"
 type InvoiceColumnActions = {
   onEdit: (invoice: InvoiceRow) => void
   onDelete: (invoice: InvoiceRow) => void
-}
-
-const INVOICE_STATUS_LABELS: Record<
-  InvoiceRow["status"],
-  string
-> = {
-  draft: "Draft",
-  open: "Open",
-  paid: "Paid",
-  void: "Void",
+  onView: (invoice: InvoiceRow) => void
 }
 
 export function getInvoiceColumns({
   onEdit,
   onDelete,
+  onView,
 }: InvoiceColumnActions): AdminColumnDef<InvoiceRow>[] {
   return [
     {
       accessorKey: "number",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Invoice" />
+        <DataTableColumnHeader
+          column={column}
+          title="Invoice No."
+        />
       ),
       cell: ({ row }) => (
-        <div>
-          <p className="font-medium text-foreground">
-            {row.original.number
-              ? `#${row.original.number}`
-              : "Unassigned"}
-          </p>
-
-          {row.original.notes ? (
-            <p className="line-clamp-1 text-xs text-muted-foreground">
-              {row.original.notes}
-            </p>
-          ) : null}
-        </div>
+        <span className="font-medium text-foreground">
+          {row.original.number
+            ? `#${row.original.number}`
+            : "Unassigned"}
+        </span>
       ),
     },
+
+    {
+      accessorKey: "issued_at",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Date"
+        />
+      ),
+      cell: ({ row }) => {
+        const date =
+          row.original.issued_at ??
+          row.original.created_at
+
+        return (
+          <span>
+            {new Date(date).toLocaleDateString([], {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
+        )
+      },
+    },
+
+    {
+      id: "owner",
+      accessorFn: (row) => row.owner?.name ?? "",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Owner"
+        />
+      ),
+      cell: ({ row }) => (
+        <span>
+          {row.original.owner?.name ?? "—"}
+        </span>
+      ),
+    },
+
+    {
+      id: "pet",
+      accessorFn: (row) => row.pet?.name ?? "",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Pet"
+        />
+      ),
+      cell: ({ row }) => (
+        <span>
+          {row.original.pet?.name ?? "—"}
+        </span>
+      ),
+    },
+
+    {
+      accessorKey: "total",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Total"
+        />
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-foreground">
+          {row.original.currency}{" "}
+          {Number(row.original.total).toFixed(2)}
+        </span>
+      ),
+    },
+
     {
       accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Status" />
+        <DataTableColumnHeader
+          column={column}
+          title="Status"
+        />
       ),
       cell: ({ row }) => {
         const status = row.original.status
@@ -75,58 +144,21 @@ export function getInvoiceColumns({
         }
 
         if (status === "void") {
-          return <Badge variant="destructive">Void</Badge>
+          return (
+            <Badge variant="destructive">
+              Void
+            </Badge>
+          )
         }
 
-        return <Badge variant="secondary">Draft</Badge>
+        return (
+          <Badge variant="secondary">
+            Draft
+          </Badge>
+        )
       },
     },
-    {
-      accessorKey: "subtotal",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Subtotal" />
-      ),
-      cell: ({ row }) => (
-        <span>
-          {row.original.currency}{" "}
-          {row.original.subtotal.toFixed(2)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "tax",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Tax" />
-      ),
-      cell: ({ row }) => (
-        <span>
-          {row.original.currency}{" "}
-          {row.original.tax.toFixed(2)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "total",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Total" />
-      ),
-      cell: ({ row }) => (
-        <span className="font-medium text-foreground">
-          {row.original.currency}{" "}
-          {row.original.total.toFixed(2)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "issued_at",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Issued" />
-      ),
-      cell: ({ row }) =>
-        row.original.issued_at
-          ? new Date(row.original.issued_at).toLocaleDateString()
-          : "—",
-    },
+
     {
       id: "actions",
       header: "Actions",
@@ -152,6 +184,13 @@ export function getInvoiceColumns({
 
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => onView(row.original)}
+              >
+                <EyeIcon />
+                View
+              </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => onEdit(row.original)}
               >

@@ -20,7 +20,7 @@ import {
 } from "@/lib/validations/daycare-schedule"
 
 const REVALIDATE_PATHS = [
-  "/admin/scheduling/daycare",
+  "/admin/schedule/daycare",
 ] as const
 
 function revalidateDaycareSchedulePaths() {
@@ -48,9 +48,11 @@ export async function createDaycareSchedule(
     .from("daycare_schedules")
     .insert({
       pet_id: parsed.data.pet_id,
-      day_of_week: parsed.data.day_of_week,
-      start_time: parsed.data.start_time,
-      end_time: parsed.data.end_time,
+      owner_id: parsed.data.owner_id,
+      resource_id: parsed.data.resource_id,
+      days_of_week: parsed.data.days_of_week,
+      starts_at: parsed.data.starts_at,
+      ends_at: parsed.data.ends_at,
       is_active: parsed.data.is_active,
     })
     .select()
@@ -91,16 +93,24 @@ export async function updateDaycareSchedule(
     payload.pet_id = updates.pet_id
   }
 
-  if (updates.day_of_week !== undefined) {
-    payload.day_of_week = updates.day_of_week
+  if (updates.owner_id !== undefined) {
+    payload.owner_id = updates.owner_id
   }
 
-  if (updates.start_time !== undefined) {
-    payload.start_time = updates.start_time
+  if (updates.resource_id !== undefined) {
+    payload.resource_id = updates.resource_id
   }
 
-  if (updates.end_time !== undefined) {
-    payload.end_time = updates.end_time
+  if (updates.days_of_week !== undefined) {
+    payload.days_of_week = updates.days_of_week
+  }
+
+  if (updates.starts_at !== undefined) {
+    payload.starts_at = updates.starts_at
+  }
+
+  if (updates.ends_at !== undefined) {
+    payload.ends_at = updates.ends_at
   }
 
   if (updates.is_active !== undefined) {

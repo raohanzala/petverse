@@ -50,6 +50,7 @@ import {
     createOwnerRetentionSettingsSchema,
     type CreateOwnerRetentionSettingsInput,
 } from "@/lib/validations/owner-retention-settings"
+import { parseDateTime } from "@/lib/utils"
 
 type OwnerRetentionSettingsFormDialogProps = {
     open: boolean
@@ -67,24 +68,6 @@ const defaultValues: CreateOwnerRetentionSettingsInput =
     lapsed_after_days: 90,
     reengagement_queued_at: null,
     opt_out: false,
-}
-
-function parseDateTime(
-    value: string | null | undefined
-) {
-    if (!value) {
-        return {
-            date: undefined,
-            time: "",
-        }
-    }
-
-    const localDate = new Date(value)
-
-    return {
-        date: localDate,
-        time: format(localDate, "HH:mm"),
-    }
 }
 
 function combineDateTime(

@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import type { PetListFilters } from "@/lib/constants/pet-filters"
 import { deletePet } from "@/lib/supabase/mutations/pets"
 import type { OwnerRow, PetRow } from "@/lib/supabase/types"
+import { PetHasReservationsDialog } from "./pet-has-reservations-dialog"
 
 type PetsManagerProps = {
   pets: PetRow[]
@@ -39,6 +40,8 @@ export function PetsManager({
   const router = useRouter()
   const [isFiltering, setIsFiltering] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
+  const [showReservationsDialog, setShowReservationsDialog] =
+    useState(false)
   const [editingPet, setEditingPet] =
     useState<PetRow | null>(null)
   const [deletingPet, setDeletingPet] =
@@ -59,19 +62,37 @@ export function PetsManager({
     setFormOpen(true)
   }
 
+  function openDetails(pet: PetRow) {
+    router.push(`/admin/clients/pets/${pet.id}`)
+  }
+
   async function confirmDelete() {
     if (!deletingPet) return
 
     setIsDeleting(true)
+
     const result = await deletePet(deletingPet.id)
+
     setIsDeleting(false)
 
     if (!result.success) {
-       toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+      // Close the delete confirmation dialog first.
+      setDeletingPet(null)
+
+      if (
+        result.error ===
+        "This pet cannot be deleted because it has existing reservations. Deactivate the pet instead."
+      ) {
+        setShowReservationsDialog(true)
+        return
+      }
+
+      toast.add({
+        type: "error",
+        description: result.error,
+        priority: "high",
+      })
+
       return
     }
 
@@ -80,15 +101,18 @@ export function PetsManager({
       description: "Pet deleted",
       priority: "high",
     })
+
     setDeletingPet(null)
     refreshList()
   }
+
 
   const columns = useMemo(
     () =>
       getPetColumns({
         onEdit: openEdit,
         onDelete: setDeletingPet,
+        onView: openDetails
       }),
     []
   )
@@ -171,6 +195,11 @@ export function PetsManager({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PetHasReservationsDialog
+        open={showReservationsDialog}
+        onOpenChange={setShowReservationsDialog}
+      />
     </div>
   )
 }

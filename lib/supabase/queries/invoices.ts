@@ -3,11 +3,119 @@ import type { InvoiceListFilters } from "@/lib/constants/invoice-filters"
 import type { InvoiceRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
-const INVOICE_COLUMNS =
-  "id, owner_id, appointment_id, number, status, subtotal, tax, total, currency, issued_at, paid_at, voided_at, notes, created_at, updated_at" as const
+const INVOICE_COLUMNS = `
+  id,
+  owner_id,
+  appointment_id,
+  number,
+  status,
+  subtotal,
+  tax,
+  total,
+  currency,
+  issued_at,
+  paid_at,
+  voided_at,
+  notes,
+  created_at,
+  updated_at,
+
+  owner:owners (
+    id,
+    name,
+    phone,
+    email
+  ),
+
+  appointment:appointments (
+    pet:pets (
+      id,
+      name,
+      species
+    )
+  )
+`
+
+const INVOICE_DETAIL_COLUMNS = `
+  id,
+  owner_id,
+  appointment_id,
+  number,
+  status,
+  subtotal,
+  tax,
+  total,
+  currency,
+  issued_at,
+  paid_at,
+  voided_at,
+  notes,
+  created_at,
+  updated_at,
+
+  owner:owners (
+    id,
+    name,
+    phone,
+    email
+  ),
+
+  appointment:appointments (
+    pet:pets (
+      id,
+      name,
+      species
+    )
+  ),
+
+  invoice_line_items (
+    id,
+    description,
+    quantity,
+    unit_price,
+    total
+  )
+`
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
+}
+
+type InvoiceRelation<T> = T | T[] | null
+
+type RawInvoiceRow = Omit<
+  InvoiceRow,
+  "owner" | "pet"
+> & {
+  owner: InvoiceRelation<InvoiceRow["owner"]>
+  appointment:
+    | {
+        pet: InvoiceRelation<InvoiceRow["pet"]>
+      }
+    | Array<{
+        pet: InvoiceRelation<InvoiceRow["pet"]>
+      }>
+    | null
+}
+
+function normalizeInvoice(invoice: RawInvoiceRow): InvoiceRow {
+  const appointment = Array.isArray(invoice.appointment)
+    ? invoice.appointment[0] ?? null
+    : invoice.appointment
+
+  const pet = appointment?.pet
+    ? Array.isArray(appointment.pet)
+      ? appointment.pet[0] ?? null
+      : appointment.pet
+    : null
+
+  return {
+    ...invoice,
+    owner: Array.isArray(invoice.owner)
+      ? invoice.owner[0] ?? null
+      : invoice.owner,
+    pet,
+  }
 }
 
 /** Admin list — supports server-side search and status filter */
@@ -39,11 +147,14 @@ export async function listInvoices(
 
   if (error) {
     throw new Error(
-      getSupabaseErrorMessage(error, "Failed to load invoices")
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load invoices"
+      )
     )
   }
 
-  return data ?? []
+  return (data ?? []).map(normalizeInvoice)
 }
 
 export async function getInvoiceById(
@@ -53,15 +164,22 @@ export async function getInvoiceById(
 
   const { data, error } = await supabase
     .from("invoices")
-    .select(INVOICE_COLUMNS)
+    .select(INVOICE_DETAIL_COLUMNS)
     .eq("id", id)
     .maybeSingle()
 
   if (error) {
     throw new Error(
-      getSupabaseErrorMessage(error, "Failed to load invoice")
+      getSupabaseErrorMessage(
+        error,
+        "Failed to load invoice"
+      )
     )
   }
 
-  return data
+  if (!data) {
+    return null
+  }
+
+  return normalizeInvoice(data)
 }

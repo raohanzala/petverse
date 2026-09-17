@@ -42,6 +42,7 @@ import {
 } from "@/lib/validations/outbound-campaigns"
 import { format } from "date-fns"
 import { DatePickerTime } from "@/components/ui/date-picker-with-time"
+import { parseDateTime } from "@/lib/utils"
 
 type OutboundCampaignFormDialogProps = {
   open: boolean
@@ -120,29 +121,6 @@ export function OutboundCampaignFormDialog({
 
     onOpenChange(false)
     onSuccess()
-  }
-
-  function parseDateTime(value: string | null) {
-    if (!value) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    const date = new Date(value)
-
-    if (Number.isNaN(date.getTime())) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    return {
-      date,
-      time: format(date, "HH:mm:ss"),
-    }
   }
 
   function combineDateTime(

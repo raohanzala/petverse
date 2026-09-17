@@ -43,11 +43,7 @@ export function VaccineTypesFilters({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState(initialSearch)
-
-  useEffect(() => {
-    setSearch(initialSearch)
-  }, [initialSearch])
-
+  
   useEffect(() => {
     onLoadingChange?.(isPending)
   }, [isPending, onLoadingChange])

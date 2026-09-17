@@ -51,6 +51,7 @@ import {
   createPetVaccinationSchema,
   type CreatePetVaccinationInput,
 } from "@/lib/validations/pet-vaccinations"
+import { parseDateTime } from "@/lib/utils"
 
 type PetVaccinationFormDialogProps = {
   open: boolean
@@ -179,25 +180,6 @@ export function PetVaccinationFormDialog({
     onSuccess()
   }
 
-  function parseDateTime(value: string) {
-    if (!value) {
-      return {
-        date: undefined,
-        time: "",
-      }
-    }
-
-    const [datePart, timePart] =
-      value.split("T")
-
-    return {
-      date: datePart
-        ? new Date(`${datePart}T00:00:00`)
-        : undefined,
-      time: timePart ?? "",
-    }
-  }
-
   function combineDateTime(
     date: Date | undefined,
     time: string
@@ -229,7 +211,7 @@ export function PetVaccinationFormDialog({
           </DialogTitle>
 
           <DialogDescription>
-            Record a pet's vaccination, including the
+            Record a pet&apos;s vaccination, including the
             vaccine, dates, and additional notes.
           </DialogDescription>
         </DialogHeader>

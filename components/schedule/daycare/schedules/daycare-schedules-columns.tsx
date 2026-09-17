@@ -1,159 +1,211 @@
 "use client"
 
-import { MoreHorizontal, PencilIcon, Trash2Icon } from "lucide-react"
+import { EyeIcon } from "lucide-react"
 
 import {
-    DataTableColumnHeader,
-    type AdminColumnDef,
+  DataTableColumnHeader,
+  type AdminColumnDef,
 } from "@/components/shared/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import type { DaycareScheduleRow, PetRow } from "@/lib/supabase/types"
+
+import type {
+  DaycareScheduleListRow,
+} from "@/lib/supabase/types"
 
 type DaycareScheduleColumnActions = {
-    pets: PetRow[]
-    onEdit: (schedule: DaycareScheduleRow) => void
-    onDelete: (schedule: DaycareScheduleRow) => void
+  onPreview: (schedule: DaycareScheduleListRow) => void
 }
 
 const DAYS_OF_WEEK = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ] as const
 
-function formatDay(dayOfWeek: number) {
-    return DAYS_OF_WEEK[dayOfWeek] ?? "Unknown"
+function formatDays(days?: number[] | null) {
+  if (!Array.isArray(days) || days.length === 0) {
+    return "No days selected"
+  }
+
+  return [...days]
+    .sort((a, b) => a - b)
+    .map((day) => DAYS_OF_WEEK[day])
+    .filter(Boolean)
+    .join(", ")
 }
 
-function formatTime(value: string) {
-    const [hours, minutes] = value.split(":").map(Number)
+function formatDate(value: string) {
+  if (!value) return "—"
 
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
-        return value
-    }
-
-    const date = new Date()
-    date.setHours(hours, minutes, 0, 0)
-
-    return date.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-    })
+  return new Date(value).toLocaleDateString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
 }
 
 export function getDaycareScheduleColumns({
-    pets,
-    onEdit,
-    onDelete,
-}: DaycareScheduleColumnActions): AdminColumnDef<DaycareScheduleRow>[] {
-    return [
-        {
-            accessorKey: "pet_id",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Pet" />
-            ),
-            cell: ({ row }) => {
-                const pet = pets.find(
-                    (pet) => pet.id === row.original.pet_id
-                )
+  onPreview,
+}: DaycareScheduleColumnActions): AdminColumnDef<DaycareScheduleListRow>[] {
+  return [
+    {
+      accessorKey: "pet_id",
 
-                return (
-                    <span className="font-medium">
-                        {pet?.name ?? "Unknown pet"}
-                    </span>
-                )
-            },
-        },
-        {
-            accessorKey: "day_of_week",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Day" />
-            ),
-            cell: ({ row }) => (
-                <span className="font-medium">
-                    {formatDay(row.original.day_of_week)}
-                </span>
-            ),
-        },
-        {
-            accessorKey: "start_time",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Start Time" />
-            ),
-            cell: ({ row }) => (
-                <span>{formatTime(row.original.start_time)}</span>
-            ),
-        },
-        {
-            accessorKey: "end_time",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="End Time" />
-            ),
-            cell: ({ row }) => (
-                <span>{formatTime(row.original.end_time)}</span>
-            ),
-        },
-        {
-            accessorKey: "is_active",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Status" />
-            ),
-            cell: ({ row }) =>
-                row.original.is_active ? (
-                    <Badge variant="completed">Active</Badge>
-                ) : (
-                    <Badge variant="secondary">Inactive</Badge>
-                ),
-        },
-        {
-            id: "actions",
-            header: "Actions",
-            enableHiding: false,
-            enableSorting: false,
-            cell: ({ row }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger
-                        render={
-                            <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                aria-label={`Actions for schedule ${row.original.id}`}
-                            />
-                        }
-                    >
-                        <MoreHorizontal />
-                    </DropdownMenuTrigger>
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Pet"
+        />
+      ),
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => onEdit(row.original)}>
-                                <PencilIcon />
-                                Edit
-                            </DropdownMenuItem>
+      cell: ({ row }) => {
+        const pet = row.original.pet
 
-                            <DropdownMenuItem
-                                variant="destructive"
-                                onClick={() => onDelete(row.original)}
-                            >
-                                <Trash2Icon />
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            ),
-        },
-    ]
+        return (
+          <div className="min-w-0">
+            <p className="font-medium">
+              {pet?.name ?? "Unknown pet"}
+            </p>
+
+            <p className="text-xs text-muted-foreground">
+              {pet?.species ?? "Unknown species"}
+            </p>
+          </div>
+        )
+      },
+    },
+
+    {
+      accessorKey: "owner_id",
+
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Owner"
+        />
+      ),
+
+      cell: ({ row }) => (
+        <span>
+          {row.original.owner?.name ?? "Unknown owner"}
+        </span>
+      ),
+    },
+
+    {
+      accessorKey: "resource_id",
+
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Resource"
+        />
+      ),
+
+      cell: ({ row }) => {
+        const resource = row.original.resource
+
+        return (
+          <div>
+            <p className="font-medium">
+              {resource?.name ?? "Unassigned"}
+            </p>
+
+            {resource?.type && (
+              <p className="text-xs text-muted-foreground capitalize">
+                {resource.type}
+              </p>
+            )}
+          </div>
+        )
+      },
+    },
+
+    {
+      accessorKey: "days_of_week",
+
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Days"
+        />
+      ),
+
+      cell: ({ row }) => (
+        <div className="max-w-[240px]">
+          <span className="text-sm">
+            {formatDays(row.original.days_of_week)}
+          </span>
+        </div>
+      ),
+    },
+
+    {
+      id: "date_range",
+
+      header: "Date Range",
+
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          <p className="text-sm">
+            {formatDate(row.original.starts_at)}
+          </p>
+
+          <p className="text-xs text-muted-foreground">
+            to {formatDate(row.original.ends_at)}
+          </p>
+        </div>
+      ),
+    },
+
+    {
+      accessorKey: "is_active",
+
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Status"
+        />
+      ),
+
+      cell: ({ row }) =>
+        row.original.is_active ? (
+          <Badge variant="completed">
+            Active
+          </Badge>
+        ) : (
+          <Badge variant="secondary">
+            Inactive
+          </Badge>
+        ),
+    },
+
+    {
+      id: "actions",
+
+      header: "Actions",
+
+      enableHiding: false,
+      enableSorting: false,
+
+      cell: ({ row }) => (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Preview schedule for ${
+            row.original.pet?.name ?? "pet"
+          }`}
+          onClick={() => onPreview(row.original)}
+        >
+          <EyeIcon />
+        </Button>
+      ),
+    },
+  ]
 }

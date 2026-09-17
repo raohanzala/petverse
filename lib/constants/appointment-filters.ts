@@ -1,43 +1,57 @@
-export const APPOINTMENT_STATUS_FILTERS = [
-  "all",
-  "requested",
-  "confirmed",
-  "arrived",
-  "in_service",
-  "completed",
-  "cancelled",
-  "no_show",
-] as const
-
-export type AppointmentStatusFilter =
-  (typeof APPOINTMENT_STATUS_FILTERS)[number]
+import type { AppointmentStatus } from "@/lib/supabase/types"
 
 export type AppointmentListFilters = {
   search?: string
-  status?: AppointmentStatusFilter
+  status?: AppointmentStatus | "all"
+  from?: string
+  to?: string
+  employee?: string
+  service?: string
 }
 
-export function parseAppointmentListFilters(
-  params: Record<string, string | string[] | undefined>
+export const DEFAULT_APPOINTMENT_FILTERS: Required<
+  Pick<AppointmentListFilters, "status">
+> = {
+  status: "all",
+}
+
+type SearchParams = Record<
+  string,
+  string | string[] | undefined
+>
+
+export function parseAppointmentFilters(
+  params: SearchParams
 ): AppointmentListFilters {
-  const rawStatus =
-    typeof params.status === "string"
-      ? params.status
-      : "all"
+  const getValue = (key: string) => {
+    const value = params[key]
 
-  const status = APPOINTMENT_STATUS_FILTERS.includes(
-    rawStatus as AppointmentStatusFilter
-  )
-    ? (rawStatus as AppointmentStatusFilter)
-    : "all"
+    if (Array.isArray(value)) {
+      return value[0]
+    }
 
-  const search =
-    typeof params.q === "string"
-      ? params.q.trim()
-      : undefined
+    return value
+  }
 
   return {
-    search: search || undefined,
-    status,
+    search: getValue("q") ?? "",
+    status: (getValue("status") as AppointmentStatus) ?? "all",
+    from: getValue("from") ?? "",
+    to: getValue("to") ?? "",
+    employee: getValue("employee") ?? "",
+    service: getValue("service") ?? "",
   }
+}
+function isAppointmentStatus(
+  value: string
+): value is AppointmentStatus {
+  return [
+    "requested",
+    "confirmed",
+    "arrived",
+    "in_service",
+    "completed",
+    "cancelled",
+    "no_show",
+  ].includes(value)
 }

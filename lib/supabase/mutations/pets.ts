@@ -168,6 +168,36 @@ export async function updatePet(
   return mutationSuccess(data)
 }
 
+export async function deactivatePet(
+  id: string
+): Promise<MutationResult> {
+  await requireStaff()
+
+  const parsed = deletePetSchema.safeParse({ id })
+
+  if (!parsed.success) {
+    return mutationError(
+      parsed.error.issues[0]?.message ?? "Invalid pet"
+    )
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from("pets")
+    .update({ is_active: false })
+    .eq("id", parsed.data.id)
+
+  if (error) {
+    return mutationError(
+      getSupabaseErrorMessage(error, "Failed to deactivate pet")
+    )
+  }
+
+  revalidatePetPaths()
+  return mutationSuccess(undefined)
+}
+
 export async function deletePet(
   id: string
 ): Promise<MutationResult> {
@@ -182,6 +212,27 @@ export async function deletePet(
   }
 
   const supabase = await createClient()
+
+  // Check whether this pet has any reservations.
+  const { count, error: reservationError } = await supabase
+    .from("reservations")
+    .select("id", { count: "exact", head: true })
+    .eq("pet_id", parsed.data.id)
+
+  if (reservationError) {
+    return mutationError(
+      getSupabaseErrorMessage(
+        reservationError,
+        "Failed to check pet reservations"
+      )
+    )
+  }
+
+  if ((count ?? 0) > 0) {
+    return mutationError(
+      "This pet cannot be deleted because it has existing reservations. Deactivate the pet instead."
+    )
+  }
 
   const { error } = await supabase
     .from("pets")

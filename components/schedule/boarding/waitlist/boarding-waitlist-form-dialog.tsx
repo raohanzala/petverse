@@ -156,8 +156,6 @@ export function BoardingWaitlistFormDialog({
   useEffect(() => {
     if (!open) return
 
-    setError("")
-
     if (entry) {
       setPetId(entry.pet_id)
       setOwnerId(entry.owner_id)
@@ -195,18 +193,6 @@ export function BoardingWaitlistFormDialog({
 
     setNotes("")
   }, [open, entry])
-
-  useEffect(() => {
-    if (!petId) return
-
-    const selectedPet = pets.find(
-      (pet) => pet.id === petId
-    )
-
-    if (!selectedPet) return
-
-    setOwnerId(selectedPet.owner_id)
-  }, [petId, pets])
 
   const selectedPet = useMemo(
     () =>

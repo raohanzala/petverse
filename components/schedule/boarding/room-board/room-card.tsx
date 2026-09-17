@@ -30,6 +30,9 @@ import {
 type RoomCardProps = {
   resource: FacilityResourceRow
   reservation?: ReservationRow
+  onCreateReservation: (
+    resource: FacilityResourceRow
+  ) => void
 }
 
 const TYPE_LABELS: Record<
@@ -45,13 +48,15 @@ const TYPE_LABELS: Record<
 export function RoomCard({
   resource,
   reservation,
+  onCreateReservation,
 }: RoomCardProps) {
-  const status =
-    getResourceStatus(reservation)
+  const status = getResourceStatus(reservation)
 
   const pet = reservation?.pet
   const owner = reservation?.owner
   const service = reservation?.service
+
+  const isAvailable = !reservation
 
   return (
     <Card
@@ -108,8 +113,7 @@ export function RoomCard({
 
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">
-                  {pet?.name ??
-                    "Unknown pet"}
+                  {pet?.name ?? "Unknown pet"}
                 </p>
 
                 <p className="truncate text-xs text-muted-foreground">
@@ -139,7 +143,11 @@ export function RoomCard({
             )}
           </div>
         ) : (
-          <div className="flex min-h-[72px] items-center justify-center rounded-md border border-dashed bg-muted/20">
+          <button
+            type="button"
+            onClick={() => onCreateReservation(resource)}
+            className="flex min-h-[72px] w-full cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/20 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <div className="text-center">
               <Plus className="mx-auto mb-1 size-4 text-muted-foreground" />
 
@@ -147,18 +155,8 @@ export function RoomCard({
                 Available
               </p>
             </div>
-          </div>
+          </button>
         )}
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="absolute right-3 bottom-3 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100"
-          aria-label={`Open ${resource.name}`}
-        >
-          <ChevronRight className="size-4" />
-        </Button>
       </CardContent>
     </Card>
   )

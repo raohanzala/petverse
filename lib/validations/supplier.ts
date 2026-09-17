@@ -33,6 +33,8 @@ export const supplierBaseSchema = z.object({
     )
     .optional()
     .nullable(),
+    
+  address: z.string().optional(),
 
   notes: z
     .string()

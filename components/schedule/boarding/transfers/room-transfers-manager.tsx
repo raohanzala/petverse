@@ -160,7 +160,7 @@ export function RoomTransfersManager({
                 </>
               ) : null}
               . If this is the latest transfer for the
-              reservation, the reservation's room will be
+              reservation, the reservation&apos;s room will be
               restored to the previous resource.
             </AlertDialogDescription>
           </AlertDialogHeader>

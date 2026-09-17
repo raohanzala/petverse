@@ -2,8 +2,33 @@ import { createClient } from "@/lib/supabase/server"
 import type { DaycareScheduleRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
-const DAYCARE_SCHEDULE_COLUMNS =
-  "id, pet_id, day_of_week, start_time, end_time, is_active" as const
+const DAYCARE_SCHEDULE_COLUMNS = `
+  id,
+  pet_id,
+  owner_id,
+  resource_id,
+  days_of_week,
+  starts_at,
+  ends_at,
+  is_active,
+  created_at,
+  updated_at,
+  pet:pets (
+    id,
+    name,
+    species
+  ),
+  owner:owners (
+    id,
+    name,
+    phone
+  ),
+  resource:facility_resources (
+    id,
+    name,
+    type
+  )
+`
 
 /** Admin list — all daycare schedules */
 export async function listDaycareSchedules(): Promise<
@@ -14,8 +39,8 @@ export async function listDaycareSchedules(): Promise<
   const { data, error } = await supabase
     .from("daycare_schedules")
     .select(DAYCARE_SCHEDULE_COLUMNS)
-    .order("day_of_week", { ascending: true })
-    .order("start_time", { ascending: true })
+    .order("days_of_week", { ascending: true })
+    .order("starts_at", { ascending: true })
 
   if (error) {
     throw new Error(
@@ -39,8 +64,8 @@ export async function listActiveDaycareSchedules(): Promise<
     .from("daycare_schedules")
     .select(DAYCARE_SCHEDULE_COLUMNS)
     .eq("is_active", true)
-    .order("day_of_week", { ascending: true })
-    .order("start_time", { ascending: true })
+    .order("days_of_week", { ascending: true })
+    .order("starts_at", { ascending: true })
 
   if (error) {
     throw new Error(
@@ -64,8 +89,8 @@ export async function listDaycareSchedulesByPetId(
     .from("daycare_schedules")
     .select(DAYCARE_SCHEDULE_COLUMNS)
     .eq("pet_id", petId)
-    .order("day_of_week", { ascending: true })
-    .order("start_time", { ascending: true })
+    .order("days_of_week", { ascending: true })
+    .order("starts_at", { ascending: true })
 
   if (error) {
     throw new Error(
@@ -88,9 +113,9 @@ export async function listDaycareSchedulesByDay(
   const { data, error } = await supabase
     .from("daycare_schedules")
     .select(DAYCARE_SCHEDULE_COLUMNS)
-    .eq("day_of_week", dayOfWeek)
+    .eq("days_of_week", dayOfWeek)
     .eq("is_active", true)
-    .order("start_time", { ascending: true })
+    .order("starts_at", { ascending: true })
 
   if (error) {
     throw new Error(

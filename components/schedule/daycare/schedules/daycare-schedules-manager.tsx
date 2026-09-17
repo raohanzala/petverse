@@ -4,22 +4,27 @@ import { DataTable, PageHeader } from "@/components/shared"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { deleteDaycareSchedule } from "@/lib/supabase/mutations/daycare-schedules"
-import { DaycareScheduleRow, PetRow } from "@/lib/supabase/types"
+import { DaycareScheduleListRow, DaycareScheduleRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { DaycareScheduleFormDialog } from "./daycare-schedule-form-dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { getDaycareScheduleColumns } from "./daycare-schedules-columns"
+import { DaycareSchedulePreviewDialog } from "./daycare-schedule-preview-dialog"
 
 type DaycareSchedulesManagerProps = {
-    schedules: DaycareScheduleRow[]
+    schedules: DaycareScheduleListRow[]
     pets: PetRow[]
+    owners: OwnerRow[]
+    resources: FacilityResourceRow[]
 }
 
 export function DaycareSchedulesManager({
     schedules,
     pets,
+    owners,
+    resources
 }: DaycareSchedulesManagerProps) {
     const router = useRouter()
 
@@ -77,29 +82,21 @@ export function DaycareSchedulesManager({
         refreshList()
     }
 
+    const [previewingSchedule, setPreviewingSchedule] =
+        useState<DaycareScheduleListRow | null>(null)
+
     const columns = useMemo(
         () =>
             getDaycareScheduleColumns({
-                pets,
-                onEdit: openEdit,
-                onDelete: setDeletingSchedule,
+                onPreview: setPreviewingSchedule,
             }),
-        [pets]
+        []
     )
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-lg font-semibold">
-                        Daycare Schedules
-                    </h2>
-
-                    <p className="text-sm text-muted-foreground">
-                        Manage recurring daycare schedules for pets.
-                    </p>
-                </div>
-                {/* <PageHeader title="Daycare Schedules" description="Manage recurring daycare schedules for pets."/> */}
+                <PageHeader title="Daycare Schedules" description="Manage recurring daycare schedules for pets." />
 
                 <Button onClick={openCreate}>
                     <Plus />
@@ -116,11 +113,23 @@ export function DaycareSchedulesManager({
             />
 
             <DaycareScheduleFormDialog
+                owners={owners}
+                resources={resources}
                 open={formOpen}
                 onOpenChange={setFormOpen}
                 schedule={editingSchedule}
                 pets={pets}
                 onSuccess={refreshList}
+            />
+
+            <DaycareSchedulePreviewDialog
+                open={Boolean(previewingSchedule)}
+                onOpenChange={open => {
+                    if(!open){
+                        setPreviewingSchedule(null)
+                    }
+                }}
+                schedule={previewingSchedule}
             />
 
             <AlertDialog

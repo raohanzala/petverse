@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -14,7 +14,7 @@ import {
   createDaycareSchedule,
   updateDaycareSchedule,
 } from "@/lib/supabase/mutations/daycare-schedules"
-import type { DaycareScheduleRow, PetRow } from "@/lib/supabase/types"
+import type { DaycareScheduleRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -41,30 +41,37 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Form } from "@/components/ui/form"
+import { format } from "date-fns"
+import { DatePickerTime } from "@/components/ui/date-picker-with-time"
+import { parseDateTime } from "@/lib/utils"
 
 type DaycareScheduleFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   schedule: DaycareScheduleRow | null
   pets: PetRow[]
+  owners: OwnerRow[]
+  resources: FacilityResourceRow[]
   onSuccess: () => void
 }
 
 const DAYS = [
-  { value: "0", label: "Sunday" },
-  { value: "1", label: "Monday" },
-  { value: "2", label: "Tuesday" },
-  { value: "3", label: "Wednesday" },
-  { value: "4", label: "Thursday" },
-  { value: "5", label: "Friday" },
-  { value: "6", label: "Saturday" },
-]
+  { value: 0, label: "Sun" },
+  { value: 1, label: "Mon" },
+  { value: 2, label: "Tue" },
+  { value: 3, label: "Wed" },
+  { value: 4, label: "Thu" },
+  { value: 5, label: "Fri" },
+  { value: 6, label: "Sat" },
+] as const
 
 export function DaycareScheduleFormDialog({
   schedule,
   pets,
   open: controlledOpen,
   onOpenChange,
+  owners,
+  resources
 }: DaycareScheduleFormDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -84,9 +91,11 @@ export function DaycareScheduleFormDialog({
     resolver: zodResolver(createDaycareScheduleSchema),
     defaultValues: {
       pet_id: schedule?.pet_id ?? "",
-      day_of_week: schedule?.day_of_week ?? 1,
-      start_time: schedule?.start_time?.slice(0, 5) ?? "09:00",
-      end_time: schedule?.end_time?.slice(0, 5) ?? "17:00",
+      owner_id: schedule?.owner_id ?? "",
+      resource_id: schedule?.resource_id ?? null,
+      days_of_week: schedule?.days_of_week ?? [],
+      starts_at: schedule?.starts_at?.slice(0, 19) ?? "",
+      ends_at: schedule?.ends_at?.slice(0, 19) ?? "",
       is_active: schedule?.is_active ?? true,
     },
   })
@@ -96,9 +105,11 @@ export function DaycareScheduleFormDialog({
 
     form.reset({
       pet_id: schedule?.pet_id ?? "",
-      day_of_week: schedule?.day_of_week ?? 1,
-      start_time: schedule?.start_time?.slice(0, 5) ?? "09:00",
-      end_time: schedule?.end_time?.slice(0, 5) ?? "17:00",
+      owner_id: schedule?.owner_id ?? "",
+      resource_id: schedule?.resource_id ?? null,
+      days_of_week: schedule?.days_of_week ?? [],
+      starts_at: schedule?.starts_at?.slice(0, 19) ?? "",
+      ends_at: schedule?.ends_at?.slice(0, 19) ?? "",
       is_active: schedule?.is_active ?? true,
     })
   }, [open, schedule, form])
@@ -130,6 +141,20 @@ export function DaycareScheduleFormDialog({
     form.reset()
   }
 
+  function combineDateTime(
+    date: Date | undefined,
+    time: string
+  ) {
+    if (!date) return ""
+
+    const datePart = format(date, "yyyy-MM-dd")
+
+    const finalTime =
+      time || format(new Date(), "HH:mm:ss")
+
+    return `${datePart}T${finalTime}`
+  }
+
   return (
     <Dialog
       open={open}
@@ -144,7 +169,7 @@ export function DaycareScheduleFormDialog({
           </DialogTitle>
 
           <DialogDescription>
-            Configure a recurring daycare schedule for a pet.
+            Configure the days, resource, and date range for this daycare schedule.
           </DialogDescription>
         </DialogHeader>
 
@@ -161,11 +186,27 @@ export function DaycareScheduleFormDialog({
                   value={form.watch("pet_id")}
                   onValueChange={(value) => {
                     if (!value) return
+
+                    const selectedPet = pets.find(
+                      (pet) => pet.id === value
+                    )
+
                     form.setValue("pet_id", value, {
+                      shouldDirty: true,
                       shouldValidate: true,
                     })
-                  }
-                  }
+
+                    if (selectedPet?.owner_id) {
+                      form.setValue(
+                        "owner_id",
+                        selectedPet.owner_id,
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue>
@@ -195,91 +236,231 @@ export function DaycareScheduleFormDialog({
               </Field>
 
               <Field>
-                <FieldLabel>Day</FieldLabel>
+                <FieldLabel>Owner</FieldLabel>
 
                 <Select
-                  value={String(form.watch("day_of_week"))}
-                  onValueChange={(value) =>
-                    form.setValue(
-                      "day_of_week",
-                      Number(value),
-                      {
-                        shouldValidate: true,
-                      }
-                    )
-                  }
+                  value={form.watch("owner_id")}
+                  disabled
                 >
                   <SelectTrigger>
                     <SelectValue>
-                      {DAYS.find(
-                        (day) => day.value === String(form.watch("day_of_week"))
-                      )?.label ?? "Select a day"}
+                      {owners.find(
+                        (owner) =>
+                          owner.id === form.watch("owner_id")
+                      )?.name ?? "Select a pet first"}
                     </SelectValue>
                   </SelectTrigger>
-
-                  <SelectContent>
-                    {DAYS.map((day) => (
-                      <SelectItem
-                        key={day.value}
-                        value={day.value}
-                      >
-                        {day.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
                 </Select>
 
-                {form.formState.errors.day_of_week && (
+                {form.formState.errors.owner_id && (
                   <FieldError>
-                    {form.formState.errors.day_of_week.message}
+                    {form.formState.errors.owner_id.message}
                   </FieldError>
                 )}
               </Field>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="start_time">
-                    Start Time
-                  </FieldLabel>
+              <Field>
+                <FieldLabel>Resource</FieldLabel>
 
-                  <Input
-                    id="start_time"
-                    type="time"
-                    {...form.register("start_time")}
-                  />
+                <Select
+                  value={form.watch("resource_id") ?? ""}
+                  onValueChange={(value) => {
+                    form.setValue(
+                      "resource_id",
+                      value || null,
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue>
+                      {resources.find(
+                        (resource) =>
+                          resource.id === form.watch("resource_id")
+                      )?.name ?? "Select a resource"}
+                    </SelectValue>
+                  </SelectTrigger>
 
-                  {form.formState.errors.start_time && (
-                    <FieldError>
-                      {form.formState.errors.start_time.message}
-                    </FieldError>
-                  )}
-                </Field>
+                  <SelectContent>
+                    {resources
+                      .filter((resource) => resource.is_active)
+                      .map((resource) => (
+                        <SelectItem
+                          key={resource.id}
+                          value={resource.id}
+                        >
+                          {resource.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
 
-                <Field>
-                  <FieldLabel htmlFor="end_time">
-                    End Time
-                  </FieldLabel>
+                {form.formState.errors.resource_id && (
+                  <FieldError>
+                    {form.formState.errors.resource_id.message}
+                  </FieldError>
+                )}
+              </Field>
 
-                  <Input
-                    id="end_time"
-                    type="time"
-                    {...form.register("end_time")}
-                  />
+              <Controller
+                control={form.control}
+                name="days_of_week"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Days</FieldLabel>
 
-                  {form.formState.errors.end_time && (
-                    <FieldError>
-                      {form.formState.errors.end_time.message}
-                    </FieldError>
-                  )}
-                </Field>
-              </div>
+                    <div className="grid grid-cols-7 gap-2">
+                      {DAYS.map((day) => {
+                        const selected =
+                          field.value?.includes(day.value)
+
+                        return (
+                          <Button
+                            key={day.value}
+                            type="button"
+                            variant={selected ? "default" : "outline"}
+                            className="h-9 px-2"
+                            onClick={() => {
+                              const current =
+                                field.value ?? []
+
+                              const next = selected
+                                ? current.filter(
+                                  (value) =>
+                                    value !== day.value
+                                )
+                                : [...current, day.value]
+
+                              field.onChange(
+                                next.sort((a, b) => a - b)
+                              )
+                            }}
+                          >
+                            {day.label}
+                          </Button>
+                        )
+                      })}
+                    </div>
+
+                    <FieldDescription>
+                      Select the days when this daycare schedule
+                      should run.
+                    </FieldDescription>
+
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={form.control}
+                name="starts_at"
+                render={({ field, fieldState }) => {
+                  const { date, time } = parseDateTime(field.value)
+
+                  return (
+                    <Field data-invalid={fieldState.invalid}>
+                      <DatePickerTime
+                        date={date}
+                        onDateChange={(selectedDate) => {
+                          if (!selectedDate) {
+                            field.onChange("")
+                            return
+                          }
+
+                          const currentTime = field.value
+                            ? parseDateTime(field.value).time
+                            : format(new Date(), "HH:mm:ss")
+
+                          field.onChange(
+                            combineDateTime(
+                              selectedDate,
+                              currentTime
+                            )
+                          )
+                        }}
+                        time={time}
+                        onTimeChange={(selectedTime) => {
+                          const currentDate =
+                            parseDateTime(field.value).date
+
+                          field.onChange(
+                            combineDateTime(
+                              currentDate,
+                              selectedTime
+                            )
+                          )
+                        }}
+                        dateLabel="Start date"
+                        timeLabel="Start time"
+                        datePlaceholder="Select start date"
+                      />
+
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )
+                }}
+              />
+
+              <Controller
+                control={form.control}
+                name="ends_at"
+                render={({ field, fieldState }) => {
+                  const { date, time } = parseDateTime(field.value)
+
+                  return (
+                    <Field data-invalid={fieldState.invalid}>
+                      <DatePickerTime
+                        date={date}
+                        onDateChange={(selectedDate) => {
+                          if (!selectedDate) {
+                            field.onChange("")
+                            return
+                          }
+
+                          const currentTime = field.value
+                            ? parseDateTime(field.value).time
+                            : format(new Date(), "HH:mm:ss")
+
+                          field.onChange(
+                            combineDateTime(
+                              selectedDate,
+                              currentTime
+                            )
+                          )
+                        }}
+                        time={time}
+                        onTimeChange={(selectedTime) => {
+                          const currentDate =
+                            parseDateTime(field.value).date
+
+                          field.onChange(
+                            combineDateTime(
+                              currentDate,
+                              selectedTime
+                            )
+                          )
+                        }}
+                        dateLabel="End date"
+                        timeLabel="End time"
+                        datePlaceholder="Select end date"
+                      />
+
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )
+                }}
+              />
 
               <Field orientation="horizontal">
                 <div className="flex-1">
                   <FieldLabel>Active</FieldLabel>
 
                   <FieldDescription>
-                    Enable this recurring schedule.
+                    Allow this daycare schedule to generate visits.
                   </FieldDescription>
                 </div>
 

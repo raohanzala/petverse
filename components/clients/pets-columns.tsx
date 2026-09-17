@@ -1,6 +1,11 @@
 "use client"
 
-import { MoreHorizontal, PencilIcon, Trash2Icon } from "lucide-react"
+import {
+  EyeIcon,
+  MoreHorizontal,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react"
 
 import {
   DataTableColumnHeader,
@@ -20,12 +25,15 @@ import type { PetRow } from "@/lib/supabase/types"
 type PetColumnActions = {
   onEdit: (pet: PetRow) => void
   onDelete: (pet: PetRow) => void
+  onView: (pet: PetRow) => void
 }
 
 export function getPetColumns({
   onEdit,
   onDelete,
+  onView
 }: PetColumnActions): AdminColumnDef<PetRow>[] {
+
   return [
     {
       accessorKey: "name",
@@ -115,38 +123,49 @@ export function getPetColumns({
       enableHiding: false,
       enableSorting: false,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Actions for ${row.original.name}`}
-              />
-            }
-          >
-            <MoreHorizontal />
-          </DropdownMenuTrigger>
+        <div className="flex items-center gap-1">
 
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => onEdit(row.original)}
-              >
-                <PencilIcon />
-                Edit
-              </DropdownMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Actions for ${row.original.name}`}
+                />
+              }
+            >
+              <MoreHorizontal />
+            </DropdownMenuTrigger>
 
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => onDelete(row.original)}
-              >
-                <Trash2Icon />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <DropdownMenuContent align="end">
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => onEdit(row.original)}
+                >
+                  <PencilIcon />
+                  Edit
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => onView(row.original)}
+                >
+                  <EyeIcon />
+                  View
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => onDelete(row.original)}
+                >
+                  <Trash2Icon />
+                  Delete
+                </DropdownMenuItem>
+
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ),
     },
   ]

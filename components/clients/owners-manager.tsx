@@ -41,6 +41,8 @@ export function OwnersManager({
     useState<OwnerRow | null>(null)
   const [deletingOwner, setDeletingOwner] =
     useState<OwnerRow | null>(null)
+  const [deleteError, setDeleteError] =
+    useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
   function refreshList() {
@@ -61,17 +63,14 @@ export function OwnersManager({
     if (!deletingOwner) return
 
     setIsDeleting(true)
+    setDeleteError(null)
 
     const result = await deleteOwner(deletingOwner.id)
 
     setIsDeleting(false)
 
     if (!result.success) {
-       toast.add({
-            type: "error",
-            description: result.error,
-            priority: "high",
-          })
+      setDeleteError(result.error)
       return
     }
 
@@ -80,15 +79,21 @@ export function OwnersManager({
       description: "Owner deleted",
       priority: "high",
     })
+
     setDeletingOwner(null)
     refreshList()
+  }
+
+  function openDelete(owner: OwnerRow) {
+    setDeleteError(null)
+    setDeletingOwner(owner)
   }
 
   const columns = useMemo(
     () =>
       getOwnerColumns({
         onEdit: openEdit,
-        onDelete: setDeletingOwner,
+        onDelete: openDelete,
       }),
     []
   )
@@ -135,38 +140,58 @@ export function OwnersManager({
       <AlertDialog
         open={Boolean(deletingOwner)}
         onOpenChange={(open) => {
-          if (!open) setDeletingOwner(null)
+          if (!open && !isDeleting) {
+            setDeletingOwner(null)
+            setDeleteError(null)
+          }
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete owner?
+              {deleteError ? "Owner can't be deleted" : "Delete owner?"}
             </AlertDialogTitle>
 
             <AlertDialogDescription>
-              This will permanently delete{" "}
-              <strong>{deletingOwner?.name}</strong>.
-              Any pets or appointments linked to this owner
-              may be affected.
+              {deleteError ? (
+                <div className="space-y-3">
+                  <p>{deleteError}</p>
+
+                  <p>
+                    This owner has records associated with their account
+                    that must be resolved before the owner can be deleted.
+                  </p>
+                </div>
+              ) : (
+                <p>
+                  This will permanently delete{" "}
+                  <span className="font-medium text-foreground">
+                    {deletingOwner?.name}
+                  </span>
+                  .
+                  Any records linked to this owner may be affected.
+                </p>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>
-              Cancel
+              {deleteError ? "Close" : "Cancel"}
             </AlertDialogCancel>
 
-            <AlertDialogAction
-              variant="destructive"
-              disabled={isDeleting}
-              onClick={(event) => {
-                event.preventDefault()
-                void confirmDelete()
-              }}
-            >
-              {isDeleting ? "Deleting…" : "Delete"}
-            </AlertDialogAction>
+            {!deleteError && (
+              <AlertDialogAction
+                variant="destructive"
+                disabled={isDeleting}
+                onClick={(event) => {
+                  event.preventDefault()
+                  void confirmDelete()
+                }}
+              >
+                {isDeleting ? "Deleting…" : "Delete"}
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

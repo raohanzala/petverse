@@ -141,8 +141,6 @@ export function PaymentLinkFormDialog({
   useEffect(() => {
     if (!open) return
 
-    setError("")
-
     if (paymentLink) {
       setInvoiceId(paymentLink.invoice_id)
 
@@ -410,7 +408,7 @@ export function PaymentLinkFormDialog({
                 />
 
                 <FieldDescription>
-                  The customer won't be able to
+                  The customer won&apos;t be able to
                   use the link after this time.
                 </FieldDescription>
               </Field>

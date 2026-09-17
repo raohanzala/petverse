@@ -19,6 +19,9 @@ type RoomBoardGroupProps = {
     string,
     ReservationRow[]
   >
+  onCreateReservation: (
+    resource: FacilityResourceRow
+  ) => void
 }
 
 const GROUP_LABELS: Record<
@@ -35,6 +38,7 @@ export function RoomBoardGroup({
   type,
   resources,
   reservationsByResource,
+  onCreateReservation
 }: RoomBoardGroupProps) {
   const occupiedCount = resources.filter(
     (resource) =>
@@ -92,6 +96,7 @@ export function RoomBoardGroup({
                 key={resource.id}
                 resource={resource}
                 reservation={reservation}
+                onCreateReservation={onCreateReservation}
               />
             )
           })}

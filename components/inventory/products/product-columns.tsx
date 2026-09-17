@@ -1,6 +1,10 @@
 "use client"
 
-import { MoreHorizontal, PencilIcon, Trash2Icon } from "lucide-react"
+import {
+  MoreHorizontal,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react"
 
 import {
   DataTableColumnHeader,
@@ -48,25 +52,68 @@ export function getProductColumns({
     },
 
     {
-      accessorKey: "supplier_id",
+      accessorKey: "brand",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Supplier" />
+        <DataTableColumnHeader column={column} title="Brand" />
       ),
       cell: ({ row }) => (
         <span className="text-sm">
-          {row.original.supplier_id ?? "—"}
+          {row.original.brand ?? "—"}
         </span>
       ),
     },
 
     {
-      accessorKey: "price",
+      accessorKey: "category",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Price" />
+        <DataTableColumnHeader column={column} title="Category" />
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm">
+          {row.original.category ?? "—"}
+        </span>
+      ),
+    },
+
+    {
+      id: "supplier",
+      accessorFn: (row) => row.supplier?.name ?? "",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Supplier" />
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm">
+          {row.original.supplier?.name ?? "—"}
+        </span>
+      ),
+    },
+
+    {
+      accessorKey: "retail_price",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Retail Price"
+        />
       ),
       cell: ({ row }) => (
         <span className="font-medium">
-          {Number(row.original.price).toFixed(2)}
+          {Number(row.original.retail_price).toFixed(2)}
+        </span>
+      ),
+    },
+
+    {
+      accessorKey: "cost_price",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Cost Price"
+        />
+      ),
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground">
+          {Number(row.original.cost_price).toFixed(2)}
         </span>
       ),
     },
@@ -88,9 +135,13 @@ export function getProductColumns({
       ),
       cell: ({ row }) =>
         row.original.is_active ? (
-          <Badge variant="completed">Active</Badge>
+          <Badge variant="completed">
+            Active
+          </Badge>
         ) : (
-          <Badge variant="secondary">Inactive</Badge>
+          <Badge variant="secondary">
+            Inactive
+          </Badge>
         ),
     },
 

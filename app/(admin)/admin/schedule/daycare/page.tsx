@@ -13,6 +13,7 @@ import { listOwners } from "@/lib/supabase/queries/owners"
 import { getDaycarePricing } from "@/lib/supabase/queries/daycare-pricing"
 import { listDaycareTransactionHistory } from "@/lib/supabase/queries/daycare-transactions"
 import { listDaycareSchedules } from "@/lib/supabase/queries/daycare-schedules"
+import { listFacilityResources } from "@/lib/supabase/queries/facility-resources"
 
 type DaycarePageProps = {
   searchParams: Promise<
@@ -36,14 +37,15 @@ export default async function DaycarePage({
   const walletFilters =
     parseDaycareWalletFilters(params)
 
-  const [packages, wallets, pets, owners, pricing, transactions, schedules] = await Promise.all([
+  const [packages, wallets, pets, owners, pricing, transactions, schedules, resources] = await Promise.all([
     listDaycarePackages(),
     listDaycareWallets(),
     listActivePets(),
     listOwners(),
     getDaycarePricing(),
     listDaycareTransactionHistory(),
-    listDaycareSchedules()
+    listDaycareSchedules(),
+    listFacilityResources()
   ])
 
   return (
@@ -58,6 +60,7 @@ export default async function DaycarePage({
             | "history"
             | "billing-packs"
         }
+        resources={resources}
         pets={pets}
         owners={owners}
         schedules={schedules}

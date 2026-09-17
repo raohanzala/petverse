@@ -20,9 +20,11 @@ import type {
 import type {
   DaycarePackageRow,
   DaycarePricingRow,
+  DaycareScheduleListRow,
   DaycareScheduleRow,
   DaycareTransactionRow,
   DaycareWalletRow,
+  FacilityResourceRow,
   OwnerRow,
   PetRow,
 } from "@/lib/supabase/types"
@@ -36,7 +38,8 @@ type DaycareTab =
 type DaycareTabsProps = {
   pets: PetRow[]
   owners: OwnerRow[]
-  schedules: DaycareScheduleRow[]
+  resources: FacilityResourceRow[]
+  schedules: DaycareScheduleListRow[]
   transactions: DaycareTransactionRow[]
   pricing: DaycarePricingRow | null
   packages: DaycarePackageRow[]
@@ -53,6 +56,7 @@ type DaycareTabsProps = {
 export function DaycareTabs({
   pets,
   owners,
+  resources,
   schedules,
   transactions,
   pricing,
@@ -78,7 +82,7 @@ export function DaycareTabs({
       </TabsContent>
 
       <TabsContent value="schedules">
-        <SchedulesTab pets={pets} schedules={schedules} />
+        <SchedulesTab pets={pets} schedules={schedules} owners={owners} resources={resources} />
       </TabsContent>
 
       <TabsContent value="history">
