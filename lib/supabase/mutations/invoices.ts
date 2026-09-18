@@ -213,9 +213,6 @@ export async function deleteInvoice(
     error: authError,
   } = await supabase.auth.getUser()
 
-  console.log("AUTH USER:", user?.id)
-  console.log("AUTH ERROR:", authError)
-
   if (user) {
     const { data: employee, error: employeeError } =
       await supabase
@@ -224,8 +221,6 @@ export async function deleteInvoice(
         .eq("user_id", user.id)
         .maybeSingle()
 
-    console.log("EMPLOYEE:", employee)
-    console.log("EMPLOYEE ERROR:", employeeError)
   }
 
   const { data, error } = await supabase
@@ -234,8 +229,6 @@ export async function deleteInvoice(
     .eq("id", parsed.data.id)
     .select("id")
 
-  console.log("DELETE DATA:", data)
-  console.log("DELETE ERROR:", error)
 
   if (error) {
     return mutationError(

@@ -388,8 +388,16 @@ export function BoardingWaitlistFormDialog({
                 <Select
                   value={petId}
                   onValueChange={(value) => {
-                    if (value) {
-                      setPetId(value)
+                    if (!value) return
+
+                    setPetId(value)
+
+                    const pet = pets.find((pet) => pet.id === value)
+
+                    if (pet?.owner_id) {
+                      setOwnerId(pet.owner_id)
+                    } else {
+                      setOwnerId("")
                     }
                   }}
                 >

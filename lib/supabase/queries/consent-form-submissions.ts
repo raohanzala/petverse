@@ -45,6 +45,8 @@ const CONSENT_FORM_SUBMISSION_COLUMNS = `
   )
 ` as const
 
+type Relation<T> = T | T[] | null
+
 type ConsentFormSubmissionQueryRow = {
   id: string
   template_id: string
@@ -54,28 +56,38 @@ type ConsentFormSubmissionQueryRow = {
   signed_at: string
   signature_data: Record<string, unknown> | null
 
-  template: {
+  template: Relation<{
     id: string
     name: string
     version: number
-  }[] | null
+  }>
 
-  appointment: {
+  appointment: Relation<{
     id: string
     starts_at: string
-  }[] | null
+  }>
 
-  owner: {
+  owner: Relation<{
     id: string
     name: string
     phone: string
-  }[] | null
+  }>
 
-  pet: {
+  pet: Relation<{
     id: string
     name: string
     species: string
-  }[] | null
+  }>
+}
+
+function firstRelation<T>(
+  relation: T | T[] | null | undefined
+): T | null {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null
+  }
+
+  return relation ?? null
 }
 
 function normalizeConsentFormSubmission(
@@ -90,10 +102,10 @@ function normalizeConsentFormSubmission(
     signed_at: row.signed_at,
     signature_data: row.signature_data,
 
-    template: row.template?.[0] ?? null,
-    appointment: row.appointment?.[0] ?? null,
-    owner: row.owner?.[0] ?? null,
-    pet: row.pet?.[0] ?? null,
+    template: firstRelation(row.template),
+    appointment: firstRelation(row.appointment),
+    owner: firstRelation(row.owner),
+    pet: firstRelation(row.pet),
   }
 }
 

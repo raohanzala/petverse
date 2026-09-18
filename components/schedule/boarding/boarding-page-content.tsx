@@ -20,9 +20,6 @@ type BoardingTab =
 
 type BoardingPageContentProps = {
   tab: BoardingTab
-  params: {
-    reservationId?: string
-  }
   searchParams: Record<
     string,
     string | string[] | undefined
@@ -31,7 +28,6 @@ type BoardingPageContentProps = {
 
 export async function BoardingPageContent({
   tab,
-  params,
   searchParams,
 }: BoardingPageContentProps) {
   const instructionFilters =
@@ -66,7 +62,6 @@ export async function BoardingPageContent({
     <div className="space-y-6">
       <BoardingTabs
         tab={tab}
-        params={params}
         searchParams={searchParams}
         instructions={instructions}
         pets={pets}

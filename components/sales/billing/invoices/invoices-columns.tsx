@@ -45,7 +45,7 @@ export function getInvoiceColumns({
       cell: ({ row }) => (
         <span className="font-medium text-foreground">
           {row.original.number
-            ? `#${row.original.number}`
+            ? `#INV-00${row.original.number}`
             : "Unassigned"}
         </span>
       ),

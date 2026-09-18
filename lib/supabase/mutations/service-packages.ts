@@ -93,11 +93,6 @@ export async function updateServicePackage(
     })
 
     if (!parsed.success) {
-        // console.log(
-        //     "PACKAGE UPDATE VALIDATION ERROR:",
-        //     parsed.error.issues
-        // )
-
         return mutationError(
             parsed.error.issues[0]?.message ?? "Invalid input"
         )

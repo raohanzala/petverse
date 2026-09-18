@@ -121,16 +121,41 @@ function normalizeAppointment(
     ? row.preferred_employee[0]
     : row.preferred_employee
 
+  // Owner and pet are required for every appointment.
+  if (!owner || !pet) {
+    throw new Error(
+      `Appointment ${row.id} is missing owner or pet relation`
+    )
+  }
+
+  // Service is required only when service_id exists.
+  if (row.service_id && !service) {
+    throw new Error(
+      `Appointment ${row.id} references a missing service`
+    )
+  }
+
+  // Package is required only when package_id exists.
+  if (row.package_id && !packageRelation) {
+    throw new Error(
+      `Appointment ${row.id} references a missing package`
+    )
+  }
+
+  // Employee is required only when employee_id exists.
+  if (row.employee_id && !employee) {
+    throw new Error(
+      `Appointment ${row.id} references a missing employee`
+    )
+  }
+
+  // Preferred employee is required only when preferred_employee_id exists.
   if (
-    !owner ||
-    !pet ||
-    !service ||
-    !packageRelation ||
-    !employee ||
+    row.preferred_employee_id &&
     !preferredEmployee
   ) {
     throw new Error(
-      "Appointment is missing a required relation"
+      `Appointment ${row.id} references a missing preferred employee`
     )
   }
 
@@ -138,10 +163,10 @@ function normalizeAppointment(
     ...row,
     owner,
     pet,
-    service,
-    package: packageRelation,
-    employee,
-    preferred_employee: preferredEmployee,
+    service: service ?? null,
+    package: packageRelation ?? null,
+    employee: employee ?? null,
+    preferred_employee: preferredEmployee ?? null,
   }
 }
 

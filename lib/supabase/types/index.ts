@@ -413,19 +413,19 @@ export type AppointmentRow = {
 
   service: {
     name: string
-  }
+  } | null
 
   package: {
     name: string
-  }
+  } | null
 
   employee: {
     display_name: string
-  }
+  } | null
 
   preferred_employee: {
     display_name: string
-  }
+  } | null
 }
 
 export type AppointmentInsert = Pick<

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
@@ -105,7 +105,15 @@ export function BoardingInstructionsFormDialog({
     form.reset(defaultValues)
   }, [open, instructions, form])
 
-  const selectedPetId = form.watch("pet_id")
+  const selectedPetId = useWatch({
+    control: form.control,
+    name: "pet_id",
+  })
+
+  const selectedReservationId = useWatch({
+    control: form.control,
+    name: "reservation_id",
+  })
 
   const availableReservations =
     reservations.filter(
@@ -113,29 +121,46 @@ export function BoardingInstructionsFormDialog({
         reservation.pet_id === selectedPetId
     )
 
+  const selectedPet = pets.find(
+    (pet) => pet.id === selectedPetId
+  )
+
+  const selectedReservation =
+    reservations.find(
+      (reservation) =>
+        reservation.id === selectedReservationId
+    )
+
   useEffect(() => {
-    if (!selectedPetId) return
+    if (!selectedPetId) {
+      form.setValue("reservation_id", null)
+      return
+    }
 
     const currentReservationId =
       form.getValues("reservation_id")
 
-    const reservationBelongsToPet =
+    const currentReservationBelongsToPet =
       availableReservations.some(
         (reservation) =>
-          reservation.id ===
-          currentReservationId
+          reservation.id === currentReservationId
       )
 
-    if (
-      currentReservationId &&
-      !reservationBelongsToPet
-    ) {
-      form.setValue(
-        "reservation_id",
-        null,
-        { shouldDirty: true }
-      )
+    if (currentReservationBelongsToPet) {
+      return
     }
+
+    const firstReservation =
+      availableReservations[0]
+
+    form.setValue(
+      "reservation_id",
+      firstReservation?.id ?? null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
+    )
   }, [
     selectedPetId,
     availableReservations,
@@ -149,9 +174,9 @@ export function BoardingInstructionsFormDialog({
 
     const result = isEditing
       ? await updateBoardingInstructions({
-          id: instructions!.id,
-          ...values,
-        })
+        id: instructions!.id,
+        ...values,
+      })
       : await createBoardingInstructions(values)
 
     setIsSubmitting(false)
@@ -214,18 +239,14 @@ export function BoardingInstructionsFormDialog({
                 </FieldLabel>
 
                 <Select
-                  value={form.watch("pet_id")}
+                  value={selectedPetId}
                   onValueChange={(value) => {
                     if (!value) return
 
-                    form.setValue(
-                      "pet_id",
-                      value,
-                      {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      }
-                    )
+                    form.setValue("pet_id", value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
                   }}
                 >
                   <SelectTrigger
@@ -234,13 +255,8 @@ export function BoardingInstructionsFormDialog({
                       !!form.formState.errors.pet_id
                     }
                   >
-                    <SelectValue>
-                      {pets.find(
-                        (pet) =>
-                          pet.id ===
-                          form.watch("pet_id")
-                      )?.name ??
-                        "Select pet"}
+                    <SelectValue placeholder="Select pet">
+                      {selectedPet?.name ?? "Select pet"}
                     </SelectValue>
                   </SelectTrigger>
 
@@ -279,14 +295,13 @@ export function BoardingInstructionsFormDialog({
                 </FieldLabel>
 
                 <Select
-                  value={
-                    form.watch("reservation_id") ??
-                    ""
-                  }
+                  value={selectedReservationId ?? ""}
                   onValueChange={(value) => {
                     form.setValue(
                       "reservation_id",
-                      value || null,
+                      value === "none" || !value
+                        ? null
+                        : value,
                       {
                         shouldDirty: true,
                         shouldValidate: true,
@@ -298,23 +313,21 @@ export function BoardingInstructionsFormDialog({
                   <SelectTrigger
                     id="instructions-reservation"
                     aria-invalid={
-                      !!form.formState.errors
-                        .reservation_id
+                      !!form.formState.errors.reservation_id
                     }
                   >
-                    <SelectValue>
-                      {form.watch(
-                        "reservation_id"
-                      )
-                        ? reservations.find(
-                            (reservation) =>
-                              reservation.id ===
-                              form.watch(
-                                "reservation_id"
-                              )
-                          )?.id ??
-                          "Select reservation"
-                        : "No reservation"}
+                    <SelectValue
+                      placeholder={
+                        selectedPetId
+                          ? "Select reservation"
+                          : "Select a pet first"
+                      }
+                    >
+                      {selectedReservation
+                        ? `${selectedPet?.name ?? "Pet"} · ${selectedReservation.status}`
+                        : selectedPetId
+                          ? "No reservation"
+                          : "Select a pet first"}
                     </SelectValue>
                   </SelectTrigger>
 
@@ -329,12 +342,11 @@ export function BoardingInstructionsFormDialog({
                           key={reservation.id}
                           value={reservation.id}
                         >
-                          {reservation.id.slice(
-                            0,
-                            8
-                          )}{" "}
-                          ·{" "}
-                          {reservation.status}
+                          {selectedPet?.name ?? "Pet"} ·{" "}
+                          {reservation.status} ·{" "}
+                          {new Date(
+                            reservation.check_in_at
+                          ).toLocaleDateString()}
                         </SelectItem>
                       )
                     )}

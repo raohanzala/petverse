@@ -48,7 +48,7 @@ export function BillingTabsNav() {
 
   return (
     <TabsList
-      variant="line"
+      variant="default"
       className="w-full justify-start gap-1 bg-white py-2 rounded-md"
     >
       {BILLING_TABS.map((item) => {

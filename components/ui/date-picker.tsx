@@ -38,7 +38,7 @@ export function DatePicker({
               <span>{placeholder}</span>
             )}
 
-            <ChevronDownIcon data-icon="inline-end" />
+            {!date && <ChevronDownIcon data-icon="inline-end" />}
           </Button>
         }
       />

@@ -40,24 +40,50 @@ type BoardingInstructionsQueryRow = {
   behavior_notes: string | null
   updated_at: string
 
-  pet: {
+  pet:
+  | {
     name: string
     species: string
-  }[] | null
+  }
+  | {
+    name: string
+    species: string
+  }[]
+  | null
 
-  reservation: {
+  reservation:
+  | {
     id: string
     status: ReservationStatus
     check_in_at: string
     check_out_at: string
-  }[] | null
+  }
+  | {
+    id: string
+    status: ReservationStatus
+    check_in_at: string
+    check_out_at: string
+  }[]
+  | null
+}
+
+function firstRelation<T>(
+  relation: T | T[] | null | undefined
+): T | null {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null
+  }
+
+  return relation ?? null
 }
 
 function normalizeBoardingInstructions(
   row: BoardingInstructionsQueryRow
 ): PetBoardingInstructionsListRow {
-  const pet = row.pet?.[0]
-  const reservation = row.reservation?.[0]
+  const pet = firstRelation(row.pet)
+  const reservation = firstRelation(
+    row.reservation
+  )
 
   return {
     id: row.id,
@@ -77,8 +103,10 @@ function normalizeBoardingInstructions(
       ? {
         id: reservation.id,
         status: reservation.status,
-        check_in_at: reservation.check_in_at,
-        check_out_at: reservation.check_out_at,
+        check_in_at:
+          reservation.check_in_at,
+        check_out_at:
+          reservation.check_out_at,
       }
       : null,
   }

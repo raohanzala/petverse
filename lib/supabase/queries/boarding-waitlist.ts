@@ -30,22 +30,44 @@ type BoardingWaitlistQueryRow = {
   notes: string | null
   created_at: string
 
-  pet: {
+  pet:
+  | {
     name: string
     species: string
-  }[] | null
+  }
+  | {
+    name: string
+    species: string
+  }[]
+  | null
 
-  owner: {
+  owner:
+  | {
     name: string
     phone: string
-  }[] | null
+  }
+  | {
+    name: string
+    phone: string
+  }[]
+  | null
+}
+
+function firstRelation<T>(
+  relation: T | T[] | null | undefined
+): T | null {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null
+  }
+
+  return relation ?? null
 }
 
 function normalizeBoardingWaitlist(
   row: BoardingWaitlistQueryRow
 ): BoardingWaitlistListRow {
-  const pet = row.pet?.[0]
-  const owner = row.owner?.[0]
+  const pet = firstRelation(row.pet)
+  const owner = firstRelation(row.owner)
 
   return {
     id: row.id,

@@ -56,16 +56,16 @@ export function getAttendanceEntryColumns({
       header: "Pet",
       enableSorting: false,
       cell: ({ row }) => (
-        <div>
-          <p className="font-medium text-foreground">
-            {row.original.reservation?.pet?.name ?? "Unknown pet"}
-          </p>
-          {row.original.reservation?.pet?.species ? (
-            <p className="text-xs text-muted-foreground">
-              {row.original.reservation.pet.species}
+          <div>
+            <p className="font-medium text-foreground">
+              {row.original.reservation?.pet?.name ?? "Unknown pet"}
             </p>
-          ) : null}
-        </div>
+            {row.original.reservation?.pet?.species ? (
+              <p className="text-xs text-muted-foreground">
+                {row.original.reservation.pet.species}
+              </p>
+            ) : null}
+          </div>
       ),
     },
 
@@ -138,7 +138,7 @@ export function getAttendanceEntryColumns({
               ))
             ) : (
               <span className="text-sm text-muted-foreground">
-                —   
+                —
               </span>
             )}
           </div>

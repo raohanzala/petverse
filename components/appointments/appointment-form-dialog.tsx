@@ -202,6 +202,10 @@ export function AppointmentFormDialog({
     }
 
     function handleServiceChange(serviceId: string) {
+        const selectedService = services.find(
+            (service) => service.id === serviceId
+        )
+
         form.setValue("service_id", serviceId || null, {
             shouldDirty: true,
             shouldValidate: true,
@@ -213,9 +217,33 @@ export function AppointmentFormDialog({
                 shouldValidate: true,
             })
         }
+
+        if (selectedService) {
+            form.setValue(
+                "duration_minutes",
+                selectedService.duration_minutes,
+                {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                }
+            )
+
+            form.setValue(
+                "price",
+                selectedService.price,
+                {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                }
+            )
+        }
     }
 
     function handlePackageChange(packageId: string) {
+        const selectedPackage = packages.find(
+            (pkg) => String(pkg.id) === String(packageId)
+        )
+
         form.setValue("package_id", packageId || null, {
             shouldDirty: true,
             shouldValidate: true,
@@ -226,6 +254,26 @@ export function AppointmentFormDialog({
                 shouldDirty: true,
                 shouldValidate: true,
             })
+        }
+
+        if (selectedPackage) {
+            form.setValue(
+                "duration_minutes",
+                selectedPackage.duration_minutes,
+                {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                }
+            )
+
+            form.setValue(
+                "price",
+                selectedPackage.price,
+                {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                }
+            )
         }
     }
 
@@ -679,8 +727,7 @@ export function AppointmentFormDialog({
                                 <Input
                                     id="appointment-duration"
                                     type="number"
-                                    min={1}
-                                    placeholder="60"
+                                    readOnly
                                     aria-invalid={
                                         !!form.formState.errors.duration_minutes
                                     }
@@ -690,7 +737,7 @@ export function AppointmentFormDialog({
                                 />
 
                                 <FieldDescription>
-                                    Duration in minutes.
+                                    Automatically set from the selected service or package.
                                 </FieldDescription>
 
                                 <FieldError
@@ -713,9 +760,7 @@ export function AppointmentFormDialog({
                                 <Input
                                     id="appointment-price"
                                     type="number"
-                                    min={0}
-                                    step="0.01"
-                                    placeholder="2500"
+                                    readOnly
                                     aria-invalid={
                                         !!form.formState.errors.price
                                     }

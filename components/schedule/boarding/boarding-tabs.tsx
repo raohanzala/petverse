@@ -31,9 +31,6 @@ type BoardingTab =
   | "facilities"
 
 type BoardingTabsProps = {
-  params: {
-    reservationId?: string
-  }
   searchParams: Record<
     string,
     string | string[] | undefined
@@ -47,7 +44,6 @@ type BoardingTabsProps = {
 }
 
 export function BoardingTabs({
-  params,
   searchParams,
   tab,
   instructions,
@@ -75,7 +71,6 @@ export function BoardingTabs({
 
       <TabsContent value="attendance">
         <AttendanceTab
-          // params={params}
           searchParams={searchParams}
         />
       </TabsContent>

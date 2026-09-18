@@ -2,7 +2,6 @@
 
 import {
   CalendarDays,
-  ChevronRight,
   PawPrint,
   Plus,
 } from "lucide-react"
@@ -15,7 +14,6 @@ import {
   CardAction,
   CardTitle,
 } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 
 import type {
   FacilityResourceRow,
@@ -26,6 +24,7 @@ import {
   formatDateRange,
   getResourceStatus,
 } from "./room-board-manager"
+import { Button } from "@/components/ui/button"
 
 type RoomCardProps = {
   resource: FacilityResourceRow
@@ -55,8 +54,6 @@ export function RoomCard({
   const pet = reservation?.pet
   const owner = reservation?.owner
   const service = reservation?.service
-
-  const isAvailable = !reservation
 
   return (
     <Card
@@ -143,7 +140,7 @@ export function RoomCard({
             )}
           </div>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={() => onCreateReservation(resource)}
             className="flex min-h-[72px] w-full cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/20 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -155,7 +152,7 @@ export function RoomCard({
                 Available
               </p>
             </div>
-          </button>
+          </Button>
         )}
       </CardContent>
     </Card>

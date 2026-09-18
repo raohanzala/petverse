@@ -213,10 +213,6 @@ export function RoomBoardManager({
     })
   }
 
-  function goToToday() {
-    setSelectedDate(new Date())
-  }
-
   return (
     <div className="space-y-5">
       <RoomBoardControls
@@ -225,7 +221,6 @@ export function RoomBoardManager({
         selectedDate={selectedDate}
         onPreviousDay={() => changeDate(-1)}
         onNextDay={() => changeDate(1)}
-        onToday={goToToday}
         occupiedCount={occupiedCount}
         totalCount={filteredResources.length}
       />

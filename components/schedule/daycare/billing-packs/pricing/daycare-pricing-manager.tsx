@@ -52,19 +52,6 @@ export function DaycarePricingManager({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Daycare pricing"
-        description="Manage standard full-day and half-day daycare pricing."
-        actions={
-          <Button
-            onClick={openCreate}
-            disabled={Boolean(pricing)}
-          >
-            <Plus />
-            New pricing
-          </Button>
-        }
-      />
 
       <DataTable
         columns={columns}

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useMemo, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
@@ -151,9 +151,37 @@ export function InvoiceFormDialog({
         setLineItems([])
     }, [open, invoice, form])
 
-    const tax = form.watch("tax")
-    const ownerId = form.watch("owner_id")
-    const appointmentId = form.watch("appointment_id")
+    const tax = useWatch({
+        control: form.control,
+        name: "tax",
+    })
+
+    const ownerId = useWatch({
+        control: form.control,
+        name: "owner_id",
+    })
+
+    const appointmentId = useWatch({
+        control: form.control,
+        name: "appointment_id",
+    })
+
+    const selectedOwner = owners.find(
+        (owner) => owner.id === ownerId
+    )
+
+    const availableAppointments = useMemo(
+        () =>
+            appointments.filter(
+                (appointment) =>
+                    appointment.owner_id === ownerId
+            ),
+        [appointments, ownerId]
+    )
+
+    const selectedAppointment = appointments.find(
+        (appointment) => appointment.id === appointmentId
+    )
 
     const subtotal = useMemo(
         () =>
@@ -168,6 +196,47 @@ export function InvoiceFormDialog({
     const calculatedTotal =
         Math.max(0, Number(subtotal) || 0) +
         Math.max(0, Number(tax) || 0)
+
+    useEffect(() => {
+        if (!ownerId) {
+            form.setValue("appointment_id", null, {
+                shouldValidate: true,
+                shouldDirty: true,
+            })
+            return
+        }
+
+        const currentAppointment = appointments.find(
+            (appointment) => appointment.id === appointmentId
+        )
+
+        // Keep the current appointment if it already belongs
+        // to the selected owner.
+        if (
+            currentAppointment?.owner_id === ownerId
+        ) {
+            return
+        }
+
+        // Otherwise select the first appointment
+        // belonging to the selected owner.
+        const firstAppointment = availableAppointments[0]
+
+        form.setValue(
+            "appointment_id",
+            firstAppointment?.id ?? null,
+            {
+                shouldValidate: true,
+                shouldDirty: true,
+            }
+        )
+    }, [
+        ownerId,
+        appointmentId,
+        appointments,
+        availableAppointments,
+        form,
+    ])
 
     async function onSubmit(
         values: CreateInvoiceOutput
@@ -235,14 +304,6 @@ export function InvoiceFormDialog({
         onSuccess()
     }
 
-    const selectedOwner = owners.find(
-        (owner) => owner.id === ownerId
-    )
-
-    const selectedAppointment = appointments.find(
-        (appointment) => appointment.id === appointmentId
-    )
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -276,11 +337,6 @@ export function InvoiceFormDialog({
                                         if (!value) return
 
                                         form.setValue("owner_id", value, {
-                                            shouldValidate: true,
-                                            shouldDirty: true,
-                                        })
-
-                                        form.setValue("appointment_id", null, {
                                             shouldValidate: true,
                                             shouldDirty: true,
                                         })
@@ -345,31 +401,14 @@ export function InvoiceFormDialog({
                                     onValueChange={(value) => {
                                         if (!value) return
 
-                                        const appointment = appointments.find(
-                                            (item) => item.id === value
-                                        )
-
-                                        if (!appointment) return
-
                                         form.setValue(
                                             "appointment_id",
-                                            appointment.id,
+                                            value,
                                             {
                                                 shouldValidate: true,
                                                 shouldDirty: true,
                                             }
                                         )
-
-                                        if (appointment.owner_id !== ownerId) {
-                                            form.setValue(
-                                                "owner_id",
-                                                appointment.owner_id,
-                                                {
-                                                    shouldValidate: true,
-                                                    shouldDirty: true,
-                                                }
-                                            )
-                                        }
                                     }}
                                     disabled={
                                         isSubmitting || !ownerId
@@ -384,37 +423,31 @@ export function InvoiceFormDialog({
                                     >
                                         <SelectValue>
                                             {selectedAppointment
-                                                ? `Appointment ${selectedAppointment.id.slice(
-                                                    0,
-                                                    8
+                                                ? `Appointment ${format(
+                                                    new Date(selectedAppointment.created_at),
+                                                    "PPP"
                                                 )}`
                                                 : ownerId
-                                                    ? "Select appointment"
+                                                    ? "No appointment"
                                                     : "Select owner first"}
                                         </SelectValue>
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        {appointments.filter(
-                                            (appointment) =>
-                                                appointment.owner_id === ownerId
-                                        ).length > 0 ? (
-                                            appointments
-                                                .filter(
-                                                    (appointment) =>
-                                                        appointment.owner_id === ownerId
-                                                )
-                                                .map((appointment) => (
+                                        {availableAppointments.length > 0 ? (
+                                            availableAppointments.map(
+                                                (appointment) => (
                                                     <SelectItem
                                                         key={appointment.id}
                                                         value={appointment.id}
                                                     >
-                                                        {`Appointment ${appointment.id.slice(
-                                                            0,
-                                                            8
+                                                        {`Appointment ${format(
+                                                            new Date(appointment.created_at),
+                                                            "PPP"
                                                         )}`}
                                                     </SelectItem>
-                                                ))
+                                                )
+                                            )
                                         ) : (
                                             <div className="px-2 py-1.5 text-sm text-muted-foreground">
                                                 No appointments found

@@ -85,7 +85,7 @@ export function BoardingTabsNav({
 
   return (
     <TabsList
-      variant="line"
+      variant="default"
       className="w-full justify-start gap-1 rounded-none bg-white"
     >
       {BOARDING_TABS.map((item) => {

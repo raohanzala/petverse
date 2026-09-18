@@ -25,7 +25,6 @@ type RoomBoardControlsProps = {
   selectedDate: Date
   onPreviousDay: () => void
   onNextDay: () => void
-  onToday: () => void
   occupiedCount: number
   totalCount: number
 }
@@ -62,7 +61,6 @@ export function RoomBoardControls({
   selectedDate,
   onPreviousDay,
   onNextDay,
-  onToday,
   occupiedCount,
   totalCount,
 }: RoomBoardControlsProps) {
@@ -75,7 +73,7 @@ export function RoomBoardControls({
           onFilterChange(value as ResourceFilter)
         }
       >
-        <TabsList>
+        <TabsList variant="compact">
           {FILTERS.map((item) => {
 
             return (

@@ -19,22 +19,47 @@ const RESERVATION_COLUMNS = `
   notes,
   created_at,
   updated_at,
-  pet:pets (
+
+  pet:pets!reservations_pet_id_fkey (
     name,
     species
   ),
-  owner:owners (
+
+  owner:owners!reservations_owner_id_fkey (
     name,
     phone
   ),
-  resource:facility_resources (
+
+  resource:facility_resources!reservations_resource_id_fkey (
     name,
     type
   ),
-  service:services (
+
+  service:services!reservations_service_id_fkey (
     name
   )
 ` as const
+
+type PetRelation = {
+  name: string
+  species: string
+}
+
+type OwnerRelation = {
+  name: string
+  phone: string
+}
+
+type ResourceRelation = {
+  name: string
+  type: FacilityResourceType
+}
+
+type ServiceRelation = {
+  name: string
+}
+
+type RawRelation<T> = T | T[] | null
 
 type ReservationQueryRow = {
   id: string
@@ -49,33 +74,29 @@ type ReservationQueryRow = {
   created_at: string
   updated_at: string
 
-  pet: {
-    name: string
-    species: string
-  }[] | null
+  pet: RawRelation<PetRelation>
+  owner: RawRelation<OwnerRelation>
+  resource: RawRelation<ResourceRelation>
+  service: RawRelation<ServiceRelation>
+}
 
-  owner: {
-    name: string
-    phone: string
-  }[] | null
+function getRelation<T>(
+  relation: RawRelation<T>
+): T | null {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null
+  }
 
-  resource: {
-    name: string
-    type: FacilityResourceType
-  }[] | null
-
-  service: {
-    name: string
-  }[] | null
+  return relation
 }
 
 function normalizeReservation(
   row: ReservationQueryRow
 ): ReservationRow {
-  const pet = row.pet?.[0]
-  const owner = row.owner?.[0]
-  const resource = row.resource?.[0]
-  const service = row.service?.[0]
+  const pet = getRelation(row.pet)
+  const owner = getRelation(row.owner)
+  const resource = getRelation(row.resource)
+  const service = getRelation(row.service)
 
   return {
     id: row.id,
@@ -106,7 +127,7 @@ function normalizeReservation(
     },
 
     service: {
-      name: service?.name ?? "No service",
+      name: service?.name ?? "Unknown Service",
     },
   }
 }
@@ -121,7 +142,10 @@ function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
-/** Admin list — supports server-side search, status, and date filters */
+/**
+ * Admin list
+ * Supports server-side search and status filters.
+ */
 export async function listReservations(
   filters: ReservationListFilters = {}
 ): Promise<ReservationRow[]> {
@@ -167,7 +191,10 @@ export async function listReservations(
   )
 }
 
-/** Boarding / daycare — active reservations only */
+/**
+ * Boarding / daycare
+ * Returns active reservations only.
+ */
 export async function listActiveReservations(): Promise<
   ReservationRow[]
 > {
@@ -221,8 +248,8 @@ export async function getReservationById(
 
   return data
     ? normalizeReservation(
-        data as ReservationQueryRow
-      )
+      data as ReservationQueryRow
+    )
     : null
 }
 

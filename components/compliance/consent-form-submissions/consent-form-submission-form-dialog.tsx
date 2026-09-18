@@ -5,6 +5,7 @@ import { format } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import {
     useForm,
+    useWatch,
 } from "react-hook-form"
 import { toast } from "@/components/ui/toast"
 
@@ -107,6 +108,8 @@ export function ConsentFormSubmissionFormDialog({
     const [isSubmitting, setIsSubmitting] =
         useState(false)
 
+    const [signatureText, setSignatureText] = useState("")
+
     const isEditing =
         Boolean(submission)
 
@@ -120,17 +123,30 @@ export function ConsentFormSubmissionFormDialog({
             }
         )
 
-    const selectedTemplateId =
-        form.watch("template_id")
+    const selectedTemplateId = useWatch({
+        control: form.control,
+        name: "template_id",
+    })
 
-    const selectedOwnerId =
-        form.watch("owner_id")
+    const selectedOwnerId = useWatch({
+        control: form.control,
+        name: "owner_id",
+    })
 
-    const selectedPetId =
-        form.watch("pet_id")
+    const selectedPetId = useWatch({
+        control: form.control,
+        name: "pet_id",
+    })
 
-    const selectedAppointmentId =
-        form.watch("appointment_id")
+    const selectedAppointmentId = useWatch({
+        control: form.control,
+        name: "appointment_id",
+    })
+
+    const signedAtValue = useWatch({
+        control: form.control,
+        name: "signed_at",
+    })
 
     const selectedTemplate = useMemo(
         () =>
@@ -196,6 +212,16 @@ export function ConsentFormSubmissionFormDialog({
                     submission.signature_data,
             })
 
+            setSignatureText(
+                submission.signature_data
+                    ? JSON.stringify(
+                        submission.signature_data,
+                        null,
+                        2
+                    )
+                    : ""
+            )
+
             return
         }
 
@@ -225,24 +251,65 @@ export function ConsentFormSubmissionFormDialog({
         ]
     )
 
-    const filteredAppointments =
-        useMemo(
-            () =>
-                appointments.filter(
-                    (appointment) =>
-                        (!selectedOwnerId ||
-                            appointment.owner_id ===
-                            selectedOwnerId) &&
-                        (!form.watch("pet_id") ||
-                            appointment.pet_id ===
-                            form.watch("pet_id"))
-                ),
-            [
-                appointments,
-                selectedOwnerId,
-                form,
-            ]
+    const filteredAppointments = useMemo(
+        () =>
+            appointments.filter(
+                (appointment) =>
+                    (!selectedOwnerId ||
+                        appointment.owner_id === selectedOwnerId) &&
+                    (!selectedPetId ||
+                        appointment.pet_id === selectedPetId)
+            ),
+        [
+            appointments,
+            selectedOwnerId,
+            selectedPetId,
+        ]
+    )
+
+    useEffect(() => {
+        if (!selectedOwnerId || !selectedPetId) {
+            form.setValue("appointment_id", null, {
+                shouldDirty: true,
+                shouldValidate: true,
+            })
+            return
+        }
+
+        const currentAppointment = appointments.find(
+            (appointment) =>
+                appointment.id === selectedAppointmentId
         )
+
+        // Keep the current appointment if it belongs
+        // to the selected owner and pet.
+        if (
+            currentAppointment?.owner_id === selectedOwnerId &&
+            currentAppointment?.pet_id === selectedPetId
+        ) {
+            return
+        }
+
+        // Automatically select the first appointment
+        // belonging to the selected owner and pet.
+        const firstAppointment = filteredAppointments[0]
+
+        form.setValue(
+            "appointment_id",
+            firstAppointment?.id ?? null,
+            {
+                shouldDirty: true,
+                shouldValidate: true,
+            }
+        )
+    }, [
+        selectedOwnerId,
+        selectedPetId,
+        selectedAppointmentId,
+        appointments,
+        filteredAppointments,
+        form,
+    ])
 
     const signedAt = parseDateTime(
         form.watch("signed_at")
@@ -481,40 +548,21 @@ export function ConsentFormSubmissionFormDialog({
                                     onValueChange={(value) => {
                                         if (!value) return
 
-                                        const ownerPets = pets.filter(
-                                            (pet) => pet.owner_id === value
+                                        const selectedPet = pets.find(
+                                            (pet) => pet.id === value
                                         )
 
-                                        const automaticPetId =
-                                            ownerPets.length === 1
-                                                ? ownerPets[0].id
-                                                : null
+                                        if (!selectedPet) return
 
-                                        form.setValue(
-                                            "owner_id",
-                                            value,
-                                            {
-                                                shouldDirty: true,
-                                                shouldValidate: true,
-                                            }
-                                        )
+                                        form.setValue("pet_id", selectedPet.id, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        })
 
-                                        form.setValue(
-                                            "pet_id",
-                                            automaticPetId,
-                                            {
-                                                shouldDirty: true,
-                                                shouldValidate: true,
-                                            }
-                                        )
-
-                                        form.setValue(
-                                            "appointment_id",
-                                            null,
-                                            {
-                                                shouldDirty: true,
-                                            }
-                                        )
+                                        form.setValue("owner_id", selectedPet.owner_id, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        })
                                     }}
                                 >
                                     <SelectTrigger>
@@ -565,7 +613,10 @@ export function ConsentFormSubmissionFormDialog({
                                     <SelectTrigger>
                                         <SelectValue>
                                             {selectedAppointment
-                                                ? `Appointment ${selectedAppointment.id.slice(0, 8)}`
+                                                ? `Appointment — ${format(
+                                                    new Date(selectedAppointment.starts_at),
+                                                    "dd MMM yyyy"
+                                                )}`
                                                 : selectedPet?.name
                                                     ? "Select appointment"
                                                     : "Select owner first"}
@@ -585,7 +636,10 @@ export function ConsentFormSubmissionFormDialog({
                                                             appointment.id
                                                         }
                                                     >
-                                                        {`Appointment ${appointment.id.slice(0, 8)}`}
+                                                        {`Appointment — ${format(
+                                                            new Date(appointment.starts_at),
+                                                            "dd MMM yyyy"
+                                                        )}`}
                                                     </SelectItem>
                                                 )
                                             )
@@ -607,40 +661,56 @@ export function ConsentFormSubmissionFormDialog({
                                 <DatePickerTime
                                     date={signedAt.date}
                                     time={signedAt.time}
-                                    onDateChange={(date) =>
+                                    onDateChange={(selectedDate) => {
+                                        if (!selectedDate) {
+                                            form.setValue("signed_at", "", {
+                                                shouldDirty: true,
+                                                shouldValidate: true,
+                                            })
+                                            return
+                                        }
+
+                                        const currentValue = signedAtValue
+
+                                        const currentTime = currentValue
+                                            ? parseDateTime(currentValue).time
+                                            : format(new Date(), "HH:mm:ss")
+
                                         form.setValue(
                                             "signed_at",
                                             combineDateTime(
-                                                date,
-                                                signedAt.time
+                                                selectedDate,
+                                                currentTime
                                             ),
                                             {
                                                 shouldDirty: true,
                                                 shouldValidate: true,
                                             }
                                         )
-                                    }
-                                    onTimeChange={(time) =>
+                                    }}
+                                    onTimeChange={(selectedTime) => {
+                                        const currentDate =
+                                            parseDateTime(signedAtValue).date
+
                                         form.setValue(
                                             "signed_at",
                                             combineDateTime(
-                                                signedAt.date,
-                                                time
+                                                currentDate,
+                                                selectedTime
                                             ),
                                             {
                                                 shouldDirty: true,
                                                 shouldValidate: true,
                                             }
                                         )
-                                    }
+                                    }}
                                     dateLabel="Signed date"
                                     timeLabel="Signed time"
                                 />
 
                                 <FieldError
                                     errors={[
-                                        form.formState.errors
-                                            .signed_at,
+                                        form.formState.errors.signed_at,
                                     ]}
                                 />
                             </Field>
@@ -653,45 +723,35 @@ export function ConsentFormSubmissionFormDialog({
                                 <Textarea
                                     placeholder='{"signature": "..."}'
                                     rows={5}
-                                    value={
-                                        form.watch(
-                                            "signature_data"
-                                        )
-                                            ? JSON.stringify(
-                                                form.watch(
-                                                    "signature_data"
-                                                ),
-                                                null,
-                                                2
-                                            )
-                                            : ""
-                                    }
+                                    value={signatureText}
                                     onChange={(event) => {
-                                        const value =
-                                            event.target.value.trim()
+                                        const value = event.target.value
 
-                                        if (!value) {
+                                        // Always update the textarea so the user can type freely.
+                                        setSignatureText(value)
+
+                                        const trimmedValue = value.trim()
+
+                                        // Empty textarea = null
+                                        if (!trimmedValue) {
                                             form.setValue(
                                                 "signature_data",
                                                 null,
                                                 {
                                                     shouldDirty: true,
+                                                    shouldValidate: true,
                                                 }
                                             )
                                             return
                                         }
 
                                         try {
-                                            const parsed =
-                                                JSON.parse(value)
+                                            const parsed = JSON.parse(trimmedValue)
 
                                             if (
                                                 parsed &&
-                                                typeof parsed ===
-                                                "object" &&
-                                                !Array.isArray(
-                                                    parsed
-                                                )
+                                                typeof parsed === "object" &&
+                                                !Array.isArray(parsed)
                                             ) {
                                                 form.setValue(
                                                     "signature_data",
@@ -703,16 +763,25 @@ export function ConsentFormSubmissionFormDialog({
                                                 )
                                             }
                                         } catch {
-                                            // Leave the current form value
-                                            // unchanged until valid JSON is entered.
+                                            // Keep textarea text as-is.
+                                            // Do not update signature_data until valid JSON.
                                         }
                                     }}
+                                    aria-invalid={
+                                        !!form.formState.errors.signature_data
+                                    }
                                 />
 
                                 <FieldDescription>
                                     Optional JSON data produced by the
                                     signature provider.
                                 </FieldDescription>
+
+                                <FieldError
+                                    errors={[
+                                        form.formState.errors.signature_data,
+                                    ]}
+                                />
                             </Field>
                         </FieldGroup>
                     </form>

@@ -17,9 +17,6 @@ export async function uploadPetUpdateImage(
         error,
     } = await supabase.auth.getUser()
 
-    console.log("Supabase storage user:", user)
-    console.log("Supabase auth error:", error)
-
     const fileExtension =
         file.name.split(".").pop()?.toLowerCase() ?? "jpg"
 

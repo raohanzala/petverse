@@ -41,9 +41,6 @@ export default async function BoardingPage({
             | "transfers"
             | "facilities"
         }
-        params={{
-          reservationId,
-        }}
         searchParams={params}
       />
     </Suspense>

@@ -33,6 +33,24 @@ type BillingPacksManagerProps = {
 
 type BillingPackTab = "pricing" | "packages" | "wallets"
 
+const FILTERS: {
+  value: BillingPackTab
+  label: string
+}[] = [
+    {
+      value: "pricing",
+      label: "Pricing"
+    },
+    {
+      value: "packages",
+      label: "Packages"
+    },
+    {
+      value: "wallets",
+      label: "Wallets"
+    }
+  ]
+
 export function BillingPacksManager({
   pricing,
   packages,
@@ -53,29 +71,29 @@ export function BillingPacksManager({
           setActiveTab(value as BillingPackTab)
         }
       >
-        <TabsList>
-          <TabsTrigger value="pricing">
-            Pricing
-          </TabsTrigger>
+        <TabsList variant="compact" className="w-fit">
+          {FILTERS.map((item) => {
 
-          <TabsTrigger value="packages">
-            Packages
-          </TabsTrigger>
-
-          <TabsTrigger value="wallets">
-            Wallets
-          </TabsTrigger>
+            return (
+              <TabsTrigger
+                key={item.value}
+                value={item.value}
+              >
+                {item.label}
+              </TabsTrigger>
+            )
+          })}
         </TabsList>
 
-        <TabsContent value="pricing" className="mt-6">
+        <TabsContent value="pricing">
           <DaycarePricingManager pricing={pricing} />
         </TabsContent>
 
-        <TabsContent value="packages" className="mt-6">
+        <TabsContent value="packages">
           <DaycarePackagesManager filters={packageFilters} packages={packages} />
         </TabsContent>
 
-        <TabsContent value="wallets" className="mt-6">
+        <TabsContent value="wallets">
           <DaycareWalletsManager pets={pets} packages={packages} owners={owners} filters={walletFilters} wallets={wallets} />
         </TabsContent>
       </Tabs>

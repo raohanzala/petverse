@@ -60,7 +60,7 @@ export function DaycareTabsNav({
 
   return (
     <TabsList
-      variant="line"
+      variant="default"
       className="w-full justify-start gap-1 rounded-none bg-white"
     >
       {DAYCARE_TABS.map((item) => {

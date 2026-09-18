@@ -7,18 +7,28 @@ const ATTENDANCE_ENTRY_COLUMNS = `
   id,
   reservation_id,
   type,
-  recorded_at,
   recorded_by,
+  recorded_at,
   flags,
   notes,
-  reservation:reservations (
+
+  reservation:reservations!attendance_entries_reservation_id_fkey (
     id,
-    pet:pets (
+    pet_id,
+    owner_id,
+
+    pet:pets!reservations_pet_id_fkey (
       name,
       species
+    ),
+
+    owner:owners!reservations_owner_id_fkey (
+      name,
+      phone
     )
   ),
-  employee:employees (
+
+  employee:employees!attendance_entries_recorded_by_fkey (
     display_name,
     initials
   )
@@ -30,19 +40,60 @@ type AttendanceEntryQueryRow = {
   type: AttendanceEntryRow["type"]
   recorded_at: string
   recorded_by: string | null
-  flags: string[]
+  flags: string[] | string | null
   notes: string | null
 
   reservation:
     | {
         id: string
+        pet_id: string
+        owner_id: string
         pet:
           | {
               name: string
               species: string
             }[]
+          | {
+              name: string
+              species: string
+            }
+          | null
+        owner:
+          | {
+              name: string
+              phone: string
+            }[]
+          | {
+              name: string
+              phone: string
+            }
           | null
       }[]
+    | {
+        id: string
+        pet_id: string
+        owner_id: string
+        pet:
+          | {
+              name: string
+              species: string
+            }[]
+          | {
+              name: string
+              species: string
+            }
+          | null
+        owner:
+          | {
+              name: string
+              phone: string
+            }[]
+          | {
+              name: string
+              phone: string
+            }
+          | null
+      }
     | null
 
   employee:
@@ -50,13 +101,48 @@ type AttendanceEntryQueryRow = {
         display_name: string
         initials: string | null
       }[]
+    | {
+        display_name: string
+        initials: string | null
+      }
     | null
+}
+
+function firstRelation<T>(
+  relation: T | T[] | null | undefined
+): T | null {
+  if (Array.isArray(relation)) {
+    return relation[0] ?? null
+  }
+
+  return relation ?? null
 }
 
 function normalizeAttendanceEntry(
   entry: AttendanceEntryQueryRow
 ): AttendanceEntryRow {
-  const reservation = entry.reservation?.[0]
+  const reservation = firstRelation(entry.reservation)
+  const pet = firstRelation(reservation?.pet)
+
+  const employee = firstRelation(entry.employee)
+
+  let flags: string[] = []
+
+  if (Array.isArray(entry.flags)) {
+    flags = entry.flags
+  } else if (entry.flags) {
+    try {
+      const parsed = JSON.parse(entry.flags)
+
+      if (Array.isArray(parsed)) {
+        flags = parsed.filter(
+          (flag): flag is string => typeof flag === "string"
+        )
+      }
+    } catch {
+      flags = []
+    }
+  }
 
   return {
     id: entry.id,
@@ -64,18 +150,18 @@ function normalizeAttendanceEntry(
     type: entry.type,
     recorded_at: entry.recorded_at,
     recorded_by: entry.recorded_by,
-    flags: entry.flags,
+    flags,
     notes: entry.notes,
 
     reservation: {
       id: reservation?.id ?? "",
       pet: {
-        name: reservation?.pet?.[0]?.name ?? "Unknown pet",
-        species: reservation?.pet?.[0]?.species ?? "Unknown",
+        name: pet?.name ?? "Unknown pet",
+        species: pet?.species ?? "Unknown",
       },
     },
 
-    employee: entry.employee?.[0] ?? null,
+    employee,
   }
 }
 

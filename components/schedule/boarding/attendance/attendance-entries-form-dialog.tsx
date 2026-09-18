@@ -216,7 +216,28 @@ export function AttendanceEntryFormDialog({
                       !!form.formState.errors.reservation_id
                     }
                   >
-                    <SelectValue placeholder="Select reservation" />
+                    <SelectValue placeholder="Select reservation">
+                      {(value) => {
+                        const selectedReservation =
+                          reservations.find(
+                            (reservation) => reservation.id === value
+                          )
+
+                        if (!selectedReservation) {
+                          return "Select reservation"
+                        }
+
+                        return (
+                          <>
+                            {selectedReservation.pet?.name ??
+                              "Unknown pet"}{" "}
+                            —{" "}
+                            {selectedReservation.owner?.name ??
+                              "Unknown owner"}
+                          </>
+                        )
+                      }}
+                    </SelectValue>
                   </SelectTrigger>
 
                   <SelectContent>

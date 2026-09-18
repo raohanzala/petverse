@@ -108,11 +108,6 @@ export async function listPetVaccinations(
     )
   }
 
-  console.log(
-    "PET VACCINATION DATA:",
-    JSON.stringify(data, null, 2)
-  )
-
   return (data ?? []).map((row) =>
     normalizePetVaccination(
       row as unknown as PetVaccinationQueryRow
