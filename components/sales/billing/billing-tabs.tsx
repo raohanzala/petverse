@@ -54,7 +54,7 @@ export function BillingTabs({
       defaultValue={tab}
       className="w-full"
     >
-      <BillingTabsNav activeTab={tab} />
+      <BillingTabsNav />
 
       <TabsContent value="invoices">
         <InvoicesTab

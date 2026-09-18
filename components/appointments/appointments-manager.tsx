@@ -105,10 +105,7 @@ export function AppointmentsManager({
 
   const columns = useMemo(
     () =>
-      getAppointmentColumns({
-        onEdit: openEdit,
-        onDelete: setDeletingAppointment,
-      }),
+      getAppointmentColumns(),
     []
   )
 

@@ -54,7 +54,6 @@ export default async function ServiceConsentFormsPage({
         assignments={assignments}
         services={services}
         templates={templates}
-        filters={filters}
         selectedServiceId={
           selectedServiceId
         }
