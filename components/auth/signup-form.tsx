@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "@/components/ui/toast"
 
-import { AuthCard } from "@/components/auth/auth-card"
 import { Button } from "@/components/ui/button"
 import {
   Field,

@@ -135,30 +135,32 @@ export function PaymentLinkFormDialog({
     useTransition()
 
   const form = useForm<CreatePaymentTokenInput>({
-        resolver: zodResolver(createPaymentTokenSchema),
-        defaultValues,
-    })
+    resolver: zodResolver(createPaymentTokenSchema),
+    defaultValues,
+  })
   useEffect(() => {
     if (!open) return
 
-    if (paymentLink) {
-      setInvoiceId(paymentLink.invoice_id)
+    queueMicrotask(() => {
+      if (paymentLink) {
+        setInvoiceId(paymentLink.invoice_id)
 
-      const parsed = parsePaymentDateTime(
-        paymentLink.expires_at
-      )
+        const parsed = parsePaymentDateTime(
+          paymentLink.expires_at
+        )
 
-      setExpiresDate(parsed.date)
-      setExpiresTime(parsed.time)
-    } else {
-      setInvoiceId("")
+        setExpiresDate(parsed.date)
+        setExpiresTime(parsed.time)
+      } else {
+        setInvoiceId("")
 
-      const defaultExpiration =
-        getDefaultExpiration()
+        const defaultExpiration =
+          getDefaultExpiration()
 
-      setExpiresDate(defaultExpiration.date)
-      setExpiresTime(defaultExpiration.time)
-    }
+        setExpiresDate(defaultExpiration.date)
+        setExpiresTime(defaultExpiration.time)
+      }
+    })
   }, [open, paymentLink])
 
   const selectedInvoice = useMemo(

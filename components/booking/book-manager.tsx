@@ -5,10 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
-import type {
-  ServiceCategoryRow,
-  ServiceListRow,
-} from "@/lib/supabase/types"
+import type {ServiceListRow} from "@/lib/supabase/types"
 
 import { Stepper, type StepperStep } from "@/components/shared/stepper"
 import { ServiceStep } from "./service-step"
@@ -42,7 +39,6 @@ type BookingState = {
 
 type BookManagerProps = {
   services: ServiceListRow[]
-  // categories: ServiceCategoryRow[]
   onConfirm?: () => void
 }
 
@@ -102,7 +98,7 @@ export function BookManager({
     const groups = new Map<
       string,
       {
-        category: ServiceCategoryRow
+        category: NonNullable<ServiceListRow["category"]>
         services: ServiceListRow[]
       }
     >()
@@ -439,12 +435,6 @@ export function BookManager({
                           selectedService?.category ?? null
                         }
                         onEditStep={goToStep}
-                        onConfirm={
-                          handleConfirmBooking
-                        }
-                        isSubmitting={
-                          isSubmitting
-                        }
                       />
                     ) : null}
 

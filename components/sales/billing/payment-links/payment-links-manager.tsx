@@ -26,8 +26,7 @@ import type { PaymentLinkListFilters } from "@/lib/constants/payment-link-filter
 import { deletePaymentToken } from "@/lib/supabase/mutations/payment-tokens"
 import type {
     InvoiceRow,
-    PaymentLinkListRow,
-    PaymentTokenRow,
+    PaymentLinkListRow
 } from "@/lib/supabase/types"
 
 

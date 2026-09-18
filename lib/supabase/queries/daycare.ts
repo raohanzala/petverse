@@ -34,10 +34,6 @@ const DAYCARE_TRANSACTION_COLUMNS = `
   )
 ` as const
 
-function escapeIlikePattern(value: string) {
-  return value.replace(/[%_\\]/g, "\\$&")
-}
-
 /** Today's daycare sessions */
 export async function listTodayDaycareTransactions(): Promise<
   DaycareTransactionRow[]

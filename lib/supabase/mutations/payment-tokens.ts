@@ -6,8 +6,7 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import {
     createPaymentTokenSchema,
-    updatePaymentTokenSchema,
-    deletePaymentTokenSchema,
+    updatePaymentTokenSchema
 } from "@/lib/validations/payment-token"
 import type {
     PaymentTokenRow,

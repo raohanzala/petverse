@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  ChevronDown,
   Clock3,
   Scissors,
   Stethoscope,
@@ -19,22 +18,19 @@ import {
 } from "@/components/ui/accordion"
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  Card
 } from "@/components/ui/card"
 
 import { cn } from "@/lib/utils"
 
 import type {
+  ServiceCategoryListRelation,
   ServiceCategoryRow,
   ServiceListRow,
 } from "@/lib/supabase/types"
 
 type GroupedService = {
-  category: ServiceCategoryRow
+  category: ServiceCategoryListRelation
   services: ServiceListRow[]
 }
 
@@ -158,7 +154,7 @@ function ServiceAccordionItem({
   selectedServiceId,
   onSelectService,
 }: {
-  category: ServiceCategoryRow
+  category: ServiceCategoryListRelation
   services: ServiceListRow[]
   selectedServiceId: string | null
   onSelectService: (

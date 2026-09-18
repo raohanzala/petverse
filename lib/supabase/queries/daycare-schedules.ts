@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
-import type { DaycareScheduleRow } from "@/lib/supabase/types"
+import type {
+  DaycareScheduleListRow,
+  DaycareScheduleRow,
+} from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const DAYCARE_SCHEDULE_COLUMNS = `
@@ -32,7 +35,7 @@ const DAYCARE_SCHEDULE_COLUMNS = `
 
 /** Admin list — all daycare schedules */
 export async function listDaycareSchedules(): Promise<
-  DaycareScheduleRow[]
+  DaycareScheduleListRow[]
 > {
   const supabase = await createClient()
 
@@ -51,7 +54,12 @@ export async function listDaycareSchedules(): Promise<
     )
   }
 
-  return data ?? []
+  return (data ?? []).map((schedule) => ({
+    ...schedule,
+    pet: schedule.pet?.[0] ?? null,
+    owner: schedule.owner?.[0] ?? null,
+    resource: schedule.resource?.[0] ?? null,
+  }))
 }
 
 /** Active daycare schedules only */
@@ -113,7 +121,7 @@ export async function listDaycareSchedulesByDay(
   const { data, error } = await supabase
     .from("daycare_schedules")
     .select(DAYCARE_SCHEDULE_COLUMNS)
-    .eq("days_of_week", dayOfWeek)
+    .contains("days_of_week", [dayOfWeek])
     .eq("is_active", true)
     .order("starts_at", { ascending: true })
 

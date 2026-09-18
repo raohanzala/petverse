@@ -10,8 +10,7 @@ import {
   Pencil,
   ShieldCheck,
   Stethoscope,
-  UserRound,
-  Weight,
+  UserRound
 } from "lucide-react"
 
 import { createClient } from "@/lib/supabase/server"

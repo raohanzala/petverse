@@ -43,7 +43,6 @@ import { Textarea } from "@/components/ui/textarea"
 import type { PetPhotoRow } from "@/lib/supabase/types"
 
 type PetPhotosProps = {
-  petId: string
   initialPhotos?: PetPhotoRow[]
   disabled?: boolean
 }
@@ -57,7 +56,6 @@ const ACCEPTED_TYPES = [
 ]
 
 export function PetPhotos({
-  petId,
   initialPhotos = [],
   disabled = false,
 }: PetPhotosProps) {

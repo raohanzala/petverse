@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "@/components/ui/toast"
 
-import { AuthCard } from "@/components/auth/auth-card"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -23,7 +22,6 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/lib/constants/auth"
 import { signInWithPassword } from "@/lib/supabase/mutations/auth"
 import { loginSchema, type LoginInput } from "@/lib/validations/auth"
 import { Card, CardContent } from "../ui/card"
-import { FcGoogle } from "react-icons/fc"
 
 type LoginFormProps = {
   redirectTo?: string

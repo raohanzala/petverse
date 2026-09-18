@@ -35,7 +35,6 @@ type ServiceConsentFormsManagerProps = {
     assignments: ServiceConsentFormWithTemplate[]
     services: ServiceConsentFormServiceOption[]
     templates: ServiceConsentFormTemplateOption[]
-    filters: ServiceConsentFormListFilters
     selectedServiceId: string
 }
 
@@ -43,7 +42,6 @@ export function ServiceConsentFormsManager({
     assignments,
     services,
     templates,
-    filters,
     selectedServiceId,
 }: ServiceConsentFormsManagerProps) {
     const router = useRouter()

@@ -14,7 +14,7 @@ import {
   createDaycareSchedule,
   updateDaycareSchedule,
 } from "@/lib/supabase/mutations/daycare-schedules"
-import type { DaycareScheduleRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
+import type { DaycareScheduleListRow, DaycareScheduleRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,

@@ -46,14 +46,6 @@ const TIME_SLOTS = [
   "16:30",
 ] as const
 
-function formatDateLabel(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  }).format(date)
-}
-
 function toDateInputValue(date: Date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, "0")

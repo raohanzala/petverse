@@ -15,9 +15,8 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
 import type {
-  ServiceCategoryRow,
-  ServiceListRow,
-  ServiceRow,
+  ServiceCategoryListRelation,
+  ServiceListRow
 } from "@/lib/supabase/types"
 
 type BookingState = {
@@ -40,10 +39,8 @@ type BookingState = {
 type ConfirmationStepProps = {
   booking: BookingState
   selectedService: ServiceListRow | null
-  selectedCategory: ServiceCategoryRow | null
+  selectedCategory: ServiceCategoryListRelation | null
   onEditStep: (step: 1 | 2 | 3) => void
-  onConfirm?: () => void
-  isSubmitting?: boolean
 }
 
 function formatDate(date: string | null) {
@@ -111,9 +108,7 @@ export function ConfirmationStep({
   booking,
   selectedService,
   selectedCategory,
-  onEditStep,
-  onConfirm,
-  isSubmitting = false,
+  onEditStep
 }: ConfirmationStepProps) {
 
   const isComplete = Boolean(

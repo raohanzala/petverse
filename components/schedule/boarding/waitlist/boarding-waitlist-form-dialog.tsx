@@ -149,49 +149,51 @@ export function BoardingWaitlistFormDialog({
     useTransition()
 
   const form = useForm<CreateBoardingWaitlistInput>({
-      resolver: zodResolver(createBoardingWaitlistSchema),
-      defaultValues,
-    })
+    resolver: zodResolver(createBoardingWaitlistSchema),
+    defaultValues,
+  })
 
   useEffect(() => {
     if (!open) return
 
-    if (entry) {
-      setPetId(entry.pet_id)
-      setOwnerId(entry.owner_id)
+    queueMicrotask(() => {
+      if (entry) {
+        setPetId(entry.pet_id)
+        setOwnerId(entry.owner_id)
 
-      const start = parseWaitlistDateTime(
-        entry.desired_from
-      )
+        const start = parseWaitlistDateTime(
+          entry.desired_from
+        )
 
-      const end = parseWaitlistDateTime(
-        entry.desired_to
-      )
+        const end = parseWaitlistDateTime(
+          entry.desired_to
+        )
 
-      setStartDate(start.date)
-      setStartTime(start.time)
+        setStartDate(start.date)
+        setStartTime(start.time)
 
-      setEndDate(end.date)
-      setEndTime(end.time)
+        setEndDate(end.date)
+        setEndTime(end.time)
 
-      setNotes(entry.notes ?? "")
+        setNotes(entry.notes ?? "")
 
-      return
-    }
+        return
+      }
 
-    setPetId("")
-    setOwnerId("")
+      setPetId("")
+      setOwnerId("")
 
-    const defaultStart = getDefaultStart()
-    const defaultEnd = getDefaultEnd()
+      const defaultStart = getDefaultStart()
+      const defaultEnd = getDefaultEnd()
 
-    setStartDate(defaultStart.date)
-    setStartTime(defaultStart.time)
+      setStartDate(defaultStart.date)
+      setStartTime(defaultStart.time)
 
-    setEndDate(defaultEnd.date)
-    setEndTime(defaultEnd.time)
+      setEndDate(defaultEnd.date)
+      setEndTime(defaultEnd.time)
 
-    setNotes("")
+      setNotes("")
+    })
   }, [open, entry])
 
   const selectedPet = useMemo(

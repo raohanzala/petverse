@@ -7,11 +7,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import type { AppointmentRow } from "@/lib/supabase/types"
 
-type AppointmentColumnActions = {
-  onEdit: (appointment: AppointmentRow) => void
-  onDelete: (appointment: AppointmentRow) => void
-}
-
 const STATUS_LABELS: Record<
   AppointmentRow["status"],
   string
@@ -45,10 +40,7 @@ function formatAppointmentDate(value: string) {
   }).format(new Date(value))
 }
 
-export function getAppointmentColumns({
-  onEdit,
-  onDelete,
-}: AppointmentColumnActions): AdminColumnDef<AppointmentRow>[] {
+export function getAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
   return [
     {
       accessorKey: "starts_at",

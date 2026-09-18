@@ -42,16 +42,3 @@ export function parseAppointmentFilters(
     service: getValue("service") ?? "",
   }
 }
-function isAppointmentStatus(
-  value: string
-): value is AppointmentStatus {
-  return [
-    "requested",
-    "confirmed",
-    "arrived",
-    "in_service",
-    "completed",
-    "cancelled",
-    "no_show",
-  ].includes(value)
-}

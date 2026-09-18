@@ -54,11 +54,6 @@ export type ServiceCategoryRow = {
   updated_at: string
 }
 
-export type ServiceCategoryListRelation = {
-  id: string
-  name: string
-}
-
 export type ServiceCategoryInsert = Pick<
   ServiceCategoryRow,
   "name" | "slug" | "description" | "sort_order" | "is_active"
@@ -97,6 +92,11 @@ export type ServiceInsert = Pick<
   | "price"
   | "is_active"
   | "is_public"
+>
+
+export type ServiceCategoryListRelation = Pick<
+  ServiceCategoryRow,
+  "id" | "name"
 >
 
 export type ServiceListRow = ServiceRow & {
@@ -649,8 +649,6 @@ export type DaycareScheduleListRow =
       name: string
       type: FacilityResourceType
     } | null
-
-    visits: number
   }
 
 export type DaycareSessionStatus =

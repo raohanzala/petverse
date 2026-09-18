@@ -38,7 +38,6 @@ import {
 
 import { Form } from "@/components/ui/form"
 
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Spinner } from "@/components/ui/spinner"
 
@@ -102,9 +101,6 @@ export function DailyUpdateFormDialog({
 }: DailyUpdateFormDialogProps) {
   const [isSubmitting, setIsSubmitting] =
     useState(false)
-
-  const [savedUpdateId, setSavedUpdateId] =
-    useState<string | null>(null)
 
   const [
     pendingPhotoFiles,

@@ -33,13 +33,7 @@ export const BILLING_TABS = [
 export type BillingTab =
   (typeof BILLING_TABS)[number]["value"]
 
-type BillingTabsNavProps = {
-  activeTab: BillingTab
-}
-
-export function BillingTabsNav({
-  activeTab,
-}: BillingTabsNavProps) {
+export function BillingTabsNav() {
   const router = useRouter()
   const pathname = usePathname()
 

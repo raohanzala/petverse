@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server"
 import type { ServiceListFilters } from "@/lib/constants/service-filters"
-import type { ServiceCategoryListRelation, ServiceListRow} from "@/lib/supabase/types"
+import type {
+  ServiceCategoryRow,
+  ServiceListRow,
+} from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
 const SERVICE_COLUMNS = `
@@ -19,20 +22,25 @@ const SERVICE_COLUMNS = `
     id,
     name
   )
-  ` as const
+` as const
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
 }
 
+type ServiceCategoryRelation = Pick<
+  ServiceCategoryRow,
+  "id" | "name"
+>
+
 type RawServiceRow = Omit<ServiceListRow, "category"> & {
-  category: ServiceCategoryListRelation[]
+  category: ServiceCategoryRelation[] | null
 }
 
 function normalizeService(row: RawServiceRow): ServiceListRow {
   return {
     ...row,
-    category: row.category[0] ?? null,
+    category: row.category?.[0] ?? null,
   }
 }
 
@@ -50,7 +58,9 @@ export async function listServices(
     visibility = "all",
   } = filters
 
-  let query = supabase.from("services").select(SERVICE_COLUMNS)
+  let query = supabase
+    .from("services")
+    .select(SERVICE_COLUMNS)
 
   if (categoryId) {
     query = query.eq("category_id", categoryId)
@@ -80,8 +90,9 @@ export async function listServices(
     )
   }
 
-  const { data, error } = await query
-    .order("name", { ascending: true })
+  const { data, error } = await query.order("name", {
+    ascending: true,
+  })
 
   if (error) {
     throw new Error(

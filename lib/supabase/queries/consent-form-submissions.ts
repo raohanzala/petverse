@@ -97,10 +97,6 @@ function normalizeConsentFormSubmission(
   }
 }
 
-function escapeIlikePattern(value: string) {
-  return value.replace(/[%_\\]/g, "\\$&")
-}
-
 export async function listConsentFormSubmissions(
   filters: ConsentFormSubmissionListFilters = {}
 ): Promise<ConsentFormSubmissionWithRelations[]> {
@@ -113,7 +109,6 @@ export async function listConsentFormSubmissions(
     .select(CONSENT_FORM_SUBMISSION_COLUMNS)
 
   if (search) {
-    const pattern = `%${escapeIlikePattern(search)}%`
 
     query = query.or(
       `owner_id.eq.${search},pet_id.eq.${search},appointment_id.eq.${search}`
