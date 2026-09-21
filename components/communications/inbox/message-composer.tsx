@@ -72,6 +72,18 @@ export function MessageComposer({
     })
   }
 
+  function handleKeyDown(
+    event: React.KeyboardEvent<HTMLTextAreaElement>
+  ) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault()
+
+      if (!isPending && body.trim()) {
+        event.currentTarget.form?.requestSubmit()
+      }
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <FieldGroup>
@@ -85,6 +97,7 @@ export function MessageComposer({
                 setError(null)
               }
             }}
+            onKeyDown={handleKeyDown}
             placeholder="Write a message..."
             disabled={isPending}
             rows={3}
@@ -94,7 +107,11 @@ export function MessageComposer({
           {error && <FieldError>{error}</FieldError>}
         </Field>
 
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            Press Enter to send · Shift + Enter for a new line
+          </p>
+
           <Button
             type="submit"
             disabled={isPending || !body.trim()}

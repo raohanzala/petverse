@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { RoomTransferListFilters } from "@/lib/constants/room-transfer-filters"
 import type {
-  FacilityResourceType,
   RoomTransferListRow,
   RoomTransferRow,
 } from "@/lib/supabase/types"
@@ -36,92 +35,6 @@ const ROOM_TRANSFER_COLUMNS = `
     type
   )
 ` as const
-
-type RoomTransferQueryRow = {
-  id: string
-  reservation_id: string
-  from_resource_id: string | null
-  to_resource_id: string
-  transferred_at: string
-  notes: string | null
-
-  reservation: {
-    id: string
-
-    pet: {
-      name: string
-      species: string
-    }[] | null
-
-    owner: {
-      name: string
-      phone: string
-    }[] | null
-  }[] | null
-
-  from_resource: {
-    id: string
-    name: string
-    type: FacilityResourceType
-  }[] | null
-
-  to_resource: {
-    id: string
-    name: string
-    type: FacilityResourceType
-  }[] | null
-}
-
-function normalizeRoomTransfer(
-  row: RoomTransferQueryRow
-): RoomTransferListRow {
-  const reservation = row.reservation?.[0]
-  const pet = reservation?.pet?.[0]
-  const owner = reservation?.owner?.[0]
-  const fromResource = row.from_resource?.[0]
-  const toResource = row.to_resource?.[0]
-
-  return {
-    id: row.id,
-    reservation_id: row.reservation_id,
-    from_resource_id: row.from_resource_id,
-    to_resource_id: row.to_resource_id,
-    transferred_at: row.transferred_at,
-    notes: row.notes,
-
-    reservation: {
-      id: reservation?.id ?? "",
-      pet: {
-        name: pet?.name ?? "Unknown pet",
-        species: pet?.species ?? "Unknown",
-      },
-      owner: {
-        name: owner?.name ?? "Unknown owner",
-        phone: owner?.phone ?? "",
-      },
-    },
-
-    from_resource: fromResource
-      ? {
-          id: fromResource.id,
-          name: fromResource.name,
-          type: fromResource.type,
-        }
-      : null,
-
-    to_resource: {
-      id: toResource?.id ?? "",
-      name: toResource?.name ?? "Unknown resource",
-      type: toResource?.type ?? "other",
-    },
-  }
-}
-
-function normalizeRoomTransfers(
-  rows: RoomTransferQueryRow[]
-): RoomTransferListRow[] {
-  return rows.map(normalizeRoomTransfer)
-}
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")
@@ -189,14 +102,8 @@ export async function listRoomTransfers(
       )
     }
 
-    const petIds = (pets ?? []).map(
-      (pet) => pet.id
-    )
-
-    const ownerIds = (owners ?? []).map(
-      (owner) => owner.id
-    )
-
+    const petIds = (pets ?? []).map((pet) => pet.id)
+    const ownerIds = (owners ?? []).map((owner) => owner.id)
     const resourceIds = (resources ?? []).map(
       (resource) => resource.id
     )
@@ -232,12 +139,8 @@ export async function listRoomTransfers(
     query = query.or(conditions.join(","))
   }
 
-  const { data, error } = await query.order(
-    "transferred_at",
-    {
-      ascending: false,
-    }
-  )
+  const { data, error } = await query
+    .order("transferred_at", { ascending: false })
 
   if (error) {
     throw new Error(
@@ -248,9 +151,7 @@ export async function listRoomTransfers(
     )
   }
 
-  return normalizeRoomTransfers(
-    (data ?? []) as RoomTransferQueryRow[]
-  )
+  return data ?? []
 }
 
 export async function getRoomTransferById(

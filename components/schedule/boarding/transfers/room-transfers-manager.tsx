@@ -150,12 +150,12 @@ export function RoomTransfersManager({
             <AlertDialogDescription>
               This will permanently delete this room transfer
               record
-              {deletingTransfer?.to_resource?.name ? (
+              {deletingTransfer?.to_resource ? (
                 <>
                   {" "}
                   to{" "}
                   <strong>
-                    {deletingTransfer.to_resource.name}
+                    {deletingTransfer.to_resource_id}
                   </strong>
                 </>
               ) : null}

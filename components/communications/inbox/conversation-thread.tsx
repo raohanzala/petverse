@@ -6,6 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Message,
+  MessageContent,
+  MessageFooter,
+  MessageGroup,
+} from "@/components/ui/message"
 import type {
   ConversationMessageRow,
   ConversationRow,
@@ -54,41 +60,39 @@ export function ConversationThread({
               No messages in this conversation.
             </div>
           ) : (
-            <div className="space-y-3">
+            <MessageGroup className="gap-4">
               {messages.map((message) => {
                 const isOutbound =
                   message.direction === "outbound"
 
                 return (
-                  <div
+                  <Message
                     key={message.id}
-                    className={
-                      isOutbound
-                        ? "flex justify-end"
-                        : "flex justify-start"
-                    }
+                    align={isOutbound ? "end" : "start"}
                   >
-                    <div
-                      className={
-                        isOutbound
-                          ? "max-w-[75%] rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
-                          : "max-w-[75%] rounded-lg bg-muted px-4 py-2 text-sm"
-                      }
-                    >
-                      <p className="whitespace-pre-wrap">
-                        {message.body}
-                      </p>
+                    <MessageContent className="w-auto max-w-[75%]">
+                      <div
+                        className={
+                          isOutbound
+                            ? "rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm text-primary-foreground"
+                            : "rounded-2xl rounded-bl-sm bg-muted px-4 py-2.5 text-sm"
+                        }
+                      >
+                        <p className="whitespace-pre-wrap break-words">
+                          {message.body}
+                        </p>
+                      </div>
 
-                      <p className="mt-1 text-[11px] opacity-70">
+                      <MessageFooter className="px-1 text-[11px]">
                         {new Date(
                           message.sent_at
                         ).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
+                      </MessageFooter>
+                    </MessageContent>
+                  </Message>
                 )
               })}
-            </div>
+            </MessageGroup>
           )}
         </div>
 

@@ -52,12 +52,19 @@ export function BoardingTabs({
   transfers,
   resources
 }: BoardingTabsProps) {
+
+  const reservationId =
+  typeof searchParams.reservationId === "string"
+    ? searchParams.reservationId
+    : undefined
+
+
   return (
     <Tabs
-      defaultValue={tab}
+      value={tab}
       className="w-full"
     >
-      <BoardingTabsNav activeTab={tab} />
+      <BoardingTabsNav activeTab={tab} reservationId={reservationId} />
 
       <TabsContent value="room-board">
         <RoomBoardTab />

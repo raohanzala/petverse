@@ -1,28 +1,19 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Loader2, Plus } from "lucide-react"
-import { toast } from "sonner"
-import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 
-import {
-  createDaycareScheduleSchema,
-  type CreateDaycareScheduleInput,
-} from "@/lib/validations/daycare-schedule"
-import {
-  createDaycareSchedule,
-  updateDaycareSchedule,
-} from "@/lib/supabase/mutations/daycare-schedules"
-import type { DaycareScheduleListRow, DaycareScheduleRow, FacilityResourceRow, OwnerRow, PetRow } from "@/lib/supabase/types"
+import { toast } from "@/components/ui/toast"
 
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Field,
@@ -31,6 +22,9 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Form } from "@/components/ui/form"
+import { Spinner } from "@/components/ui/spinner"
+import { DatePickerTime } from "@/components/ui/date-picker-with-time"
 import {
   Select,
   SelectContent,
@@ -39,9 +33,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Form } from "@/components/ui/form"
-import { format } from "date-fns"
-import { DatePickerTime } from "@/components/ui/date-picker-with-time"
+
+import {
+  createDaycareSchedule,
+  updateDaycareSchedule,
+} from "@/lib/supabase/mutations/daycare-schedules"
+import type {
+  DaycareScheduleRow,
+  FacilityResourceRow,
+  OwnerRow,
+  PetRow,
+} from "@/lib/supabase/types"
+import {
+  createDaycareScheduleSchema,
+  type CreateDaycareScheduleInput,
+} from "@/lib/validations/daycare-schedule"
 import { parseDateTime } from "@/lib/utils"
 
 type DaycareScheduleFormDialogProps = {
@@ -64,39 +70,31 @@ const DAYS = [
   { value: 6, label: "Sat" },
 ] as const
 
+const defaultValues: CreateDaycareScheduleInput = {
+  pet_id: "",
+  owner_id: "",
+  resource_id: null,
+  days_of_week: [],
+  starts_at: "",
+  ends_at: "",
+  is_active: true,
+}
+
 export function DaycareScheduleFormDialog({
+  open,
+  onOpenChange,
   schedule,
   pets,
-  open: controlledOpen,
-  onOpenChange,
   owners,
-  resources
+  resources,
 }: DaycareScheduleFormDialogProps) {
-  const [internalOpen, setInternalOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const isEditing = Boolean(schedule)
-  const open = controlledOpen ?? internalOpen
-
-  function handleOpenChange(value: boolean) {
-    if (onOpenChange) {
-      onOpenChange(value)
-    } else {
-      setInternalOpen(value)
-    }
-  }
 
   const form = useForm<CreateDaycareScheduleInput>({
     resolver: zodResolver(createDaycareScheduleSchema),
-    defaultValues: {
-      pet_id: schedule?.pet_id ?? "",
-      owner_id: schedule?.owner_id ?? "",
-      resource_id: schedule?.resource_id ?? null,
-      days_of_week: schedule?.days_of_week ?? [],
-      starts_at: schedule?.starts_at?.slice(0, 19) ?? "",
-      ends_at: schedule?.ends_at?.slice(0, 19) ?? "",
-      is_active: schedule?.is_active ?? true,
-    },
+    defaultValues,
   })
 
   useEffect(() => {
@@ -113,32 +111,25 @@ export function DaycareScheduleFormDialog({
     })
   }, [open, schedule, form])
 
-  async function onSubmit(values: CreateDaycareScheduleInput) {
-    setLoading(true)
+  const petId = form.watch("pet_id")
+  const ownerId = form.watch("owner_id")
+  const resourceId = form.watch("resource_id")
+  const daysOfWeek = form.watch("days_of_week")
+  const startsAt = form.watch("starts_at")
+  const endsAt = form.watch("ends_at")
+  const isActive = form.watch("is_active")
 
-    const result = schedule
-      ? await updateDaycareSchedule({
-        id: schedule.id,
-        ...values,
-      })
-      : await createDaycareSchedule(values)
+  const selectedPet = pets.find(
+    (pet) => pet.id === petId
+  )
 
-    setLoading(false)
+  const selectedOwner = owners.find(
+    (owner) => owner.id === ownerId
+  )
 
-    if (!result.success) {
-      toast.error(result.error)
-      return
-    }
-
-    toast.success(
-      schedule
-        ? "Daycare schedule updated"
-        : "Daycare schedule created"
-    )
-
-    handleOpenChange(false)
-    form.reset()
-  }
+  const selectedResource = resources.find(
+    (resource) => resource.id === resourceId
+  )
 
   function combineDateTime(
     date: Date | undefined,
@@ -146,72 +137,120 @@ export function DaycareScheduleFormDialog({
   ) {
     if (!date) return ""
 
-    const datePart = format(date, "yyyy-MM-dd")
-
+    const datePart = date.toISOString().slice(0, 10)
     const finalTime =
-      time || format(new Date(), "HH:mm:ss")
+      time || new Date().toTimeString().slice(0, 8)
 
     return `${datePart}T${finalTime}`
+  }
+
+  async function onSubmit(values: CreateDaycareScheduleInput) {
+    setIsSubmitting(true)
+
+    const result = schedule
+      ? await updateDaycareSchedule({
+          id: schedule.id,
+          ...values,
+        })
+      : await createDaycareSchedule(values)
+
+    setIsSubmitting(false)
+
+    if (!result.success) {
+      toast.add({
+        type: "error",
+        description: result.error,
+        priority: "high",
+      })
+      return
+    }
+
+    toast.add({
+      type: "success",
+      description: schedule
+        ? "Daycare schedule updated"
+        : "Daycare schedule created",
+      priority: "high",
+    })
+
+    onOpenChange(false)
+    form.reset()
   }
 
   return (
     <Dialog
       open={open}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
     >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditing
-              ? "Edit Daycare Schedule"
-              : "Add Daycare Schedule"}
+              ? "Edit daycare schedule"
+              : "New daycare schedule"}
           </DialogTitle>
 
           <DialogDescription>
-            Configure the days, resource, and date range for this daycare schedule.
+            Configure the days, resource, and time range for this
+            daycare schedule.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form
+            id="daycare-schedule"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
+            noValidate
+            className="sticky-form-content scroll-y-hidden"
           >
             <FieldGroup>
-              <Field>
-                <FieldLabel>Pet</FieldLabel>
+              <Field
+                data-invalid={
+                  !!form.formState.errors.pet_id
+                }
+              >
+                <FieldLabel htmlFor="daycare-schedule-pet">
+                  Pet
+                </FieldLabel>
 
                 <Select
-                  value={form.watch("pet_id")}
+                  value={petId}
                   onValueChange={(value) => {
                     if (!value) return
 
-                    const selectedPet = pets.find(
-                      (pet) => pet.id === value
+                    const pet = pets.find(
+                      (item) => item.id === value
                     )
 
-                    form.setValue("pet_id", value, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
+                    form.setValue(
+                      "pet_id",
+                      value,
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
 
-                    if (selectedPet?.owner_id) {
-                      form.setValue(
-                        "owner_id",
-                        selectedPet.owner_id,
-                        {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        }
-                      )
-                    }
+                    form.setValue(
+                      "owner_id",
+                      pet?.owner_id ?? "",
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
                   }}
                 >
-                  <SelectTrigger>
-                    <SelectValue>
-                      {pets.find(
-                        (pet) => pet.id === form.watch("pet_id")
-                      )?.name ?? "Select a pet"}
+                  <SelectTrigger
+                    id="daycare-schedule-pet"
+                    aria-invalid={
+                      !!form.formState.errors.pet_id
+                    }
+                  >
+                    <SelectValue placeholder="Select pet">
+                      {selectedPet
+                        ? `${selectedPet.name} · ${selectedPet.species}`
+                        : undefined}
                     </SelectValue>
                   </SelectTrigger>
 
@@ -221,48 +260,70 @@ export function DaycareScheduleFormDialog({
                         key={pet.id}
                         value={pet.id}
                       >
-                        {pet.name}
+                        {pet.name} · {pet.species}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
 
-                {form.formState.errors.pet_id && (
-                  <FieldError>
-                    {form.formState.errors.pet_id.message}
-                  </FieldError>
-                )}
+                <FieldDescription>
+                  Select the pet for this daycare schedule.
+                </FieldDescription>
+
+                <FieldError
+                  errors={[
+                    form.formState.errors.pet_id,
+                  ]}
+                />
               </Field>
 
-              <Field>
-                <FieldLabel>Owner</FieldLabel>
+              <Field
+                data-invalid={
+                  !!form.formState.errors.owner_id
+                }
+              >
+                <FieldLabel htmlFor="daycare-schedule-owner">
+                  Owner
+                </FieldLabel>
 
                 <Select
-                  value={form.watch("owner_id")}
+                  value={ownerId}
                   disabled
                 >
-                  <SelectTrigger>
-                    <SelectValue>
-                      {owners.find(
-                        (owner) =>
-                          owner.id === form.watch("owner_id")
-                      )?.name ?? "Select a pet first"}
+                  <SelectTrigger
+                    id="daycare-schedule-owner"
+                    aria-invalid={
+                      !!form.formState.errors.owner_id
+                    }
+                  >
+                    <SelectValue placeholder="Select a pet first">
+                      {selectedOwner?.name}
                     </SelectValue>
                   </SelectTrigger>
                 </Select>
 
-                {form.formState.errors.owner_id && (
-                  <FieldError>
-                    {form.formState.errors.owner_id.message}
-                  </FieldError>
-                )}
+                <FieldDescription>
+                  The owner is automatically selected from the pet.
+                </FieldDescription>
+
+                <FieldError
+                  errors={[
+                    form.formState.errors.owner_id,
+                  ]}
+                />
               </Field>
 
-              <Field>
-                <FieldLabel>Resource</FieldLabel>
+              <Field
+                data-invalid={
+                  !!form.formState.errors.resource_id
+                }
+              >
+                <FieldLabel htmlFor="daycare-schedule-resource">
+                  Resource
+                </FieldLabel>
 
                 <Select
-                  value={form.watch("resource_id") ?? ""}
+                  value={resourceId ?? ""}
                   onValueChange={(value) => {
                     form.setValue(
                       "resource_id",
@@ -274,187 +335,260 @@ export function DaycareScheduleFormDialog({
                     )
                   }}
                 >
-                  <SelectTrigger>
-                    <SelectValue>
-                      {resources.find(
-                        (resource) =>
-                          resource.id === form.watch("resource_id")
-                      )?.name ?? "Select a resource"}
+                  <SelectTrigger
+                    id="daycare-schedule-resource"
+                    aria-invalid={
+                      !!form.formState.errors.resource_id
+                    }
+                  >
+                    <SelectValue placeholder="Select a resource">
+                      {selectedResource
+                        ? `${selectedResource.name} · ${selectedResource.type}`
+                        : undefined}
                     </SelectValue>
                   </SelectTrigger>
 
                   <SelectContent>
                     {resources
-                      .filter((resource) => resource.is_active)
+                      .filter(
+                        (resource) => resource.is_active
+                      )
                       .map((resource) => (
                         <SelectItem
                           key={resource.id}
                           value={resource.id}
                         >
-                          {resource.name}
+                          {resource.name} · {resource.type}
                         </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
 
-                {form.formState.errors.resource_id && (
-                  <FieldError>
-                    {form.formState.errors.resource_id.message}
-                  </FieldError>
-                )}
+                <FieldDescription>
+                  Select the facility resource used by this schedule.
+                </FieldDescription>
+
+                <FieldError
+                  errors={[
+                    form.formState.errors.resource_id,
+                  ]}
+                />
               </Field>
 
-              <Controller
-                control={form.control}
-                name="days_of_week"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Days</FieldLabel>
+              <Field
+                data-invalid={
+                  !!form.formState.errors.days_of_week
+                }
+              >
+                <FieldLabel>Days</FieldLabel>
 
-                    <div className="grid grid-cols-7 gap-2">
-                      {DAYS.map((day) => {
-                        const selected =
-                          field.value?.includes(day.value)
+                <div className="grid grid-cols-7 gap-2">
+                  {DAYS.map((day) => {
+                    const selected =
+                      daysOfWeek?.includes(day.value)
 
-                        return (
-                          <Button
-                            key={day.value}
-                            type="button"
-                            variant={selected ? "default" : "outline"}
-                            className="h-9 px-2"
-                            onClick={() => {
-                              const current =
-                                field.value ?? []
+                    return (
+                      <Button
+                        key={day.value}
+                        type="button"
+                        variant={
+                          selected
+                            ? "default"
+                            : "outline"
+                        }
+                        className="h-9 px-2"
+                        onClick={() => {
+                          const current =
+                            daysOfWeek ?? []
 
-                              const next = selected
-                                ? current.filter(
-                                  (value) =>
-                                    value !== day.value
-                                )
-                                : [...current, day.value]
-
-                              field.onChange(
-                                next.sort((a, b) => a - b)
+                          const next = selected
+                            ? current.filter(
+                                (value) =>
+                                  value !== day.value
                               )
-                            }}
-                          >
-                            {day.label}
-                          </Button>
-                        )
-                      })}
-                    </div>
+                            : [
+                                ...current,
+                                day.value,
+                              ]
 
-                    <FieldDescription>
-                      Select the days when this daycare schedule
-                      should run.
-                    </FieldDescription>
-
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
-
-              <Controller
-                control={form.control}
-                name="starts_at"
-                render={({ field, fieldState }) => {
-                  const { date, time } = parseDateTime(field.value)
-
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <DatePickerTime
-                        date={date}
-                        onDateChange={(selectedDate) => {
-                          if (!selectedDate) {
-                            field.onChange("")
-                            return
-                          }
-
-                          const currentTime = field.value
-                            ? parseDateTime(field.value).time
-                            : format(new Date(), "HH:mm:ss")
-
-                          field.onChange(
-                            combineDateTime(
-                              selectedDate,
-                              currentTime
-                            )
+                          form.setValue(
+                            "days_of_week",
+                            next.sort(
+                              (a, b) => a - b
+                            ),
+                            {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            }
                           )
                         }}
-                        time={time}
-                        onTimeChange={(selectedTime) => {
-                          const currentDate =
-                            parseDateTime(field.value).date
+                      >
+                        {day.label}
+                      </Button>
+                    )
+                  })}
+                </div>
 
-                          field.onChange(
-                            combineDateTime(
-                              currentDate,
-                              selectedTime
-                            )
-                          )
-                        }}
-                        dateLabel="Start date"
-                        timeLabel="Start time"
-                        datePlaceholder="Select start date"
-                      />
+                <FieldDescription>
+                  Select the days when this daycare schedule should run.
+                </FieldDescription>
 
-                      <FieldError errors={[fieldState.error]} />
-                    </Field>
-                  )
-                }}
-              />
+                <FieldError
+                  errors={[
+                    form.formState.errors.days_of_week,
+                  ]}
+                />
+              </Field>
 
-              <Controller
-                control={form.control}
-                name="ends_at"
-                render={({ field, fieldState }) => {
-                  const { date, time } = parseDateTime(field.value)
+              <Field
+                data-invalid={
+                  !!form.formState.errors.starts_at
+                }
+              >
+                <FieldLabel>Start date and time</FieldLabel>
 
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <DatePickerTime
-                        date={date}
-                        onDateChange={(selectedDate) => {
-                          if (!selectedDate) {
-                            field.onChange("")
-                            return
-                          }
+                <DatePickerTime
+                  date={
+                    parseDateTime(startsAt).date
+                  }
+                  onDateChange={(date) => {
+                    if (!date) {
+                      form.setValue(
+                        "starts_at",
+                        "",
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                      return
+                    }
 
-                          const currentTime = field.value
-                            ? parseDateTime(field.value).time
-                            : format(new Date(), "HH:mm:ss")
+                    const currentTime =
+                      parseDateTime(startsAt).time ||
+                      new Date()
+                        .toTimeString()
+                        .slice(0, 8)
 
-                          field.onChange(
-                            combineDateTime(
-                              selectedDate,
-                              currentTime
-                            )
-                          )
-                        }}
-                        time={time}
-                        onTimeChange={(selectedTime) => {
-                          const currentDate =
-                            parseDateTime(field.value).date
+                    form.setValue(
+                      "starts_at",
+                      combineDateTime(
+                        date,
+                        currentTime
+                      ),
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
+                  }}
+                  time={
+                    parseDateTime(startsAt).time
+                  }
+                  onTimeChange={(time) => {
+                    const currentDate =
+                      parseDateTime(startsAt).date
 
-                          field.onChange(
-                            combineDateTime(
-                              currentDate,
-                              selectedTime
-                            )
-                          )
-                        }}
-                        dateLabel="End date"
-                        timeLabel="End time"
-                        datePlaceholder="Select end date"
-                      />
+                    form.setValue(
+                      "starts_at",
+                      combineDateTime(
+                        currentDate,
+                        time
+                      ),
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
+                  }}
+                  dateLabel="Start date"
+                  timeLabel="Start time"
+                  datePlaceholder="Select start date"
+                />
 
-                      <FieldError errors={[fieldState.error]} />
-                    </Field>
-                  )
-                }}
-              />
+                <FieldError
+                  errors={[
+                    form.formState.errors.starts_at,
+                  ]}
+                />
+              </Field>
 
-              <Field orientation="horizontal">
+              <Field
+                data-invalid={
+                  !!form.formState.errors.ends_at
+                }
+              >
+                <FieldLabel>End date and time</FieldLabel>
+
+                <DatePickerTime
+                  date={
+                    parseDateTime(endsAt).date
+                  }
+                  onDateChange={(date) => {
+                    if (!date) {
+                      form.setValue(
+                        "ends_at",
+                        "",
+                        {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        }
+                      )
+                      return
+                    }
+
+                    const currentTime =
+                      parseDateTime(endsAt).time ||
+                      new Date()
+                        .toTimeString()
+                        .slice(0, 8)
+
+                    form.setValue(
+                      "ends_at",
+                      combineDateTime(
+                        date,
+                        currentTime
+                      ),
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
+                  }}
+                  time={
+                    parseDateTime(endsAt).time
+                  }
+                  onTimeChange={(time) => {
+                    const currentDate =
+                      parseDateTime(endsAt).date
+
+                    form.setValue(
+                      "ends_at",
+                      combineDateTime(
+                        currentDate,
+                        time
+                      ),
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
+                  }}
+                  dateLabel="End date"
+                  timeLabel="End time"
+                  datePlaceholder="Select end date"
+                />
+
+                <FieldError
+                  errors={[
+                    form.formState.errors.ends_at,
+                  ]}
+                />
+              </Field>
+
+              <Field
+                orientation="horizontal"
+              >
                 <div className="flex-1">
                   <FieldLabel>Active</FieldLabel>
 
@@ -464,39 +598,53 @@ export function DaycareScheduleFormDialog({
                 </div>
 
                 <Switch
-                  checked={form.watch("is_active")}
+                  checked={isActive}
                   onCheckedChange={(checked) =>
-                    form.setValue("is_active", checked)
+                    form.setValue(
+                      "is_active",
+                      checked,
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }
+                    )
                   }
                 />
               </Field>
             </FieldGroup>
-
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleOpenChange(false)}
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={loading}
-              >
-                {loading && (
-                  <Loader2 className="size-4 animate-spin" />
-                )}
-
-                {isEditing
-                  ? "Save Changes"
-                  : "Create Schedule"}
-              </Button>
-            </div>
           </form>
         </Form>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            form="daycare-schedule"
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner
+                  size="sm"
+                  className="text-primary-foreground"
+                />
+                Saving…
+              </>
+            ) : isEditing ? (
+              "Save changes"
+            ) : (
+              "Create schedule"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

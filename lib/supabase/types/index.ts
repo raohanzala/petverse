@@ -919,32 +919,29 @@ export type RoomTransferInsert = Pick<
   | "notes"
 >
 
-export type RoomTransferListRow =
-  RoomTransferRow & {
-    reservation: {
-      id: string
-      pet: {
-        name: string
-        species: string
-      }
-      owner: {
-        name: string
-        phone: string
-      }
-    }
-
-    from_resource: {
-      id: string
+export type RoomTransferListRow = RoomTransferRow & {
+  reservation: {
+    id: string
+    pet: {
       name: string
-      type: FacilityResourceType
-    } | null
-
-    to_resource: {
-      id: string
+      species: string
+    }[]
+    owner: {
       name: string
-      type: FacilityResourceType
-    }
-  }
+      phone: string
+    }[]
+  }[]
+  from_resource: {
+    id: string
+    name: string
+    type: FacilityResourceType
+  }[]
+  to_resource: {
+    id: string
+    name: string
+    type: FacilityResourceType
+  }[]
+}
 
 export type RoomTransferUpdate =
   Partial<RoomTransferInsert>
@@ -962,6 +959,18 @@ export type ConversationRow = {
   id: string
 
   owner_id: string | null
+  assigned_employee_id: string | null
+
+  owner: {
+    id: string
+    name: string
+  } | null
+
+  assigned_employee: {
+    id: string
+    display_name: string
+  } | null
+
   channel: string
   external_id: string | null
 
@@ -971,7 +980,6 @@ export type ConversationRow = {
   quoted_amount: number | null
   lost_revenue: number | null
 
-  assigned_employee_id: string | null
   first_staff_response_at: string | null
 
   ai_handled: boolean
