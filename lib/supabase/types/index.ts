@@ -925,22 +925,24 @@ export type RoomTransferListRow = RoomTransferRow & {
     pet: {
       name: string
       species: string
-    }[]
+    } | null
     owner: {
       name: string
       phone: string
-    }[]
-  }[]
+    } | null
+  } | null
+
   from_resource: {
     id: string
     name: string
     type: FacilityResourceType
-  }[]
+  } | null
+
   to_resource: {
     id: string
     name: string
     type: FacilityResourceType
-  }[]
+  } | null
 }
 
 export type RoomTransferUpdate =

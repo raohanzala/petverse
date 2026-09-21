@@ -151,7 +151,7 @@ export async function listRoomTransfers(
     )
   }
 
-  return data ?? []
+  return (data ?? []) as unknown as RoomTransferListRow[]
 }
 
 export async function getRoomTransferById(

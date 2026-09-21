@@ -85,10 +85,10 @@ export function getRoomTransferColumns({
         return (
           <div>
             <p className="font-medium text-foreground">
-              {resource.name}
+              {resource?.name}
             </p>
             <Badge variant="completed" className="mt-1">
-              {resource.type}
+              {resource?.type}
             </Badge>
           </div>
         )
