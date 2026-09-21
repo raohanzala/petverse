@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { createClient } from "@/lib/supabase/server"
+
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN
 
 /**
  * Meta webhook verification
- *
- * Meta sends a GET request when we configure the webhook.
- * We verify that the token sent by Meta matches our secret token.
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -37,25 +36,24 @@ export async function GET(request: NextRequest) {
 
 /**
  * WhatsApp incoming webhook
- *
- * Meta will send POST requests here when a WhatsApp event occurs.
- *
- * We will implement message processing after
- * webhook verification is working.
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    console.log("WhatsApp webhook received:", body)
+    console.log(
+      "WhatsApp webhook received:",
+      JSON.stringify(body, null, 2),
+    )
 
     return NextResponse.json(
       {
         success: true,
+        received: true,
+        field: body?.field ?? null,
+        hasMessages: Boolean(body?.value?.messages),
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     )
   } catch (error) {
     console.error("WhatsApp webhook error:", error)
@@ -64,9 +62,7 @@ export async function POST(request: NextRequest) {
       {
         error: "Invalid webhook payload",
       },
-      {
-        status: 400,
-      },
+      { status: 400 },
     )
   }
 }
