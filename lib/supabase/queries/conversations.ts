@@ -3,8 +3,29 @@ import type { ConversationListFilters } from "@/lib/constants/conversations-filt
 import type { ConversationRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
 
-const CONVERSATION_COLUMNS =
-  "id, owner_id, channel, external_id, stage, closed_lost_reason, quoted_amount, lost_revenue, assigned_employee_id, first_staff_response_at, ai_handled, created_at, updated_at" as const
+const CONVERSATION_COLUMNS = `
+  id,
+  owner_id,
+  channel,
+  external_id,
+  stage,
+  closed_lost_reason,
+  quoted_amount,
+  lost_revenue,
+  assigned_employee_id,
+  first_staff_response_at,
+  ai_handled,
+  created_at,
+  updated_at,
+  owner:owners (
+    id,
+    name
+  ),
+  assigned_employee:employees (
+    id,
+    display_name
+  )
+` as const
 
 function escapeIlikePattern(value: string) {
   return value.replace(/[%_\\]/g, "\\$&")

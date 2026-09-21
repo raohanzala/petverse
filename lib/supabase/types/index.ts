@@ -964,12 +964,12 @@ export type ConversationRow = {
   owner: {
     id: string
     name: string
-  } | null
+  }[]
 
   assigned_employee: {
     id: string
     display_name: string
-  } | null
+  }[]
 
   channel: string
   external_id: string | null

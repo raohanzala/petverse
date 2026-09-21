@@ -147,7 +147,7 @@ export function getConversationColumns({
       ),
       cell: ({ row }) => (
         <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-          {row.original.owner_id ?? "Unmatched"}
+          {row.original.owner?.[0]?.name ?? "Unmatched"}
         </code>
       ),
     },
@@ -161,7 +161,7 @@ export function getConversationColumns({
       ),
       cell: ({ row }) => (
         <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-          {row.original.assigned_employee_id ?? "Unassigned"}
+          {row.original.assigned_employee?.[0].display_name ?? "Unassigned"}
         </code>
       ),
     },
