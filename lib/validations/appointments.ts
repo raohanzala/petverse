@@ -3,7 +3,11 @@ import { z } from "zod"
 const appointmentFields = {
   owner_id: z.string().uuid("Invalid owner id"),
 
-  pet_id: z.string().uuid("Invalid pet id"),
+  pet_id: z
+    .string()
+    .uuid("Invalid pet id")
+    .optional()
+    .nullable(),
 
   service_id: z
     .string()
@@ -82,14 +86,56 @@ const appointmentFields = {
 
 const appointmentObjectSchema = z.object(appointmentFields)
 
+const serviceOrPackageRule = (
+  data: z.infer<typeof appointmentObjectSchema>,
+) =>
+  (data.service_id !== null && data.service_id !== undefined) ||
+  (data.package_id !== null && data.package_id !== undefined)
+
+export function createAppointmentSchemaForMode(
+  petEnabled: boolean,
+) {
+  return appointmentObjectSchema
+    .refine(serviceOrPackageRule, {
+      message: "Select a service or package",
+      path: ["service_id"],
+    })
+    .superRefine((data, ctx) => {
+      if (petEnabled && !data.pet_id) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Pet is required",
+          path: ["pet_id"],
+        })
+      }
+    })
+}
+
+export function updateAppointmentSchemaForMode(
+  petEnabled: boolean,
+) {
+  return appointmentObjectSchema
+    .partial()
+    .extend({
+      id: z.string().uuid("Invalid appointment id"),
+    })
+    .superRefine((data, ctx) => {
+      if (petEnabled && "pet_id" in data && !data.pet_id) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Pet is required",
+          path: ["pet_id"],
+        })
+      }
+    })
+}
+
 export const appointmentBaseSchema = appointmentObjectSchema.refine(
-  (data) =>
-    (data.service_id !== null && data.service_id !== undefined) ||
-    (data.package_id !== null && data.package_id !== undefined),
+  serviceOrPackageRule,
   {
     message: "Select a service or package",
     path: ["service_id"],
-  }
+  },
 )
 
 export const createAppointmentSchema = appointmentBaseSchema

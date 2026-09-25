@@ -5,6 +5,7 @@ import {
   type AdminColumnDef,
 } from "@/components/shared/data-table"
 import { Badge } from "@/components/ui/badge"
+import { useFeatures } from "@/lib/features/feature-context"
 import type { AppointmentRow } from "@/lib/supabase/types"
 
 const STATUS_LABELS: Record<
@@ -40,8 +41,10 @@ function formatAppointmentDate(value: string) {
   }).format(new Date(value))
 }
 
-export function getAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
-  return [
+export function useAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
+  const { petEnabled } = useFeatures()
+
+  const columns: AdminColumnDef<AppointmentRow>[] = [
     {
       accessorKey: "starts_at",
       header: ({ column }) => (
@@ -80,7 +83,10 @@ export function getAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
         </div>
       ),
     },
-    {
+  ]
+
+  if (petEnabled) {
+    columns.push({
       accessorKey: "pet",
       header: ({ column }) => (
         <DataTableColumnHeader
@@ -98,7 +104,10 @@ export function getAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
           </p>
         </div>
       ),
-    },
+    })
+  }
+
+  columns.push(
     {
       accessorKey: "service",
       header: ({ column }) => (
@@ -159,6 +168,8 @@ export function getAppointmentColumns(): AdminColumnDef<AppointmentRow>[] {
           })}
         </span>
       ),
-    }
-  ]
+    },
+  )
+
+  return columns
 }

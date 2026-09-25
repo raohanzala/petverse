@@ -46,11 +46,13 @@ import type {
 } from "@/lib/supabase/types"
 import {
     createAppointmentSchema,
+    createAppointmentSchemaForMode,
     type CreateAppointmentInput,
 } from "@/lib/validations/appointments"
 import { format } from "date-fns"
 import { DatePickerTime } from "../ui/date-picker-with-time"
 import { parseDateTime } from "@/lib/utils"
+import { useFeatures } from "@/lib/features/feature-context"
 
 type AppointmentFormDialogProps = {
     open: boolean
@@ -66,7 +68,7 @@ type AppointmentFormDialogProps = {
 
 const defaultValues: CreateAppointmentInput = {
     owner_id: "",
-    pet_id: "",
+    pet_id: null,
     service_id: null,
     package_id: null,
     employee_id: null,
@@ -112,11 +114,14 @@ export function AppointmentFormDialog({
     onSuccess,
 }: AppointmentFormDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const { petEnabled } = useFeatures()
 
     const isEditing = Boolean(appointment)
 
     const form = useForm<CreateAppointmentInput>({
-        resolver: zodResolver(createAppointmentSchema),
+        resolver: zodResolver(
+            createAppointmentSchemaForMode(petEnabled),
+        ),
         defaultValues,
     })
 
@@ -126,7 +131,9 @@ export function AppointmentFormDialog({
         if (appointment) {
             form.reset({
                 owner_id: appointment.owner_id,
-                pet_id: appointment.pet_id,
+                pet_id: petEnabled
+                    ? appointment.pet_id
+                    : null,
                 service_id: appointment.service_id,
                 package_id: appointment.package_id,
                 employee_id: appointment.employee_id,
@@ -149,7 +156,7 @@ export function AppointmentFormDialog({
         }
 
         form.reset(defaultValues)
-    }, [open, appointment, form])
+    }, [open, appointment, form, petEnabled])
 
     const selectedOwnerId = form.watch("owner_id")
     const selectedPetId = form.watch("pet_id")
@@ -187,17 +194,26 @@ export function AppointmentFormDialog({
             shouldValidate: true,
         })
 
+        if (!petEnabled) {
+            form.setValue("pet_id", null, {
+                shouldDirty: true,
+                shouldValidate: false,
+            })
+
+            return
+        }
+
         const ownerPets = pets.filter(
-            (pet) => pet.owner_id === ownerId
+            (pet) => pet.owner_id === ownerId,
         )
 
         form.setValue(
             "pet_id",
-            ownerPets.length === 1 ? ownerPets[0].id : "",
+            ownerPets.length === 1 ? ownerPets[0].id : null,
             {
                 shouldDirty: true,
                 shouldValidate: true,
-            }
+            },
         )
     }
 
@@ -339,8 +355,9 @@ export function AppointmentFormDialog({
                     </DialogTitle>
 
                     <DialogDescription>
-                        Create an appointment and assign it to a pet,
-                        service, and staff member.
+                        {petEnabled
+                            ? "Create an appointment and assign it to a pet, service, and staff member."
+                            : "Create an appointment and assign it to a service and staff member."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -400,51 +417,59 @@ export function AppointmentFormDialog({
                                 />
                             </Field>
 
-                            <Field data-invalid={!!form.formState.errors.pet_id} >
-                                <FieldLabel htmlFor="appointment-pet"> Pet </FieldLabel>
-                                <Select
-                                    value={selectedPetId}
-                                    onValueChange={(value) => {
-                                        if (!value) return
+                            {petEnabled ? (
+                                <Field data-invalid={!!form.formState.errors.pet_id}>
+                                    <FieldLabel htmlFor="appointment-pet">
+                                        Pet
+                                    </FieldLabel>
 
-                                        form.setValue("pet_id", value, {
-                                            shouldDirty: true,
-                                            shouldValidate: true,
-                                        })
-                                    }}
-                                    disabled={!selectedOwnerId}
-                                >
-                                    <SelectTrigger
-                                        id="appointment-pet"
-                                        aria-invalid={!!form.formState.errors.pet_id}
+                                    <Select
+                                        value={selectedPetId ?? ""}
+                                        onValueChange={(value) => {
+                                            if (!value) return
+
+                                            form.setValue("pet_id", value, {
+                                                shouldDirty: true,
+                                                shouldValidate: true,
+                                            })
+                                        }}
+                                        disabled={!selectedOwnerId}
                                     >
-                                        <SelectValue
-                                            placeholder={
-                                                selectedOwnerId
-                                                    ? "Select pet"
-                                                    : "Select owner first"
-                                            }
+                                        <SelectTrigger
+                                            id="appointment-pet"
+                                            aria-invalid={!!form.formState.errors.pet_id}
                                         >
-                                            {selectedPet?.name ??
-                                                (selectedOwnerId
-                                                    ? "Select pet"
-                                                    : "Select owner first")}
-                                        </SelectValue>
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        {ownerPets.map((pet) => (
-                                            <SelectItem
-                                                key={pet.id}
-                                                value={pet.id}
+                                            <SelectValue
+                                                placeholder={
+                                                    selectedOwnerId
+                                                        ? "Select pet"
+                                                        : "Select owner first"
+                                                }
                                             >
-                                                {pet.name} — {pet.species}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <FieldError errors={[form.formState.errors.pet_id,]} />
-                            </Field>
+                                                {selectedPet?.name ??
+                                                    (selectedOwnerId
+                                                        ? "Select pet"
+                                                        : "Select owner first")}
+                                            </SelectValue>
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {ownerPets.map((pet) => (
+                                                <SelectItem
+                                                    key={pet.id}
+                                                    value={pet.id}
+                                                >
+                                                    {pet.name} — {pet.species}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <FieldError
+                                        errors={[form.formState.errors.pet_id]}
+                                    />
+                                </Field>
+                            ) : null}
 
                             <Field
                                 data-invalid={

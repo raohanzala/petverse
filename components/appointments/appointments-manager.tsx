@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 
-import { getAppointmentColumns } from "@/components/appointments/appointments-columns"
+import { useAppointmentColumns } from "@/components/appointments/appointments-columns"
 import { AppointmentsFilters } from "@/components/appointments/appointments-filters"
 import { AppointmentFormDialog } from "@/components/appointments/appointment-form-dialog"
 import { DataTable } from "@/components/shared/data-table"
@@ -103,11 +103,7 @@ export function AppointmentsManager({
     refreshList()
   }
 
-  const columns = useMemo(
-    () =>
-      getAppointmentColumns(),
-    []
-  )
+  const columns = useAppointmentColumns()
 
   const hasFilters =
     Boolean(filters.search) ||

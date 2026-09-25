@@ -12,12 +12,13 @@ import {
 import { createClient } from "@/lib/supabase/server"
 import type { AppointmentRow } from "@/lib/supabase/types"
 import {
-  createAppointmentSchema,
+  createAppointmentSchemaForMode,
+  updateAppointmentSchemaForMode,
   deleteAppointmentSchema,
-  updateAppointmentSchema,
   type CreateAppointmentInput,
   type UpdateAppointmentInput,
 } from "@/lib/validations/appointments"
+import { getFeatureConfig } from "@/lib/features/get-feature-config"
 
 const REVALIDATE_PATHS = [
   "/admin/appointments",
@@ -44,7 +45,11 @@ export async function createAppointment(
 ): Promise<MutationResult<AppointmentRow>> {
   await requireStaff()
 
-  const parsed = createAppointmentSchema.safeParse({
+  const { petEnabled } = await getFeatureConfig()
+
+  const parsed = createAppointmentSchemaForMode(
+    petEnabled,
+  ).safeParse({
     ...input,
     notes: normalizeOptionalText(input.notes),
     cancel_reason: normalizeOptionalText(input.cancel_reason),
@@ -62,7 +67,7 @@ export async function createAppointment(
     .from("appointments")
     .insert({
       owner_id: parsed.data.owner_id,
-      pet_id: parsed.data.pet_id,
+      pet_id: parsed.data.pet_id ?? null,
       service_id: parsed.data.service_id ?? null,
       package_id: parsed.data.package_id ?? null,
       employee_id: parsed.data.employee_id ?? null,
@@ -101,7 +106,11 @@ export async function updateAppointment(
 ): Promise<MutationResult<AppointmentRow>> {
   await requireStaff()
 
-  const parsed = updateAppointmentSchema.safeParse({
+  const { petEnabled } = await getFeatureConfig()
+
+  const parsed = updateAppointmentSchemaForMode(
+    petEnabled,
+  ).safeParse({
     ...input,
     notes:
       input.notes !== undefined

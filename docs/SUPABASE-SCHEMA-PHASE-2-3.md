@@ -844,7 +844,7 @@ create index idx_campaign_blackout on campaign_blackout_periods(campaign_id);
 
 | Column | Type | Notes |
 |--------|------|-------|
-| `id` | uuid PK | |
+| `id` | uuid PK | | 
 | `name` | text | |
 | `body_html` | text | Template HTML |
 | `version` | int | default 1 |

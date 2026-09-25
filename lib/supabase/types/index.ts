@@ -382,7 +382,7 @@ export type AppointmentSource =
 export type AppointmentRow = {
   id: string
   owner_id: string
-  pet_id: string
+  pet_id: string | null
   service_id: string | null
   package_id: string | null
   employee_id: string | null
@@ -409,7 +409,7 @@ export type AppointmentRow = {
   pet: {
     name: string
     species: string
-  }
+  } | null
 
   service: {
     name: string
@@ -1639,3 +1639,14 @@ export type ProductSupplierOption = {
   id: string
   name: string
 }
+
+export const APP_MODES = {
+  PET: "pet",
+  GENERAL: "general",
+} as const
+
+export type AppMode = (typeof APP_MODES)[keyof typeof APP_MODES]
+
+export const DEFAULT_APP_MODE: AppMode = APP_MODES.PET
+
+export const APP_MODE_COOKIE = "admin_view_mode"

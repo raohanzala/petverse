@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/command"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ADMIN_NAV_GROUPS } from "@/lib/constants/admin-nav"
+import { AppModeToggle } from "./app-mode-toggle"
 
 export function AdminHeader({ user }: { user: AdminUserInfo }) {
   const router = useRouter()
@@ -98,6 +99,7 @@ export function AdminHeader({ user }: { user: AdminUserInfo }) {
       </CommandDialog>
 
       <div className="ml-auto flex items-center gap-2">
+        <AppModeToggle/>
         <AdminThemeToggle />
         <button
           type="button"

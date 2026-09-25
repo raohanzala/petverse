@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import type { AppointmentListFilters } from "@/lib/constants/appointment-filters"
 import type { AppointmentRow } from "@/lib/supabase/types"
 import { getSupabaseErrorMessage } from "@/lib/supabase/errors"
+import { getFeatureConfig } from "@/lib/features/get-feature-config"
 
 const APPOINTMENT_COLUMNS = `
   id,
@@ -93,7 +94,8 @@ type RawAppointmentRow = Omit<
 }
 
 function normalizeAppointment(
-  row: RawAppointmentRow
+  row: RawAppointmentRow,
+  petEnabled: boolean,
 ): AppointmentRow {
   const owner = Array.isArray(row.owner)
     ? row.owner[0]
@@ -116,53 +118,54 @@ function normalizeAppointment(
     : row.employee
 
   const preferredEmployee = Array.isArray(
-    row.preferred_employee
+    row.preferred_employee,
   )
     ? row.preferred_employee[0]
     : row.preferred_employee
 
-  // Owner and pet are required for every appointment.
-  if (!owner || !pet) {
+  if (!owner) {
     throw new Error(
-      `Appointment ${row.id} is missing owner or pet relation`
+      `Appointment ${row.id} is missing owner relation`,
     )
   }
 
-  // Service is required only when service_id exists.
+  // if (petEnabled && !pet) {
+  //   throw new Error(
+  //     `Appointment ${row.id} is missing pet relation`,
+  //   )
+  // }
+
   if (row.service_id && !service) {
     throw new Error(
-      `Appointment ${row.id} references a missing service`
+      `Appointment ${row.id} references a missing service`,
     )
   }
 
-  // Package is required only when package_id exists.
   if (row.package_id && !packageRelation) {
     throw new Error(
-      `Appointment ${row.id} references a missing package`
+      `Appointment ${row.id} references a missing package`,
     )
   }
 
-  // Employee is required only when employee_id exists.
   if (row.employee_id && !employee) {
     throw new Error(
-      `Appointment ${row.id} references a missing employee`
+      `Appointment ${row.id} references a missing employee`,
     )
   }
 
-  // Preferred employee is required only when preferred_employee_id exists.
   if (
     row.preferred_employee_id &&
     !preferredEmployee
   ) {
     throw new Error(
-      `Appointment ${row.id} references a missing preferred employee`
+      `Appointment ${row.id} references a missing preferred employee`,
     )
   }
 
   return {
     ...row,
     owner,
-    pet,
+    pet: pet ?? null,
     service: service ?? null,
     package: packageRelation ?? null,
     employee: employee ?? null,
@@ -174,6 +177,7 @@ function normalizeAppointment(
 export async function listAppointments(
   filters: AppointmentListFilters = {}
 ): Promise<AppointmentRow[]> {
+  const { petEnabled } = await getFeatureConfig()
   const supabase = await createClient()
 
   const {
@@ -247,13 +251,16 @@ export async function listAppointments(
     )
   }
 
-  return (data ?? []).map(normalizeAppointment)
+  return (data ?? []).map((row) =>
+    normalizeAppointment(row, petEnabled)
+  )
 }
 
 /** Upcoming appointments — active appointment statuses only */
 export async function listUpcomingAppointments(): Promise<
   AppointmentRow[]
 > {
+  const { petEnabled } = await getFeatureConfig()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -272,12 +279,13 @@ export async function listUpcomingAppointments(): Promise<
     )
   }
 
-  return (data ?? []).map(normalizeAppointment)
+  return (data ?? []).map((row) => normalizeAppointment(row, petEnabled))
 }
 
 export async function listAppointmentsByPetId(
   petId: string
 ): Promise<AppointmentRow[]> {
+  const { petEnabled } = await getFeatureConfig()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -295,12 +303,13 @@ export async function listAppointmentsByPetId(
     )
   }
 
-  return (data ?? []).map(normalizeAppointment)
+  return (data ?? []).map((row) => normalizeAppointment(row, petEnabled))
 }
 
 export async function listAppointmentsByOwnerId(
   ownerId: string
 ): Promise<AppointmentRow[]> {
+  const { petEnabled } = await getFeatureConfig()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -318,12 +327,13 @@ export async function listAppointmentsByOwnerId(
     )
   }
 
-  return (data ?? []).map(normalizeAppointment)
+  return (data ?? []).map((row) => normalizeAppointment(row, petEnabled))
 }
 
 export async function getAppointmentById(
   id: string
 ): Promise<AppointmentRow | null> {
+  const { petEnabled } = await getFeatureConfig()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -341,5 +351,5 @@ export async function getAppointmentById(
     )
   }
 
-  return data ? normalizeAppointment(data) : null
+  return data ? normalizeAppointment(data, petEnabled) : null
 }

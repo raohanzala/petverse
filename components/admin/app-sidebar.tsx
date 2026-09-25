@@ -23,10 +23,12 @@ import {
   SidebarRail,
   useSidebar
 } from "@/components/ui/sidebar"
+import { useFeatures } from "@/lib/features/feature-context"
 
 export function AppSidebar({ user }: { user: AdminUserInfo }) {
   const pathname = usePathname()
   const { isMobile, setOpenMobile } = useSidebar()
+  const { features } = useFeatures()
 
   return (
     <Sidebar
@@ -49,38 +51,50 @@ export function AppSidebar({ user }: { user: AdminUserInfo }) {
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-3">
-        {ADMIN_NAV_GROUPS.map((group) => (
-          <SidebarGroup key={group.label ?? group.items[0]?.href}>
-            {group.label ? (
-              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            ) : null}
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => {
-                  const isActive = isAdminNavActive(pathname, item.href)
+        {ADMIN_NAV_GROUPS.map((group) => {
+          const visibleItems = group.items.filter(
+            (item) =>
+              !item.feature || features[item.feature],
+          )
 
-                  return (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        render={<Link href={item.href} />}
-                        tooltip={item.title}
-                        onClick={() => {
-                          if (isMobile) {
-                            setOpenMobile(false)
-                          }
-                        }}
-                      >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+          if (visibleItems.length === 0) {
+            return null
+          }
+
+          return (
+            <SidebarGroup key={group.label ?? group.items[0]?.href}>
+              {group.label ? (
+                <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              ) : null}
+
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {visibleItems.map((item) => {
+                    const isActive = isAdminNavActive(pathname, item.href)
+
+                    return (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          render={<Link href={item.href} />}
+                          tooltip={item.title}
+                          onClick={() => {
+                            if (isMobile) {
+                              setOpenMobile(false)
+                            }
+                          }}
+                        >
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )
+        })}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-2">

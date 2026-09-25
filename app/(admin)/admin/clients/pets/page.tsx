@@ -7,6 +7,8 @@ import {
   listPets,
 } from "@/lib/supabase/queries/pets"
 import { listOwnersForSelection } from "@/lib/supabase/queries/owners"
+import { requireFeature } from "@/lib/features/require-feature"
+import { APP_FEATURES } from "@/lib/features/feature-registry"
 
 type PetsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -15,6 +17,7 @@ type PetsPageProps = {
 export default async function PetsPage({
   searchParams,
 }: PetsPageProps) {
+  await requireFeature(APP_FEATURES.PETS)
   const params = await searchParams
 
   const filters = parsePetListFilters(params)

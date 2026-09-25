@@ -31,11 +31,13 @@ import {
   UsersRound,
   type LucideIcon,
 } from "lucide-react"
+import { APP_FEATURES, AppFeature } from "../features/feature-registry"
 
 export type AdminNavItem = {
   title: string
   href: string
   icon: LucideIcon
+  feature?: AppFeature
 }
 
 export type AdminNavGroup = {
@@ -66,11 +68,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Boarding",
         href: "/admin/schedule/boarding",
         icon: Hotel,
+        feature: APP_FEATURES.BOARDING,
       },
       {
         title: "Daycare",
         href: "/admin/schedule/daycare",
         icon: Dog,
+        feature: APP_FEATURES.DAYCARE,
       },
     ],
   },
@@ -82,6 +86,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Pets",
         href: "/admin/clients/pets",
         icon: PawPrint,
+        feature: APP_FEATURES.PETS,
       },
       {
         title: "Owners",
@@ -133,6 +138,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Daily Updates",
         href: "/admin/communications/daily-updates",
         icon: Newspaper,
+        feature: APP_FEATURES.PET_UPDATES,
       },
     ],
   },
@@ -192,6 +198,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         title: "Pet Vaccinations",
         href: "/admin/compliance/pet-vaccinations",
         icon: ShieldCheck,
+        feature: APP_FEATURES.VACCINATIONS,
       },
       {
         title: "Consent Form Templates",
